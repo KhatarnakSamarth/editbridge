@@ -129,7 +129,7 @@ export default function EditorsDirectoryPage() {
                 >
                   <div>
                     {/* Top row */}
-                    <div className="flex items-start justify-between gap-3 pb-3.5 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3.5 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex items-start gap-3.5">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -158,7 +158,7 @@ export default function EditorsDirectoryPage() {
                         </div>
                       </div>
 
-                      <div className="text-right flex-shrink-0">
+                      <div className="self-end sm:self-auto text-right flex-shrink-0">
                         <span className="text-[10px] text-slate-400 block font-mono font-medium">FROM</span>
                         <strong className="text-sm font-mono text-emerald-600 dark:text-emerald-400 font-bold">
                           ${editor.fixed_rate_starting}

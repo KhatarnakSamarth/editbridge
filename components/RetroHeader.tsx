@@ -22,8 +22,11 @@ import {
   ArrowRight,
   Sparkles,
   ChevronDown,
+  Palette,
+  Check,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
+import { AccentTheme } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
 
 export function RetroHeader() {
@@ -37,10 +40,21 @@ export function RetroHeader() {
     toggleSound,
     themeMode,
     toggleThemeMode,
+    accentTheme,
+    setAccentTheme,
   } = useEditBridge();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  const THEMES: { id: AccentTheme; label: string; color: string; border: string }[] = [
+    { id: 'CYAN', label: 'Electric Cyan', color: 'bg-cyan-500', border: 'border-cyan-400' },
+    { id: 'PURPLE', label: 'Neon Violet', color: 'bg-purple-500', border: 'border-purple-400' },
+    { id: 'EMERALD', label: 'Emerald Vault', color: 'bg-emerald-500', border: 'border-emerald-400' },
+    { id: 'AMBER', label: 'Sunset Amber', color: 'bg-amber-500', border: 'border-amber-400' },
+    { id: 'ROSE', label: 'Cyber Rose', color: 'bg-rose-500', border: 'border-rose-400' },
+  ];
 
   // Dynamic Navigation Links strictly tailored by Authentication & Role
   const navLinks = React.useMemo(() => {
@@ -137,7 +151,55 @@ export function RetroHeader() {
         </nav>
 
         {/* Right: Controls & User Authentication Profile */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Accent Color Palette Switcher */}
+          <div className="relative">
+            <button
+              onClick={() => setPaletteOpen(!paletteOpen)}
+              title="Change UI Accent Theme"
+              aria-label="UI Accent Theme Palette"
+              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+            >
+              <Palette className="w-4 h-4 text-cyan-500" />
+            </button>
+
+            {paletteOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setPaletteOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white dark:bg-[#0c1222] border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-2 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Accent Color Theme
+                  </div>
+                  {THEMES.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setAccentTheme(t.id);
+                        setPaletteOpen(false);
+                      }}
+                      className={`w-full px-2.5 py-1.5 rounded-xl flex items-center justify-between text-left transition-colors cursor-pointer ${
+                        accentTheme === t.id
+                          ? 'bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`w-3.5 h-3.5 rounded-full ${t.color} border border-white/20`} />
+                        <span className="text-[11px]">{t.label}</span>
+                      </div>
+                      {accentTheme === t.id && (
+                        <Check className="w-3.5 h-3.5 text-cyan-500" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
           {/* Theme Mode Toggle */}
           <button
             onClick={toggleThemeMode}
@@ -157,7 +219,7 @@ export function RetroHeader() {
             onClick={toggleSound}
             aria-label={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
             title={soundEnabled ? 'Sound: ON' : 'Sound: OFF'}
-            className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+            className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hidden sm:flex items-center justify-center transition-colors shadow-xs cursor-pointer"
           >
             {soundEnabled ? (
               <Volume2 className="w-4 h-4 text-emerald-500" />
@@ -337,6 +399,31 @@ export function RetroHeader() {
               </Link>
             );
           })}
+
+          {/* Mobile Accent Theme Swatches */}
+          <div className="pt-2 pb-1 border-t border-slate-200 dark:border-slate-800">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2">
+              Color Accent Theme
+            </span>
+            <div className="grid grid-cols-5 gap-1.5">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setAccentTheme(t.id);
+                  }}
+                  className={`p-2 rounded-xl flex flex-col items-center gap-1 text-[9px] font-bold border transition-all ${
+                    accentTheme === t.id
+                      ? 'border-cyan-400 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                      : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  <span className={`w-3.5 h-3.5 rounded-full ${t.color}`} />
+                  <span className="truncate max-w-[40px]">{t.id}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
             {isAuthenticated ? (

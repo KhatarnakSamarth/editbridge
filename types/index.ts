@@ -205,3 +205,6 @@ export interface Notification {
   read: boolean;
   created_at: string;
 }
+
+export type AccentTheme = 'CYAN' | 'PURPLE' | 'EMERALD' | 'AMBER' | 'ROSE';
+

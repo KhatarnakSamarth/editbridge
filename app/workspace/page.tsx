@@ -316,10 +316,10 @@ function ProjectWorkspaceContent() {
       </div>
 
       {/* Modern Workspace Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto select-none">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto select-none no-scrollbar">
         <button
           onClick={() => handleTabChange('REVIEW')}
-          className={`px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'REVIEW'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -331,7 +331,7 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('FILES')}
-          className={`px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'FILES'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -343,7 +343,7 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('CHAT')}
-          className={`px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'CHAT'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -355,7 +355,7 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('MILESTONES')}
-          className={`px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'MILESTONES'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -367,7 +367,7 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('BRIEF')}
-          className={`px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'BRIEF'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'

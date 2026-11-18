@@ -16,6 +16,8 @@ import {
   Zap,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
+import { Hero3DVisual } from '@/components/Hero3DVisual';
+import { CursorFollower } from '@/components/CursorFollower';
 import { useEditBridge } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
 
@@ -44,31 +46,37 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 font-sans">
+    <div className="relative max-w-6xl mx-auto px-4 py-8 space-y-8 font-sans">
+      {/* Interactive Cursor Glow (Automatically disabled on mobile touch devices) */}
+      <CursorFollower />
+
       {/* Hero Container */}
       <RetroWindow
         title="EDITBRIDGE WORKSPACE — CREATOR &amp; EDITOR COLLABORATION HUB"
         icon={<Film className="w-4 h-4 text-cyan-500" />}
-        className="w-full shadow-2xl"
+        className="w-full shadow-2xl relative overflow-hidden"
       >
         <div className="space-y-6">
-          {/* Main Hero Banner */}
-          <div className="bg-gradient-to-b from-blue-950/40 via-indigo-950/20 to-slate-900/40 dark:from-[#0b1329] dark:via-[#090e1c] dark:to-[#070b14] text-slate-900 dark:text-white p-7 sm:p-12 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center relative overflow-hidden transition-colors">
-            <div className="inline-flex items-center gap-2 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-xs">
+          {/* Main Hero Banner with 3D Cyber Grid */}
+          <div className="bg-grid-cyber bg-gradient-to-b from-blue-950/40 via-indigo-950/20 to-slate-900/40 dark:from-[#0b1329] dark:via-[#090e1c] dark:to-[#070b14] text-slate-900 dark:text-white p-6 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center relative overflow-hidden transition-colors">
+            {/* Ambient Background Glow Effect */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-gradient-to-b from-cyan-500/20 to-transparent blur-3xl pointer-events-none -z-0" />
+
+            <div className="inline-flex items-center gap-2 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-xs z-10">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>THE DIGITAL WORKSPACE FOR MODERN VIDEO CREATORS &amp; EDITORS</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-tight z-10">
               One Workspace to Brief, Review &amp; Deliver High-Retention Videos.
             </h1>
 
-            <p className="mt-4 text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-2xl font-sans leading-relaxed">
+            <p className="mt-4 text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-2xl font-sans leading-relaxed z-10">
               Stop scattering instructions across WhatsApp, Drive links, and messy notes. EditBridge brings editor discovery, timestamp video feedback, revision limits, and 30/70 milestone payments into one structured workspace.
             </p>
 
             {/* Two Action Paths */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
+            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg z-10">
               <Link
                 href="/workspace"
                 onClick={() => retroSound.playDing()}
@@ -88,8 +96,13 @@ export default function LandingPage() {
               </Link>
             </div>
 
+            {/* Interactive 3D Video Studio Perspective Visual */}
+            <div className="w-full mt-8 z-10">
+              <Hero3DVisual />
+            </div>
+
             {/* Production trust pill */}
-            <div className="mt-6 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+            <div className="mt-6 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold z-10">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Production Infrastructure • 30/70 Escrow Protocol • Supabase Cloud Active</span>
             </div>

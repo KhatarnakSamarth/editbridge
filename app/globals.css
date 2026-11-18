@@ -20,6 +20,8 @@
   --accent-blue: #3b82f6;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --primary-accent: #00f5ff;
 }
 
 html.light,
@@ -37,6 +39,30 @@ body.light {
   --accent-blue: #2563eb;
   --accent-emerald: #059669;
   --accent-amber: #d97706;
+  --accent-rose: #e11d48;
+  --primary-accent: #0284c7;
+}
+
+/* Accent Color Themes */
+html.theme-purple {
+  --primary-accent: #a855f7;
+  --border-neon: rgba(168, 85, 247, 0.4);
+}
+html.theme-emerald {
+  --primary-accent: #10b981;
+  --border-neon: rgba(16, 185, 129, 0.4);
+}
+html.theme-amber {
+  --primary-accent: #f59e0b;
+  --border-neon: rgba(245, 158, 11, 0.4);
+}
+html.theme-rose {
+  --primary-accent: #f43f5e;
+  --border-neon: rgba(244, 63, 94, 0.4);
+}
+html.theme-cyan {
+  --primary-accent: #00f5ff;
+  --border-neon: rgba(0, 245, 255, 0.3);
 }
 
 body {
@@ -84,7 +110,6 @@ html.light .neon-border:hover {
   box-shadow: 0 0 16px rgba(59, 130, 246, 0.35), 0 0 32px rgba(59, 130, 246, 0.15);
 }
 
-/* Modern Card Frame */
 .glass-panel {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
@@ -93,9 +118,36 @@ html.light .neon-border:hover {
   transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* 3D Perspective Transformations */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.perspective-2000 {
+  perspective: 2000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* 3D Matrix / Cyber Grid */
+.bg-grid-cyber {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+html.light .bg-grid-cyber {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
 /* Accessibility Focus Ring */
 *:focus-visible {
-  outline: 2px solid var(--accent-cyan) !important;
+  outline: 2px solid var(--primary-accent) !important;
   outline-offset: 2px !important;
 }
 
@@ -115,7 +167,7 @@ html.light .neon-border:hover {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--accent-cyan);
+  background-color: var(--primary-accent);
 }
 
 /* Smooth Video Timeline Scrubber */
