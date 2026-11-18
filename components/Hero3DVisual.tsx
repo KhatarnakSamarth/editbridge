@@ -80,28 +80,37 @@ export function Hero3DVisual({ inBackground = false }: Hero3DVisualProps) {
             </div>
           </div>
 
-          {/* Video Preview Frame */}
-          <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 border border-slate-800/80 shadow-inner">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80"
-              alt="Video timeline preview"
-              className="w-full h-full object-cover opacity-80"
+          {/* Video Preview Frame with Real Local 4K Sample Video */}
+          <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border border-slate-800/80 shadow-inner">
+            <video
+              src="/videos/sample-draft-v1.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-90 transition-opacity duration-300"
             />
 
-            {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+            {/* Subtle Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
 
-            {/* Center Play Button Overlay */}
-            <div className="absolute inset-0 m-auto w-12 h-12 rounded-2xl bg-cyan-500/90 text-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/30 backdrop-blur-xs">
+            {/* Center Play Indicator */}
+            <div className="absolute inset-0 m-auto w-12 h-12 rounded-2xl bg-cyan-500/90 text-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/30 backdrop-blur-xs pointer-events-none">
               <Play className="w-5 h-5 fill-current ml-0.5" />
             </div>
 
+            {/* Frame Watermark Overlay */}
+            <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
+              <span className="px-2.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md text-[10px] font-mono text-cyan-400 border border-cyan-500/40 font-semibold shadow-xs">
+                4K PRORES 422HQ • 23.98 FPS
+              </span>
+            </div>
+
             {/* Bottom Scrubber Timeline */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 space-y-1.5">
+            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 space-y-1.5 pointer-events-none">
               <div className="flex items-center justify-between text-[11px] font-mono text-slate-200">
                 <span className="font-bold text-cyan-400">00:43</span>
-                <span className="text-slate-400">08:24 (4K ProRes)</span>
+                <span className="text-slate-400">08:24 (Final Cut Review)</span>
               </div>
 
               {/* Progress Scrubber with Frame Pin */}

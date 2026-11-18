@@ -70,10 +70,7 @@ export function LiveReviewModal({ isOpen, onClose }: LiveReviewModalProps) {
             {/* Screen Content Preview */}
             <div className="flex-1 relative flex items-center justify-center bg-neutral-950 overflow-hidden">
               <video
-                src={
-                  activeProject.active_draft_url ||
-                  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-                }
+                src={activeProject.active_draft_url || '/videos/sample-draft-v1.mp4'}
                 autoPlay
                 loop
                 muted

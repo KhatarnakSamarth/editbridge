@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { Hero3DVisual } from '@/components/Hero3DVisual';
+import { TimestampPlayer } from '@/components/TimestampPlayer';
+import { RevisionChecklist } from '@/components/RevisionChecklist';
 import { useEditBridge } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
 
@@ -24,6 +26,7 @@ export default function LandingPage() {
   const { switchRole, editors } = useEditBridge();
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [selectedPath, setSelectedPath] = useState<'CREATOR' | 'EDITOR'>('CREATOR');
+  const [selectedSeekTime, setSelectedSeekTime] = useState<number | null>(null);
 
   const faqs = [
     {
@@ -54,7 +57,7 @@ export default function LandingPage() {
       >
         <div className="space-y-6">
           {/* Main Hero Banner with Ambient 3D Prop in Background */}
-          <div className="bg-grid-cyber bg-gradient-to-b from-blue-950/20 via-indigo-950/10 to-slate-900/20 dark:from-[#0b1329] dark:via-[#090e1c] dark:to-[#070b14] text-slate-900 dark:text-white p-6 sm:p-12 md:p-16 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center relative overflow-hidden transition-colors min-h-[480px] sm:min-h-[520px] justify-center">
+          <div className="bg-gradient-to-b from-blue-950/20 via-indigo-950/10 to-slate-900/20 dark:from-[#0b1329] dark:via-[#090e1c] dark:to-[#070b14] text-slate-900 dark:text-white p-6 sm:p-12 md:p-16 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center relative overflow-hidden transition-colors min-h-[480px] sm:min-h-[520px] justify-center">
             
             {/* Ambient 3D Perspective Studio Prop in the Background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
@@ -298,6 +301,50 @@ export default function LandingPage() {
             </div>
             <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">
               Master Unlock &amp; Review
+            </div>
+          </div>
+        </div>
+      </RetroWindow>
+
+      {/* Live Interactive Video Review Monitor Playground */}
+      <RetroWindow
+        title="INTERACTIVE VIDEO REVIEW MONITOR PLAYGROUND — TEST IT LIVE"
+        icon={<Film className="w-4 h-4 text-cyan-500" />}
+      >
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-cyan-500" />
+                Live Video Review &amp; Timestamp Revision Engine
+              </h2>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Switch sample cuts, click jump buttons, pause anywhere to drop frame-accurate revision notes, and check off revision items in real time.
+              </p>
+            </div>
+            <Link
+              href="/workspace"
+              onClick={() => retroSound.playDing()}
+              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-sm transition-all shrink-0 self-start sm:self-auto"
+            >
+              <span>Open in Full Studio Workspace</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            {/* Left 7 Cols: Video Monitor Player */}
+            <div className="lg:col-span-7">
+              <TimestampPlayer
+                onSelectTimestamp={(sec) => setSelectedSeekTime(sec)}
+                externalSeekSeconds={selectedSeekTime}
+                showSampleSelector={true}
+              />
+            </div>
+
+            {/* Right 5 Cols: Revision Checklist & Scope Tracker */}
+            <div className="lg:col-span-5">
+              <RevisionChecklist onSeekToTimestamp={(sec) => setSelectedSeekTime(sec)} />
             </div>
           </div>
         </div>

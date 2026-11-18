@@ -52,7 +52,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
       size_bytes: 840000000,
       formatted_size: '840 MB',
       version: newVersion,
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      url: newFileType === 'FINAL_MASTER' ? '/videos/sample-final-master.mp4' : '/videos/sample-draft-v1.mp4',
       is_locked: newFileType === 'FINAL_MASTER' && activeProject.status !== 'COMPLETED',
       lock_reason:
         newFileType === 'FINAL_MASTER' && activeProject.status !== 'COMPLETED'

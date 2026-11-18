@@ -64,9 +64,10 @@ function ProjectWorkspaceContent() {
   const [isLiveReviewOpen, setIsLiveReviewOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [guestPlaygroundMode, setGuestPlaygroundMode] = useState(false);
 
-  // Authentication Gate: Users must be logged in to access workstation & escrow vaults
-  if (!isAuthenticated) {
+  // Authentication Gate: Users must be logged in to access workstation & escrow vaults (unless previewing playground)
+  if (!isAuthenticated && !guestPlaygroundMode) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16">
         <div className="bg-white dark:bg-[#0c1222] border border-cyan-500/30 dark:border-cyan-500/20 rounded-3xl p-8 sm:p-12 shadow-2xl text-center space-y-6 relative overflow-hidden">
@@ -92,7 +93,7 @@ function ProjectWorkspaceContent() {
               <span className="text-[11px] text-slate-500 dark:text-slate-400">Upfront deposits held until final master review is approved.</span>
             </div>
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-              <span className="font-bold text-slate-900 dark:text-white block mb-1">Frame Accurancy</span>
+              <span className="font-bold text-slate-900 dark:text-white block mb-1">Frame Accuracy</span>
               <span className="text-[11px] text-slate-500 dark:text-slate-400">Pin exact revision notes to video frames and export EDL.</span>
             </div>
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
@@ -109,11 +110,22 @@ function ProjectWorkspaceContent() {
               <span>Sign In with Password</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
+            <button
+              type="button"
+              onClick={() => {
+                retroSound.playDing();
+                setGuestPlaygroundMode(true);
+              }}
+              className="w-full sm:w-auto bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Film className="w-4 h-4 text-cyan-500" />
+              <span>Test Interactive Video Playground</span>
+            </button>
             <Link
               href="/signup"
               className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
             >
-              <span>Create Free Account</span>
+              <span>Create Account</span>
             </Link>
           </div>
         </div>
@@ -162,6 +174,32 @@ function ProjectWorkspaceContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 font-sans">
+      {/* Guest Interactive Playground Notice */}
+      {!isAuthenticated && guestPlaygroundMode && (
+        <div className="p-4 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 border border-cyan-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-300">
+          <div className="flex items-center gap-2.5 text-cyan-900 dark:text-cyan-200">
+            <Sparkles className="w-4 h-4 text-cyan-500 shrink-0" />
+            <span>
+              <strong>Interactive Video Playground Mode:</strong> You are exploring the video monitor, sample cuts, and revision checklist in guest mode.
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/signin"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs transition-all shadow-xs"
+            >
+              Sign In for Full Escrow Access →
+            </Link>
+            <button
+              onClick={() => setGuestPlaygroundMode(false)}
+              className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700/80 cursor-pointer"
+            >
+              Exit Demo
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Top Project Selector & State Banner */}
       <div className="glass-panel p-5 sm:p-6 bg-white/90 dark:bg-[#0e1526]/90 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl dark:shadow-2xl dark:shadow-cyan-950/10 transition-colors">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-slate-100 dark:border-slate-800/80">
@@ -392,6 +430,7 @@ function ProjectWorkspaceContent() {
                 <TimestampPlayer
                   externalSeekSeconds={seekSeconds}
                   onSelectTimestamp={(sec) => setSeekSeconds(sec)}
+                  showSampleSelector={true}
                 />
               </RetroWindow>
             </div>

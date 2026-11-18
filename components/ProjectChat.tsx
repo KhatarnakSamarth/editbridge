@@ -72,7 +72,7 @@ export function ProjectChat() {
               </div>
 
               <div
-                className={`max-w-[85%] p-3 text-xs leading-relaxed rounded-2xl ${
+                className={`max-w-[85%] p-3 text-xs leading-relaxed rounded-2xl break-words overflow-hidden ${
                   isMe
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/20'
                     : 'bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shadow-xs'
