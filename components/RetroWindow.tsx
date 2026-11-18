@@ -89,7 +89,11 @@ export function RetroWindow({
       </div>
 
       {/* Body content */}
-      <div className={`p-4 md:p-5 flex-1 overflow-auto bg-transparent ${bodyClassName}`}>
+      <div
+        className={`p-4 md:p-5 flex-1 bg-transparent ${
+          bodyClassName.includes('overflow-') ? '' : 'overflow-auto'
+        } ${bodyClassName}`}
+      >
         {children}
       </div>
 

@@ -35,9 +35,9 @@ export function ProjectChat() {
   ];
 
   return (
-    <div className="flex flex-col h-[500px]">
+    <div className="flex flex-col h-[520px] max-h-[75vh] min-h-[380px] w-full min-w-0">
       {/* Messages Scroll Area */}
-      <div className="p-4 flex-1 overflow-y-auto space-y-3.5 bg-slate-50 dark:bg-[#070b14] rounded-2xl border border-slate-200 dark:border-slate-800 transition-colors">
+      <div className="p-3.5 sm:p-4 flex-1 min-h-0 overflow-y-auto space-y-3.5 bg-slate-50 dark:bg-[#070b14] rounded-2xl border border-slate-200 dark:border-slate-800 transition-colors scrollbar-thin">
         {activeProjectMessages.map((msg) => {
           const isMe = msg.sender_id === currentUser.id;
           const isSystem = msg.message.startsWith('[SYSTEM');
@@ -46,7 +46,7 @@ export function ProjectChat() {
             return (
               <div
                 key={msg.id}
-                className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700/60 font-mono text-xs text-amber-900 dark:text-amber-200 rounded-xl shadow-xs leading-relaxed"
+                className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700/60 font-mono text-xs text-amber-900 dark:text-amber-200 rounded-xl shadow-xs leading-relaxed break-words whitespace-pre-wrap overflow-hidden"
               >
                 {msg.message}
               </div>
@@ -56,7 +56,7 @@ export function ProjectChat() {
           return (
             <div
               key={msg.id}
-              className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
+              className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-full`}
             >
               <div className="flex items-center gap-1.5 mb-1 text-[11px] text-slate-500 dark:text-slate-400">
                 <span className="font-semibold text-slate-700 dark:text-slate-200">{msg.sender_name}</span>
@@ -72,10 +72,10 @@ export function ProjectChat() {
               </div>
 
               <div
-                className={`max-w-[85%] p-3 text-xs leading-relaxed rounded-2xl break-words overflow-hidden ${
+                className={`max-w-[85%] sm:max-w-[75%] p-3.5 text-xs leading-relaxed rounded-2xl break-words whitespace-pre-wrap shadow-xs ${
                   isMe
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/20'
-                    : 'bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shadow-xs'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-500/20'
+                    : 'bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700'
                 }`}
               >
                 {msg.message}
@@ -87,7 +87,7 @@ export function ProjectChat() {
       </div>
 
       {/* Quick replies bar */}
-      <div className="py-2.5 flex items-center gap-2 overflow-x-auto text-[11px] text-slate-500 dark:text-slate-400">
+      <div className="py-2.5 flex items-center gap-2 overflow-x-auto text-[11px] text-slate-500 dark:text-slate-400 shrink-0 scrollbar-none">
         <span className="flex-shrink-0 flex items-center gap-1 font-semibold text-cyan-600 dark:text-cyan-400">
           <Sparkles className="w-3.5 h-3.5 text-amber-500" />
           Quick:
@@ -100,7 +100,7 @@ export function ProjectChat() {
               retroSound.playClick();
               setInputText(reply);
             }}
-            className="px-3 py-1 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex-shrink-0 transition-all shadow-xs"
+            className="px-3 py-1 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex-shrink-0 transition-all shadow-xs cursor-pointer"
           >
             {reply}
           </button>
@@ -108,7 +108,7 @@ export function ProjectChat() {
       </div>
 
       {/* Input bar */}
-      <form onSubmit={handleSend} className="pt-1 flex gap-2.5">
+      <form onSubmit={handleSend} className="pt-1 flex gap-2.5 shrink-0">
         <input
           type="text"
           value={inputText}
@@ -123,7 +123,7 @@ export function ProjectChat() {
         <button
           type="submit"
           disabled={!inputText.trim()}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm disabled:opacity-40 transition-all active:scale-95"
+          className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm disabled:opacity-40 transition-all active:scale-95 shrink-0 cursor-pointer"
         >
           <Send className="w-3.5 h-3.5" />
           <span>Send</span>

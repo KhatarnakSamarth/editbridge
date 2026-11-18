@@ -173,7 +173,7 @@ function ProjectWorkspaceContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 font-sans">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-24 space-y-6 font-sans">
       {/* Guest Interactive Playground Notice */}
       {!isAuthenticated && guestPlaygroundMode && (
         <div className="p-4 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 border border-cyan-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-300">
@@ -440,6 +440,7 @@ function ProjectWorkspaceContent() {
               <RetroWindow
                 title="REVISION CHECKLIST &amp; SCOPE TRACKER"
                 icon={<CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                bodyClassName="p-4 sm:p-5 overflow-visible"
               >
                 <RevisionChecklist onSeekToTimestamp={handleSeekFromChecklist} />
               </RetroWindow>
@@ -452,6 +453,7 @@ function ProjectWorkspaceContent() {
           <RetroWindow
             title="STORAGE MANAGER — RAW FOOTAGE &amp; MASTER VAULT"
             icon={<FolderOpen className="w-4 h-4 text-amber-500" />}
+            bodyClassName="p-4 sm:p-5 overflow-visible"
           >
             <FileVault onRequestReleaseMilestone={() => setActiveTab('MILESTONES')} />
           </RetroWindow>
@@ -462,6 +464,7 @@ function ProjectWorkspaceContent() {
           <RetroWindow
             title="PROJECT COLLABORATION CHANNEL"
             icon={<MessageSquare className="w-4 h-4 text-cyan-500" />}
+            bodyClassName="p-3 sm:p-4 overflow-visible"
           >
             <ProjectChat />
           </RetroWindow>
@@ -472,6 +475,7 @@ function ProjectWorkspaceContent() {
           <RetroWindow
             title="ESCROW &amp; MILESTONE SETTLEMENT TERMINAL"
             icon={<CreditCard className="w-4 h-4 text-emerald-500" />}
+            bodyClassName="p-4 sm:p-5 overflow-visible"
           >
             <MilestoneCard />
           </RetroWindow>
@@ -482,6 +486,7 @@ function ProjectWorkspaceContent() {
           <RetroWindow
             title="PROJECT SPECIFICATION BRIEF"
             icon={<FileText className="w-4 h-4 text-blue-500" />}
+            bodyClassName="p-4 sm:p-5 overflow-visible"
           >
             <div className="p-6 bg-white dark:bg-[#070b14] rounded-2xl text-xs space-y-5 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800">
               <div className="border-b border-slate-100 dark:border-slate-800/80 pb-4">

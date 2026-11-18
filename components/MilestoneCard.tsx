@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
+import { Portal } from '@/components/Portal';
 
 interface MilestoneCardProps {
   onShowPaymentModal?: () => void;
@@ -194,82 +195,93 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
         </div>
       </div>
 
-      {/* Receipt Modal */}
+      {/* Receipt Modal (Portal to Document Body) */}
       {showReceiptModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel max-w-lg w-full bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
-            <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-              <span className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs">
-                <Receipt className="w-4 h-4 text-emerald-500" />
-                OFFICIAL EDITBRIDGE TRANSACTION RECEIPT
-              </span>
-              <button
-                onClick={() => setShowReceiptModal(false)}
-                className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-6 font-sans text-xs space-y-4 text-slate-700 dark:text-slate-200">
-              <div className="border-b border-slate-200 dark:border-slate-800 pb-3.5 flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">EDITBRIDGE SETTLEMENT INVOICE</h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
-                    Receipt ID: EB-INV-{activeProject.id.toUpperCase()}
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                    Date: {new Date().toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 px-3 py-1 rounded-full font-bold text-[11px]">
-                    PAID IN FULL
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-2.5 text-xs">
-                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
-                  <span className="text-slate-500 dark:text-slate-400">Project:</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{activeProject.title}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
-                  <span className="text-slate-500 dark:text-slate-400">Client / Creator:</span>
-                  <span className="text-slate-900 dark:text-white">{activeProject.creator_name}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
-                  <span className="text-slate-500 dark:text-slate-400">Assigned Editor:</span>
-                  <span className="text-slate-900 dark:text-white">{activeProject.editor_name}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
-                  <span className="text-slate-500 dark:text-slate-400">Milestone 1 (30% Upfront):</span>
-                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">${ms1?.amount}.00 USD (Settled)</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
-                  <span className="text-slate-500 dark:text-slate-400">Milestone 2 (70% Final Master):</span>
-                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">${ms2?.amount}.00 USD (Settled)</span>
-                </div>
-                <div className="flex justify-between py-2 border-t border-slate-200 dark:border-slate-700 font-bold text-sm">
-                  <span className="text-slate-900 dark:text-white">TOTAL SETTLED:</span>
-                  <span className="font-mono text-emerald-600 dark:text-emerald-400 text-base">${activeProject.budget}.00 USD</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                ✓ Master 4K ProRes files, project archives, and full commercial distribution rights transferred to client.
-              </div>
-
-              <div className="pt-2 flex justify-end">
+        <Portal>
+          <div
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowReceiptModal(false);
+            }}
+          >
+            <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto">
+              <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <span className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs truncate pr-2">
+                  <Receipt className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>OFFICIAL EDITBRIDGE TRANSACTION RECEIPT</span>
+                </span>
                 <button
+                  type="button"
                   onClick={() => setShowReceiptModal(false)}
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl transition-all"
+                  className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+                  title="Close"
+                  aria-label="Close"
                 >
-                  Close Receipt
+                  ✕
                 </button>
+              </div>
+              <div className="p-6 font-sans text-xs space-y-4 text-slate-700 dark:text-slate-200 overflow-y-auto flex-1 min-h-0">
+                <div className="border-b border-slate-200 dark:border-slate-800 pb-3.5 flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">EDITBRIDGE SETTLEMENT INVOICE</h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                      Receipt ID: EB-INV-{activeProject.id.toUpperCase()}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                      Date: {new Date().toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 px-3 py-1 rounded-full font-bold text-[11px]">
+                      PAID IN FULL
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400">Project:</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{activeProject.title}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400">Client / Creator:</span>
+                    <span className="text-slate-900 dark:text-white">{activeProject.creator_name}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400">Assigned Editor:</span>
+                    <span className="text-slate-900 dark:text-white">{activeProject.editor_name || 'Assigned Editor'}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400">Milestone 1 (30% Upfront):</span>
+                    <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">${ms1?.amount}.00 USD (Settled)</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400">Milestone 2 (70% Final Master):</span>
+                    <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">${ms2?.amount}.00 USD (Settled)</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-t border-slate-200 dark:border-slate-700 font-bold text-sm">
+                    <span className="text-slate-900 dark:text-white">TOTAL SETTLED:</span>
+                    <span className="font-mono text-emerald-600 dark:text-emerald-400 text-base">${activeProject.budget}.00 USD</span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  ✓ Master 4K ProRes files, project archives, and full commercial distribution rights transferred to client.
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowReceiptModal(false)}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                  >
+                    Close Receipt
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );

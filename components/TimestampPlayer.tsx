@@ -345,6 +345,23 @@ export function TimestampPlayer({
 
         {/* Video Scrubber with Revision Pins */}
         <div className="w-full px-4 sm:px-5 py-3.5 bg-slate-900/95 dark:bg-[#080d19]/95 border-t border-slate-800 flex flex-col gap-2.5">
+          {/* Active Frame Note Banner (if playhead is near a pin) */}
+          {activeProjectComments.some((c) => Math.abs(c.timestamp_seconds - currentTime) < 2.5) && (
+            <div className="px-3 py-1.5 bg-amber-500/15 border border-amber-500/30 rounded-xl text-xs text-amber-300 flex items-center justify-between gap-2 animate-in fade-in duration-200">
+              <span className="truncate">
+                <strong className="font-mono text-cyan-300">
+                  [{activeProjectComments.find((c) => Math.abs(c.timestamp_seconds - currentTime) < 2.5)?.formatted_time}]
+                </strong>{' '}
+                <span className="text-slate-100">
+                  {activeProjectComments.find((c) => Math.abs(c.timestamp_seconds - currentTime) < 2.5)?.comment}
+                </span>
+              </span>
+              <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 shrink-0">
+                Frame Note
+              </span>
+            </div>
+          )}
+
           {/* Scrubber Pin Track */}
           <div className="relative w-full flex items-center h-7">
             {/* Scrubber Pin Markers for Revisions */}
@@ -363,8 +380,8 @@ export function TimestampPlayer({
                     className="absolute -top-1.5 w-3.5 h-5 -translate-x-1/2 cursor-pointer pointer-events-auto bg-amber-400 hover:bg-cyan-400 border border-slate-950 rounded-sm shadow-md hover:scale-130 transition-all z-20 group"
                   >
                     {/* Hover tooltip */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-950 text-white text-[10px] font-sans px-2.5 py-1 rounded-md border border-cyan-500/40 whitespace-nowrap shadow-xl z-30 pointer-events-none">
-                      <span className="font-mono text-cyan-400 font-bold">[{comment.formatted_time}]</span> {comment.comment.slice(0, 36)}...
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-950 text-white text-[10px] font-sans px-2.5 py-1 rounded-md border border-cyan-500/40 whitespace-nowrap shadow-xl z-30 pointer-events-none max-w-[200px] truncate">
+                      <span className="font-mono text-cyan-400 font-bold">[{comment.formatted_time}]</span> {comment.comment}
                     </div>
                   </div>
                 );

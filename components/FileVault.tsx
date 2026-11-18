@@ -15,6 +15,7 @@ import {
 import { useEditBridge } from '@/lib/store';
 import { ProjectFile } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
+import { Portal } from '@/components/Portal';
 
 interface FileVaultProps {
   onRequestReleaseMilestone?: () => void;
@@ -197,90 +198,100 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
         })}
       </div>
 
-      {/* Upload Modal */}
+      {/* Upload Modal (Portal to Document Body) */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel max-w-md w-full bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
-            <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-              <span className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs">
-                <Upload className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                UPLOAD PROJECT ASSET / VIDEO FILE
-              </span>
-              <button
-                onClick={() => setShowUploadModal(false)}
-                className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            <form onSubmit={handleSimulateUpload} className="p-6 space-y-4 text-xs text-slate-800 dark:text-slate-200">
-              <div>
-                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
-                  File Name:
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newFileName}
-                  onChange={(e) => setNewFileName(e.target.value)}
-                  placeholder="e.g. AI_Bubble_Final_Export_v2.mov"
-                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
-                  File Category:
-                </label>
-                <select
-                  value={newFileType}
-                  onChange={(e) =>
-                    setNewFileType(e.target.value as ProjectFile['file_type'])
-                  }
-                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
-                >
-                  <option value="DRAFT_VIDEO">Draft Video Version</option>
-                  <option value="FINAL_MASTER">Final Master Export (Locked until payment)</option>
-                  <option value="RAW_FOOTAGE">Raw Footage Package</option>
-                  <option value="REFERENCE">Reference / Style Asset</option>
-                  <option value="ASSET">Thumbnail / Sound Design Assets</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
-                  Version Label:
-                </label>
-                <input
-                  type="text"
-                  value={newVersion}
-                  onChange={(e) => setNewVersion(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
-                />
-              </div>
-
-              <div className="p-3 bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-900 dark:text-cyan-200 rounded-xl text-xs leading-relaxed">
-                🔒 In production, large files are streamed to private S3/GCS buckets via signed URLs.
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2.5">
+        <Portal>
+          <div
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowUploadModal(false);
+            }}
+          >
+            <div className="glass-panel max-w-md w-full max-h-[92vh] flex flex-col bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto">
+              <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <span className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs truncate pr-2">
+                  <Upload className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                  <span>UPLOAD PROJECT ASSET / VIDEO FILE</span>
+                </span>
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                  className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+                  title="Close"
+                  aria-label="Close"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl shadow-sm transition-all"
-                >
-                  Confirm Upload
+                  ✕
                 </button>
               </div>
-            </form>
+              <form onSubmit={handleSimulateUpload} className="p-6 space-y-4 text-xs text-slate-800 dark:text-slate-200 overflow-y-auto flex-1 min-h-0">
+                <div>
+                  <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
+                    File Name:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newFileName}
+                    onChange={(e) => setNewFileName(e.target.value)}
+                    placeholder="e.g. AI_Bubble_Final_Export_v2.mov"
+                    className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
+                    File Category:
+                  </label>
+                  <select
+                    value={newFileType}
+                    onChange={(e) =>
+                      setNewFileType(e.target.value as ProjectFile['file_type'])
+                    }
+                    className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
+                  >
+                    <option value="DRAFT_VIDEO">Draft Video Version</option>
+                    <option value="FINAL_MASTER">Final Master Export (Locked until payment)</option>
+                    <option value="RAW_FOOTAGE">Raw Footage Package</option>
+                    <option value="REFERENCE">Reference / Style Asset</option>
+                    <option value="ASSET">Thumbnail / Sound Design Assets</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
+                    Version Label:
+                  </label>
+                  <input
+                    type="text"
+                    value={newVersion}
+                    onChange={(e) => setNewVersion(e.target.value)}
+                    className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
+                  />
+                </div>
+
+                <div className="p-3 bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-900 dark:text-cyan-200 rounded-xl text-xs leading-relaxed">
+                  🔒 In production, large files are streamed to private S3/GCS buckets via signed URLs.
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setShowUploadModal(false)}
+                    className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer"
+                  >
+                    Confirm Upload
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );
