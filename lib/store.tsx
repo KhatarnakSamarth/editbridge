@@ -80,6 +80,8 @@ interface EditBridgeContextType {
   toggleCrtMode: () => void;
   soundEnabled: boolean;
   toggleSound: () => void;
+  themeMode: 'MODERN' | 'RETRO';
+  toggleThemeMode: () => void;
   resetDemoData: () => void;
 
   // Notifications
@@ -101,6 +103,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [crtMode, setCrtMode] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [themeMode, setThemeMode] = useState<'MODERN' | 'RETRO'>('MODERN');
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 'notif-1',
@@ -126,6 +129,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         if (parsed.reviews) setReviews(parsed.reviews);
         if (parsed.activeRole) setActiveRole(parsed.activeRole);
         if (parsed.crtMode !== undefined) setCrtMode(parsed.crtMode);
+        if (parsed.themeMode !== undefined) setThemeMode(parsed.themeMode);
         if (parsed.soundEnabled !== undefined) {
           setSoundEnabled(parsed.soundEnabled);
           retroSound.enabled = parsed.soundEnabled;
@@ -149,13 +153,30 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
           reviews,
           activeRole,
           crtMode,
+          themeMode,
           soundEnabled,
         })
       );
     } catch {
       // ignore
     }
-  }, [projects, revisionComments, files, messages, reviews, activeRole, crtMode, soundEnabled]);
+  }, [projects, revisionComments, files, messages, reviews, activeRole, crtMode, themeMode, soundEnabled]);
+
+  // Apply theme class to document body
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (themeMode === 'RETRO') {
+        document.body.classList.add('theme-retro');
+      } else {
+        document.body.classList.remove('theme-retro');
+      }
+    }
+  }, [themeMode]);
+
+  const toggleThemeMode = () => {
+    retroSound.playClick();
+    setThemeMode((prev) => (prev === 'MODERN' ? 'RETRO' : 'MODERN'));
+  };
 
   // Sound sync
   const toggleSound = () => {
@@ -468,6 +489,8 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         toggleCrtMode,
         soundEnabled,
         toggleSound,
+        themeMode,
+        toggleThemeMode,
         resetDemoData,
         notifications,
         markNotificationRead,

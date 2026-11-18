@@ -65,9 +65,9 @@ function ProjectWorkspaceContent() {
 
   if (!activeProject) {
     return (
-      <div className="max-w-4xl mx-auto p-6 font-mono text-center win95-window">
-        <p>No project selected.</p>
-        <Link href="/projects" className="win95-button px-4 py-2 mt-4 inline-block">
+      <div className="max-w-4xl mx-auto p-8 text-center win95-window">
+        <p className="text-slate-300">No project selected.</p>
+        <Link href="/projects" className="win95-button win95-button-primary px-4 py-2 mt-4 inline-block font-semibold">
           View Projects
         </Link>
       </div>
@@ -88,43 +88,43 @@ function ProjectWorkspaceContent() {
   const getStatusBadge = (status: ProjectStatus) => {
     switch (status) {
       case 'REVIEW_REQUESTED':
-        return <span className="bg-amber-400 text-black border border-black px-2 py-0.5 font-bold font-mono text-xs animate-pulse">● REVIEW REQUESTED</span>;
+        return <span className="bg-amber-950/70 text-amber-300 border border-amber-500/60 px-2.5 py-0.5 rounded font-semibold text-xs animate-pulse">● REVIEW REQUESTED</span>;
       case 'CHANGES_REQUESTED':
-        return <span className="bg-orange-500 text-white border border-black px-2 py-0.5 font-bold font-mono text-xs">● CHANGES REQUESTED</span>;
+        return <span className="bg-orange-950/70 text-orange-300 border border-orange-500/60 px-2.5 py-0.5 rounded font-semibold text-xs">● CHANGES REQUESTED</span>;
       case 'FINAL_PAYMENT_PENDING':
-        return <span className="bg-purple-600 text-white border border-black px-2 py-0.5 font-bold font-mono text-xs animate-pulse">● FINAL PAYMENT PENDING</span>;
+        return <span className="bg-purple-950/70 text-purple-300 border border-purple-500/60 px-2.5 py-0.5 rounded font-semibold text-xs animate-pulse">● FINAL PAYMENT DUE</span>;
       case 'COMPLETED':
-        return <span className="bg-green-600 text-white border border-black px-2 py-0.5 font-bold font-mono text-xs">✓ COMPLETED</span>;
+        return <span className="bg-emerald-950/70 text-emerald-300 border border-emerald-500/60 px-2.5 py-0.5 rounded font-semibold text-xs">✓ COMPLETED</span>;
       case 'EDITING':
-        return <span className="bg-blue-600 text-white border border-black px-2 py-0.5 font-bold font-mono text-xs">● IN EDITING</span>;
+        return <span className="bg-blue-950/70 text-blue-300 border border-blue-500/60 px-2.5 py-0.5 rounded font-semibold text-xs">● IN EDITING</span>;
       default:
-        return <span className="bg-neutral-600 text-white border border-black px-2 py-0.5 font-bold font-mono text-xs">{status}</span>;
+        return <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-0.5 rounded font-semibold text-xs">{status}</span>;
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 md:py-6 space-y-4 font-sans">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-5 font-sans">
       {/* Top Project Selector & State Banner */}
-      <div className="win95-window p-3 md:p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b-2 border-neutral-400">
+      <div className="win95-window p-4 sm:p-5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-800">
           {/* Project Details */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-mono bg-[#000080] text-yellow-300 px-1.5 py-0.2 font-bold uppercase">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="text-[11px] font-mono bg-blue-950 text-blue-300 px-2 py-0.5 rounded border border-blue-800 font-semibold uppercase">
                 {activeProject.category}
               </span>
               {getStatusBadge(activeProject.status)}
 
               {/* Project Switcher Selector */}
-              <div className="inline-flex items-center gap-1 font-mono text-xs">
-                <span className="text-neutral-600 hidden sm:inline">Switch Project:</span>
+              <div className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+                <span className="hidden sm:inline">Switch Project:</span>
                 <select
                   value={activeProject.id}
                   onChange={(e) => {
                     retroSound.playClick();
                     setActiveProjectId(e.target.value);
                   }}
-                  className="win95-sunken px-2 py-1 text-xs font-bold text-neutral-900 bg-white"
+                  className="win95-sunken px-2.5 py-1 text-xs font-semibold bg-slate-900 text-slate-100"
                 >
                   {projects.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -135,33 +135,33 @@ function ProjectWorkspaceContent() {
               </div>
             </div>
 
-            <h1 className="text-lg sm:text-2xl font-black font-mono tracking-tight text-neutral-900">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               {activeProject.title}
             </h1>
 
-            <div className="flex items-center gap-3 text-xs font-mono text-neutral-700 flex-wrap">
-              <span>Client: <strong>{activeProject.creator_name}</strong></span>
+            <div className="flex items-center gap-3 text-xs text-slate-300 flex-wrap">
+              <span>Client: <strong className="text-white">{activeProject.creator_name}</strong></span>
               <span>•</span>
-              <span>Editor: <strong>{activeProject.editor_name || 'Unassigned'}</strong></span>
+              <span>Editor: <strong className="text-white">{activeProject.editor_name || 'Unassigned'}</strong></span>
               <span>•</span>
-              <span>Budget: <strong className="text-green-800">${activeProject.budget} USD</strong></span>
+              <span>Budget: <strong className="text-emerald-400 font-mono">${activeProject.budget}.00 USD</strong></span>
               <span>•</span>
-              <span>Deadline: <strong>{activeProject.deadline}</strong></span>
+              <span>Deadline: <strong className="text-white">{activeProject.deadline}</strong></span>
             </div>
           </div>
 
           {/* Quick Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap self-start lg:self-center">
+          <div className="flex items-center gap-2.5 flex-wrap self-start lg:self-center">
             {/* Live Review Room Button */}
             <button
               onClick={() => {
                 retroSound.playDing();
                 setIsLiveReviewOpen(true);
               }}
-              className="win95-button win95-button-primary px-3 py-1.5 text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm"
+              className="win95-button win95-button-primary px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-sm"
               title="Launch synchronized screen & video review session"
             >
-              <Video className="w-3.5 h-3.5 text-emerald-300" />
+              <Video className="w-4 h-4 text-emerald-300" />
               <span>Review Room</span>
             </button>
 
@@ -171,9 +171,9 @@ function ProjectWorkspaceContent() {
                 retroSound.playClick();
                 setIsInviteOpen(true);
               }}
-              className="win95-button px-2.5 py-1.5 text-xs font-mono font-bold flex items-center gap-1.5"
+              className="win95-button px-3 py-2 text-xs font-semibold flex items-center gap-1.5"
             >
-              <UserPlus className="w-3.5 h-3.5 text-neutral-700" />
+              <UserPlus className="w-4 h-4 text-slate-300" />
               <span>Invite Editor</span>
             </button>
 
@@ -184,9 +184,9 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsReviewModalOpen(true);
                 }}
-                className="win95-button win95-button-amber px-2.5 py-1.5 text-xs font-mono font-bold flex items-center gap-1 text-white"
+                className="win95-button win95-button-amber px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5"
               >
-                <Award className="w-3.5 h-3.5" />
+                <Award className="w-4 h-4" />
                 <span>Rate Project</span>
               </button>
             ) : null}
@@ -197,9 +197,9 @@ function ProjectWorkspaceContent() {
                 onClick={() => {
                   releaseFinalMilestone(activeProject.id);
                 }}
-                className="win95-button win95-button-amber px-3 py-1.5 text-xs font-mono font-bold flex items-center gap-1 text-white shadow-sm"
+                className="win95-button win95-button-amber px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-sm"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-4 h-4 text-yellow-300" />
                 <span>Release 70% ($420)</span>
               </button>
             ) : null}
@@ -207,8 +207,8 @@ function ProjectWorkspaceContent() {
         </div>
 
         {/* Section 9: State Machine Lifecycle Strip */}
-        <div className="pt-2 overflow-x-auto">
-          <div className="flex items-center gap-1 min-w-[700px] text-[10px] font-mono">
+        <div className="pt-3 overflow-x-auto">
+          <div className="flex items-center gap-1.5 min-w-[720px] text-[11px] font-mono">
             {LIFECYCLE_STEPS.map((step, idx) => {
               const currentIdx = LIFECYCLE_STEPS.findIndex(
                 (s) => s.status === activeProject.status
@@ -219,12 +219,12 @@ function ProjectWorkspaceContent() {
               return (
                 <div
                   key={step.status}
-                  className={`flex-1 px-1.5 py-1 text-center border ${
+                  className={`flex-1 px-2 py-1.5 text-center rounded text-xs transition-colors ${
                     isCurrent
-                      ? 'bg-[#000080] text-yellow-300 border-blue-400 font-bold shadow-xs'
+                      ? 'bg-blue-600/30 text-blue-300 border border-blue-500 font-bold shadow-xs'
                       : isPast
-                      ? 'bg-neutral-200 text-neutral-700 border-neutral-400'
-                      : 'bg-neutral-100 text-neutral-400 border-neutral-300'
+                      ? 'bg-slate-800 text-slate-300 border border-slate-700'
+                      : 'bg-slate-900/40 text-slate-600 border border-slate-800'
                   }`}
                 >
                   {step.label}
@@ -235,14 +235,14 @@ function ProjectWorkspaceContent() {
         </div>
       </div>
 
-      {/* Retro Workspace Tabs */}
-      <div className="flex items-center gap-1 border-b-2 border-black overflow-x-auto select-none pt-1">
+      {/* Modern Workspace Navigation Tabs */}
+      <div className="flex items-center gap-1.5 border-b border-slate-800 pb-2 overflow-x-auto select-none">
         <button
           onClick={() => handleTabChange('REVIEW')}
-          className={`win95-button px-4 py-2 text-xs font-mono font-bold flex items-center gap-1.5 border-b-0 ${
+          className={`px-4 py-2 text-xs rounded-lg font-semibold flex items-center gap-2 transition-all ${
             activeTab === 'REVIEW'
-              ? 'bg-[#c0c0c0] border-t-2 border-l-2 border-r-2 border-black -mb-[2px] z-10 text-[#000080]'
-              : 'bg-[#a0a0a0] text-neutral-700 hover:bg-[#b0b0b0]'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
           }`}
         >
           <Film className="w-4 h-4" />
@@ -251,10 +251,10 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('FILES')}
-          className={`win95-button px-4 py-2 text-xs font-mono font-bold flex items-center gap-1.5 border-b-0 ${
+          className={`px-4 py-2 text-xs rounded-lg font-semibold flex items-center gap-2 transition-all ${
             activeTab === 'FILES'
-              ? 'bg-[#c0c0c0] border-t-2 border-l-2 border-r-2 border-black -mb-[2px] z-10 text-[#000080]'
-              : 'bg-[#a0a0a0] text-neutral-700 hover:bg-[#b0b0b0]'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
           }`}
         >
           <FolderOpen className="w-4 h-4" />
@@ -263,10 +263,10 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('CHAT')}
-          className={`win95-button px-4 py-2 text-xs font-mono font-bold flex items-center gap-1.5 border-b-0 ${
+          className={`px-4 py-2 text-xs rounded-lg font-semibold flex items-center gap-2 transition-all ${
             activeTab === 'CHAT'
-              ? 'bg-[#c0c0c0] border-t-2 border-l-2 border-r-2 border-black -mb-[2px] z-10 text-[#000080]'
-              : 'bg-[#a0a0a0] text-neutral-700 hover:bg-[#b0b0b0]'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
@@ -275,10 +275,10 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('MILESTONES')}
-          className={`win95-button px-4 py-2 text-xs font-mono font-bold flex items-center gap-1.5 border-b-0 ${
+          className={`px-4 py-2 text-xs rounded-lg font-semibold flex items-center gap-2 transition-all ${
             activeTab === 'MILESTONES'
-              ? 'bg-[#c0c0c0] border-t-2 border-l-2 border-r-2 border-black -mb-[2px] z-10 text-[#000080]'
-              : 'bg-[#a0a0a0] text-neutral-700 hover:bg-[#b0b0b0]'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
           }`}
         >
           <CreditCard className="w-4 h-4" />
@@ -287,10 +287,10 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('BRIEF')}
-          className={`win95-button px-4 py-2 text-xs font-mono font-bold flex items-center gap-1.5 border-b-0 ${
+          className={`px-4 py-2 text-xs rounded-lg font-semibold flex items-center gap-2 transition-all ${
             activeTab === 'BRIEF'
-              ? 'bg-[#c0c0c0] border-t-2 border-l-2 border-r-2 border-black -mb-[2px] z-10 text-[#000080]'
-              : 'bg-[#a0a0a0] text-neutral-700 hover:bg-[#b0b0b0]'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -300,14 +300,14 @@ function ProjectWorkspaceContent() {
 
       {/* Tab Panels */}
       <div className="min-h-[500px]">
-        {/* Tab 1: Video Review & Timestamp Feedback (THE STAR FEATURE) */}
+        {/* Tab 1: Video Review & Timestamp Feedback */}
         {activeTab === 'REVIEW' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             {/* Left 7 Cols: Interactive Video Player */}
             <div className="lg:col-span-7">
               <RetroWindow
-                title="VIDEO_REVIEW_MONITOR.EXE — DRAFT V1"
-                icon={<Film className="w-4 h-4 text-yellow-300" />}
+                title="VIDEO REVIEW MONITOR — DRAFT V1"
+                icon={<Film className="w-4 h-4 text-blue-400" />}
               >
                 <TimestampPlayer
                   externalSeekSeconds={seekSeconds}
@@ -319,7 +319,7 @@ function ProjectWorkspaceContent() {
             {/* Right 5 Cols: Revision Checklist & Scope Tracker */}
             <div className="lg:col-span-5">
               <RetroWindow
-                title="REVISION_CHECKLIST.LOG — SCOPE CONTROL"
+                title="REVISION CHECKLIST &amp; SCOPE TRACKER"
                 icon={<CheckCircle2 className="w-4 h-4 text-emerald-400" />}
               >
                 <RevisionChecklist onSeekToTimestamp={handleSeekFromChecklist} />
@@ -331,18 +331,18 @@ function ProjectWorkspaceContent() {
         {/* Tab 2: File & Asset Vault */}
         {activeTab === 'FILES' && (
           <RetroWindow
-            title="STORAGE_MANAGER.EXE — RAW FOOTAGE & MASTER VAULT"
-            icon={<FolderOpen className="w-4 h-4 text-yellow-300" />}
+            title="STORAGE MANAGER — RAW FOOTAGE &amp; MASTER VAULT"
+            icon={<FolderOpen className="w-4 h-4 text-amber-400" />}
           >
             <FileVault onRequestReleaseMilestone={() => setActiveTab('MILESTONES')} />
           </RetroWindow>
         )}
 
-        {/* Tab 3: Project IRC Chat */}
+        {/* Tab 3: Project Chat */}
         {activeTab === 'CHAT' && (
           <RetroWindow
-            title="IRC_COLLABORATION_CHANNEL.IRC — #PROJECT-ROOM"
-            icon={<MessageSquare className="w-4 h-4 text-cyan-300" />}
+            title="PROJECT COLLABORATION CHANNEL"
+            icon={<MessageSquare className="w-4 h-4 text-cyan-400" />}
           >
             <ProjectChat />
           </RetroWindow>
@@ -351,8 +351,8 @@ function ProjectWorkspaceContent() {
         {/* Tab 4: Milestones & Settlements */}
         {activeTab === 'MILESTONES' && (
           <RetroWindow
-            title="ESCROW_SETTLEMENT_TERMINAL.EXE"
-            icon={<CreditCard className="w-4 h-4 text-yellow-300" />}
+            title="ESCROW &amp; MILESTONE SETTLEMENT TERMINAL"
+            icon={<CreditCard className="w-4 h-4 text-emerald-400" />}
           >
             <MilestoneCard />
           </RetroWindow>
@@ -361,49 +361,49 @@ function ProjectWorkspaceContent() {
         {/* Tab 5: Brief & Deliverables Specs */}
         {activeTab === 'BRIEF' && (
           <RetroWindow
-            title="PROJECT_SPECIFICATION_BRIEF.DOC"
-            icon={<FileText className="w-4 h-4 text-yellow-300" />}
+            title="PROJECT SPECIFICATION BRIEF"
+            icon={<FileText className="w-4 h-4 text-blue-400" />}
           >
-            <div className="p-4 bg-white font-mono text-xs space-y-4 text-neutral-900 border border-neutral-400">
-              <div className="border-b border-neutral-300 pb-3">
-                <h3 className="font-bold text-sm text-[#000080]">PROJECT BRIEF</h3>
-                <p className="mt-1 font-sans text-xs text-neutral-700 leading-relaxed">
+            <div className="p-5 bg-slate-900 rounded-lg text-xs space-y-5 text-slate-200 border border-slate-800">
+              <div className="border-b border-slate-800 pb-4">
+                <h3 className="font-bold text-sm text-blue-400">PROJECT BRIEF &amp; NARRATIVE GOAL</h3>
+                <p className="mt-1.5 text-xs text-slate-300 leading-relaxed font-sans">
                   {activeProject.brief}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-xs uppercase text-neutral-800 mb-2">
+                <h4 className="font-semibold text-xs uppercase text-slate-300 mb-2.5">
                   Agreed Technical Deliverables:
                 </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
-                  <div className="win95-sunken p-2">
-                    <span className="text-neutral-500 block">Aspect Ratio:</span>
-                    <strong className="text-neutral-900">{activeProject.deliverables.aspect_ratio}</strong>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="p-3 bg-slate-950/70 rounded-lg border border-slate-800">
+                    <span className="text-slate-400 block text-[11px]">Aspect Ratio:</span>
+                    <strong className="text-white text-xs">{activeProject.deliverables.aspect_ratio}</strong>
                   </div>
-                  <div className="win95-sunken p-2">
-                    <span className="text-neutral-500 block">Target Duration:</span>
-                    <strong className="text-neutral-900">{activeProject.deliverables.target_duration_minutes} minutes</strong>
+                  <div className="p-3 bg-slate-950/70 rounded-lg border border-slate-800">
+                    <span className="text-slate-400 block text-[11px]">Target Duration:</span>
+                    <strong className="text-white text-xs">{activeProject.deliverables.target_duration_minutes} minutes</strong>
                   </div>
-                  <div className="win95-sunken p-2">
-                    <span className="text-neutral-500 block">Master Resolution:</span>
-                    <strong className="text-neutral-900">{activeProject.deliverables.resolution}</strong>
+                  <div className="p-3 bg-slate-950/70 rounded-lg border border-slate-800">
+                    <span className="text-slate-400 block text-[11px]">Master Resolution:</span>
+                    <strong className="text-white text-xs">{activeProject.deliverables.resolution}</strong>
                   </div>
-                  <div className="win95-sunken p-2">
-                    <span className="text-neutral-500 block">Captions:</span>
-                    <strong className="text-neutral-900">
+                  <div className="p-3 bg-slate-950/70 rounded-lg border border-slate-800">
+                    <span className="text-slate-400 block text-[11px]">Captions:</span>
+                    <strong className="text-white text-xs">
                       {activeProject.deliverables.captions_included ? 'Included (SRT + Burned)' : 'No'}
                     </strong>
                   </div>
-                  <div className="win95-sunken p-2">
-                    <span className="text-neutral-500 block">Sound Design:</span>
-                    <strong className="text-neutral-900">
+                  <div className="p-3 bg-slate-950/70 rounded-lg border border-slate-800">
+                    <span className="text-slate-400 block text-[11px]">Sound Design:</span>
+                    <strong className="text-white text-xs">
                       {activeProject.deliverables.sound_design ? 'Full Foley & Riser Mix' : 'Basic'}
                     </strong>
                   </div>
-                  <div className="win95-sunken p-2">
-                    <span className="text-neutral-500 block">Color Grading:</span>
-                    <strong className="text-neutral-900">
+                  <div className="p-3 bg-slate-950/70 rounded-lg border border-slate-800">
+                    <span className="text-slate-400 block text-[11px]">Color Grading:</span>
+                    <strong className="text-white text-xs">
                       {activeProject.deliverables.color_grading ? 'Custom Film Emulation' : 'Standard'}
                     </strong>
                   </div>
@@ -411,29 +411,29 @@ function ProjectWorkspaceContent() {
               </div>
 
               <div>
-                <h4 className="font-bold text-xs uppercase text-neutral-800 mb-1">
+                <h4 className="font-semibold text-xs uppercase text-slate-300 mb-2">
                   Style References &amp; Visual Inspiration:
                 </h4>
-                <ul className="list-disc pl-5 space-y-1 text-blue-700">
+                <ul className="list-disc pl-5 space-y-1.5 text-blue-400">
                   {activeProject.references.length > 0 ? (
                     activeProject.references.map((ref, idx) => (
                       <li key={idx}>
-                        <a href={ref} target="_blank" rel="noreferrer" className="underline">
+                        <a href={ref} target="_blank" rel="noreferrer" className="underline hover:text-blue-300">
                           {ref}
                         </a>
                       </li>
                     ))
                   ) : (
-                    <li className="text-neutral-500">None specified</li>
+                    <li className="text-slate-500">None specified</li>
                   )}
                 </ul>
               </div>
 
               <div>
-                <h4 className="font-bold text-xs uppercase text-neutral-800 mb-1">
+                <h4 className="font-semibold text-xs uppercase text-slate-300 mb-2">
                   Revision Policy Scope:
                 </h4>
-                <div className="p-2.5 bg-yellow-50 border border-yellow-400 text-yellow-900 text-xs font-sans">
+                <div className="p-3.5 bg-amber-950/40 border border-amber-800/80 rounded-lg text-amber-200 text-xs leading-relaxed">
                   Included Revisions: <strong>{activeProject.revision_limit} rounds</strong>. Changes must be documented through timestamp pins on the review player. Additional revisions beyond scope require written mutual agreement and price adjustment.
                 </div>
               </div>

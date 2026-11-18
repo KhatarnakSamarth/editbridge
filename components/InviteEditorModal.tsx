@@ -33,11 +33,11 @@ export function InviteEditorModal({ isOpen, onClose }: InviteEditorModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-      <div className="win95-window max-w-lg w-full">
-        <div className="win95-titlebar">
-          <span className="flex items-center gap-1 font-bold">
-            <UserPlus className="w-4 h-4 text-yellow-300" />
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="win95-window max-w-lg w-full bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+        <div className="win95-titlebar px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+          <span className="flex items-center gap-2 font-bold text-xs text-slate-200">
+            <UserPlus className="w-4 h-4 text-blue-400" />
             INVITE YOUR EXISTING VIDEO EDITOR TO EDITBRIDGE
           </span>
           <button
@@ -45,22 +45,24 @@ export function InviteEditorModal({ isOpen, onClose }: InviteEditorModalProps) {
               retroSound.playClick();
               onClose();
             }}
-            className="w-5 h-5 bg-[#c0c0c0] text-black border border-black text-xs font-bold"
+            className="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition-colors flex items-center justify-center"
+            title="Close"
+            aria-label="Close"
           >
             ✕
           </button>
         </div>
 
-        <div className="p-4 bg-[#c0c0c0] text-xs font-sans space-y-3">
-          <div className="p-2.5 bg-blue-50 border border-blue-400 font-mono text-[11px] text-blue-900 leading-relaxed">
-            💡 <strong>No need to replace your current editor:</strong> EditBridge lets you bring your trusted editors into one organized space for timestamp reviews, revision limits, and milestone protection.
+        <div className="p-5 text-sm space-y-4">
+          <div className="p-3 bg-blue-950/40 border border-blue-800/60 rounded-lg text-xs text-blue-200 leading-relaxed">
+            💡 <strong className="text-white">Bring Your Own Editor:</strong> EditBridge lets you onboard your trusted editors into one organized workspace for timestamp reviews, revision limits, and 30/70 escrow protection.
           </div>
 
           {invited ? (
-            <div className="p-4 bg-green-50 border-2 border-green-600 text-green-900 font-mono text-center space-y-2">
-              <p className="font-bold text-sm">🎉 Invitation Dispatched!</p>
-              <p className="text-xs">
-                We sent a fast-onboarding link to <strong>{editorEmail}</strong>. When they join, they will be automatically connected to your workspace.
+            <div className="p-5 bg-emerald-950/40 border border-emerald-800/60 rounded-lg text-emerald-200 text-center space-y-3">
+              <p className="font-bold text-sm text-emerald-300">🎉 Invitation Dispatched!</p>
+              <p className="text-xs text-emerald-100">
+                We sent a fast-onboarding link to <strong className="text-white">{editorEmail}</strong>. When they click the link, they will automatically join your active workspace.
               </p>
               <button
                 onClick={() => {
@@ -68,15 +70,15 @@ export function InviteEditorModal({ isOpen, onClose }: InviteEditorModalProps) {
                   setEditorEmail('');
                   onClose();
                 }}
-                className="win95-button win95-button-primary px-4 py-1 text-xs font-bold"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded text-xs font-bold transition-colors"
               >
                 Done
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block font-bold text-neutral-800 font-mono mb-1">
+                <label className="block font-semibold text-slate-300 text-xs mb-1.5">
                   Editor&apos;s Email Address:
                 </label>
                 <input
@@ -85,12 +87,12 @@ export function InviteEditorModal({ isOpen, onClose }: InviteEditorModalProps) {
                   value={editorEmail}
                   onChange={(e) => setEditorEmail(e.target.value)}
                   placeholder="editor@studio.com"
-                  className="win95-sunken w-full px-2.5 py-1.5 text-xs text-neutral-900"
+                  className="w-full px-3 py-2 text-xs text-slate-100 bg-slate-950 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-neutral-800 font-mono mb-1">
+                <label className="block font-semibold text-slate-300 text-xs mb-1.5">
                   Or Share Custom Direct Link:
                 </label>
                 <div className="flex gap-2">
@@ -98,30 +100,30 @@ export function InviteEditorModal({ isOpen, onClose }: InviteEditorModalProps) {
                     type="text"
                     readOnly
                     value={inviteLink}
-                    className="win95-sunken flex-1 px-2.5 py-1.5 text-xs font-mono text-neutral-700 bg-neutral-100"
+                    className="flex-1 px-3 py-2 text-xs font-mono text-slate-400 bg-slate-950 border border-slate-800 rounded-lg select-all"
                   />
                   <button
                     type="button"
                     onClick={handleCopy}
-                    className="win95-button px-3 py-1 font-mono font-bold flex items-center gap-1 text-xs"
+                    className="px-3.5 py-2 rounded-lg font-mono font-medium flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
                   >
-                    {copied ? <Check className="w-3.5 h-3.5 text-green-700" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                     <span>{copied ? 'Copied' : 'Copy'}</span>
                   </button>
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-2 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="win95-button px-3 py-1 font-bold font-mono"
+                  className="px-3.5 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="win95-button win95-button-primary px-4 py-1 font-bold font-mono flex items-center gap-1.5"
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Send Direct Invite</span>

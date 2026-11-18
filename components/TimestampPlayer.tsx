@@ -7,12 +7,10 @@ import {
   RotateCcw,
   Volume2,
   VolumeX,
-  Maximize2,
   Tag,
   Clock,
   Send,
   Sparkles,
-  Layers,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { CommentCategory } from '@/types';
@@ -24,12 +22,12 @@ interface TimestampPlayerProps {
 }
 
 const CATEGORIES: { label: string; value: CommentCategory; color: string }[] = [
-  { label: 'B-Roll & Visuals', value: 'B_ROLL', color: '#ff9900' },
-  { label: 'Audio / Music', value: 'AUDIO', color: '#00ccff' },
-  { label: 'Pacing & Cuts', value: 'PACING', color: '#00ff66' },
-  { label: 'Text & Graphics', value: 'TEXT_GRAPHICS', color: '#ff00aa' },
-  { label: 'Color / Lighting', value: 'COLOR', color: '#aa00ff' },
-  { label: 'General Feedback', value: 'GENERAL', color: '#ffffff' },
+  { label: 'B-Roll & Visuals', value: 'B_ROLL', color: '#f59e0b' },
+  { label: 'Audio / Music', value: 'AUDIO', color: '#06b6d4' },
+  { label: 'Pacing & Cuts', value: 'PACING', color: '#10b981' },
+  { label: 'Text & Graphics', value: 'TEXT_GRAPHICS', color: '#ec4899' },
+  { label: 'Color / Lighting', value: 'COLOR', color: '#a855f7' },
+  { label: 'General Feedback', value: 'GENERAL', color: '#94a3b8' },
 ];
 
 export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: TimestampPlayerProps) {
@@ -43,8 +41,6 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
   const [playbackRate, setPlaybackRate] = useState<number>(1);
   const [activeCategory, setActiveCategory] = useState<CommentCategory>('B_ROLL');
   const [commentText, setCommentText] = useState<string>('');
-  const [isHoveringScrubber, setIsHoveringScrubber] = useState<boolean>(false);
-  const [hoverTime, setHoverTime] = useState<number>(0);
 
   // Sync external seek requests (e.g. clicking on a comment from the list)
   useEffect(() => {
@@ -142,13 +138,13 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
   return (
     <div className="flex flex-col gap-3">
       {/* Video Display Container */}
-      <div className="win95-sunken-dark relative overflow-hidden bg-black flex flex-col items-center justify-center border-2 border-neutral-700">
+      <div className="relative overflow-hidden bg-black rounded-lg border border-slate-700/80 shadow-md flex flex-col items-center justify-center">
         {/* Top Watermark / Status Header */}
-        <div className="absolute top-2 left-2 z-20 flex items-center gap-2 pointer-events-none">
-          <span className="bg-black/80 text-yellow-400 font-mono text-[10px] px-2 py-0.5 border border-yellow-500/50">
-            DRAFT V1 PREVIEW — TIME-CODE SYNCED
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 pointer-events-none">
+          <span className="bg-black/80 backdrop-blur-xs text-amber-300 font-mono text-[11px] px-2.5 py-1 rounded border border-amber-500/40 font-semibold shadow-xs">
+            DRAFT V1 PREVIEW • TIME-SYNCED
           </span>
-          <span className="bg-black/80 text-green-400 font-mono text-[10px] px-2 py-0.5 border border-green-500/50">
+          <span className="bg-black/80 backdrop-blur-xs text-emerald-400 font-mono text-[11px] px-2.5 py-1 rounded border border-emerald-500/40 font-semibold shadow-xs">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
         </div>
@@ -157,7 +153,8 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
         <video
           ref={videoRef}
           src={videoUrl}
-          className="w-full max-h-[380px] object-contain bg-black"
+          className="w-full max-h-[380px] object-contain bg-black cursor-pointer"
+          onClick={togglePlay}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={() => setIsPlaying(false)}
@@ -165,10 +162,10 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
         />
 
         {/* Video Scrubber with Marker Pins */}
-        <div className="w-full px-3 py-1.5 bg-[#1a1a1a] border-t border-neutral-800 flex flex-col gap-1">
-          <div className="relative w-full flex items-center h-5">
+        <div className="w-full px-4 py-2.5 bg-slate-900 border-t border-slate-800 flex flex-col gap-1.5">
+          <div className="relative w-full flex items-center h-6">
             {/* Scrubber Pin Markers for Revisions */}
-            <div className="absolute inset-x-0 h-2 top-1.5 pointer-events-none z-10">
+            <div className="absolute inset-x-0 h-2 top-2 pointer-events-none z-10">
               {activeProjectComments.map((comment) => {
                 const percent = duration > 0 ? (comment.timestamp_seconds / duration) * 100 : 0;
                 return (
@@ -184,7 +181,7 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
                     }}
                     title={`[${comment.formatted_time}] ${comment.comment}`}
                     style={{ left: `${Math.min(99, Math.max(1, percent))}%` }}
-                    className="absolute -top-1 w-2.5 h-4 -translate-x-1/2 cursor-pointer pointer-events-auto bg-amber-400 border border-black hover:scale-125 transition-transform"
+                    className="absolute -top-1 w-3 h-4 -translate-x-1/2 cursor-pointer pointer-events-auto bg-amber-400 hover:bg-amber-300 border border-slate-950 rounded-xs shadow-md hover:scale-125 transition-transform"
                   />
                 );
               })}
@@ -198,18 +195,16 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
               step="0.1"
               value={currentTime}
               onChange={handleScrubberChange}
-              onMouseEnter={() => setIsHoveringScrubber(true)}
-              onMouseLeave={() => setIsHoveringScrubber(false)}
-              className="w-full h-2 bg-neutral-700 rounded-none accent-[#ff9900] cursor-pointer"
+              className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none"
             />
           </div>
 
           {/* Player controls strip */}
-          <div className="flex items-center justify-between text-xs font-mono text-neutral-300">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-300">
+            <div className="flex items-center gap-2">
               <button
                 onClick={togglePlay}
-                className="win95-button px-2 py-0.5 text-black flex items-center gap-1 font-bold"
+                className="win95-button px-3 py-1 flex items-center gap-1.5 font-bold"
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                 <span>{isPlaying ? 'PAUSE' : 'PLAY'}</span>
@@ -217,7 +212,7 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
 
               <button
                 onClick={() => seekRelative(-5)}
-                className="win95-button px-1.5 py-0.5 text-black text-[11px]"
+                className="win95-button px-2 py-1 text-[11px]"
                 title="Rewind 5 seconds"
               >
                 -5s
@@ -225,7 +220,7 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
 
               <button
                 onClick={() => seekRelative(5)}
-                className="win95-button px-1.5 py-0.5 text-black text-[11px]"
+                className="win95-button px-2 py-1 text-[11px]"
                 title="Forward 5 seconds"
               >
                 +5s
@@ -233,28 +228,28 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
 
               <button
                 onClick={toggleMute}
-                className="win95-button px-1.5 py-0.5 text-black"
+                className="win95-button px-2 py-1"
                 title={isMuted ? 'Unmute' : 'Mute'}
               >
-                {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
               </button>
 
-              <span className="text-green-400 font-bold ml-1">
+              <span className="text-emerald-400 font-bold ml-1">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>
 
             {/* Playback speed selector */}
             <div className="flex items-center gap-1 text-[11px]">
-              <span className="text-neutral-400 hidden sm:inline">SPEED:</span>
+              <span className="text-slate-400 hidden sm:inline">SPEED:</span>
               {[1, 1.25, 1.5, 2].map((rate) => (
                 <button
                   key={rate}
                   onClick={() => handleSpeedChange(rate)}
-                  className={`px-1.5 py-0.2 border text-[10px] ${
+                  className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-colors ${
                     playbackRate === rate
-                      ? 'bg-[#000080] text-white border-blue-400 font-bold'
-                      : 'bg-[#2a2a2a] text-neutral-300 border-neutral-600 hover:bg-neutral-700'
+                      ? 'bg-blue-600 text-white font-bold'
+                      : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
                   }`}
                 >
                   {rate}x
@@ -266,26 +261,26 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
       </div>
 
       {/* Timestamp Feedback Input Box (The Core Coordination Engine) */}
-      <div className="win95-window p-3 border-2 border-black">
-        <div className="flex items-center justify-between pb-2 mb-2 border-b border-neutral-400">
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-4 h-4 text-[#000080]" />
-            <span className="font-bold text-xs font-mono uppercase text-[#000080]">
+      <div className="win95-window p-4 border border-slate-700/80 bg-slate-900/90 rounded-lg">
+        <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-800">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-blue-400" />
+            <span className="font-semibold text-xs text-slate-200">
               Add Revision Note at Timecode:
             </span>
-            <span className="px-2 py-0.5 bg-[#000080] text-yellow-300 font-mono font-bold text-xs border border-blue-400">
+            <span className="px-2 py-0.5 bg-blue-600/30 text-blue-300 font-mono font-bold text-xs rounded border border-blue-500/40">
               {formatTime(currentTime)}
             </span>
           </div>
 
-          <span className="text-[11px] text-neutral-600 hidden sm:inline">
+          <span className="text-[11px] text-slate-400 hidden sm:inline">
             Pins directly to video timeline
           </span>
         </div>
 
         {/* Category Pill Selectors */}
-        <div className="flex flex-wrap items-center gap-1 mb-2">
-          <span className="text-[11px] font-mono text-neutral-600 mr-1">Category:</span>
+        <div className="flex flex-wrap items-center gap-1.5 mb-3">
+          <span className="text-xs text-slate-400 mr-1">Category:</span>
           {CATEGORIES.map((cat) => (
             <button
               key={cat.value}
@@ -294,10 +289,10 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
                 retroSound.playClick();
                 setActiveCategory(cat.value);
               }}
-              className={`win95-button px-2 py-0.5 text-[11px] flex items-center gap-1 font-mono ${
+              className={`px-2.5 py-1 text-xs rounded-md flex items-center gap-1.5 font-medium transition-all ${
                 activeCategory === cat.value
-                  ? 'bg-[#000080] text-white border-blue-400 font-bold'
-                  : 'text-neutral-800'
+                  ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/80'
               }`}
             >
               <span
@@ -316,20 +311,20 @@ export function TimestampPlayer({ onSelectTimestamp, externalSeekSeconds }: Time
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder={`e.g., "${formatTime(currentTime)} - Replace B-roll with chart animation from Google Drive"`}
-            className="win95-sunken flex-1 px-2.5 py-1.5 text-xs text-neutral-900 font-sans focus:outline-none"
+            className="win95-sunken flex-1 px-3 py-2 text-xs font-sans text-slate-100 placeholder:text-slate-500"
           />
           <button
             type="submit"
             disabled={!commentText.trim()}
-            className="win95-button win95-button-primary px-3 py-1 text-xs font-bold flex items-center gap-1.5 disabled:opacity-50"
+            className="win95-button win95-button-primary px-4 py-2 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Drop Note</span>
           </button>
         </form>
 
-        <p className="text-[10px] text-neutral-500 mt-1 font-mono">
-          Tip: You can pause anywhere or click along the scrubber to capture an exact frame note.
+        <p className="text-[11px] text-slate-400 mt-2">
+          💡 Click along the video scrubber or pause anywhere to capture a frame note.
         </p>
       </div>
     </div>

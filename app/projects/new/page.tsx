@@ -7,9 +7,6 @@ import {
   FolderPlus,
   ArrowRight,
   ShieldCheck,
-  Film,
-  Sparkles,
-  Layers,
   ChevronLeft,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
@@ -50,7 +47,7 @@ export default function NewProjectPage() {
     e.preventDefault();
     if (!title.trim() || !brief.trim()) return;
 
-    const projectId = createProject({
+    createProject({
       title: title.trim(),
       brief: brief.trim(),
       category,
@@ -62,7 +59,7 @@ export default function NewProjectPage() {
       currency: 'USD',
       deadline,
       revision_limit: revisionLimit,
-      status: 'PAID', // Upfront funded in demo
+      status: 'PAID',
       deliverables: {
         aspect_ratio: aspectRatio,
         target_duration_minutes: targetDuration,
@@ -101,32 +98,32 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 font-sans">
-      <div className="mb-3">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 font-sans">
+      <div className="mb-2">
         <Link
           href="/projects"
           onClick={() => retroSound.playClick()}
-          className="win95-button px-2.5 py-1 text-xs font-mono font-bold inline-flex items-center gap-1 text-neutral-800"
+          className="win95-button px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1.5 text-slate-300"
         >
-          <ChevronLeft className="w-3.5 h-3.5" />
+          <ChevronLeft className="w-4 h-4" />
           <span>Back to Projects</span>
         </Link>
       </div>
 
       <RetroWindow
-        title="NEW_PROJECT_WIZARD.EXE — CREATE STRUCTURED BRIEF"
-        icon={<FolderPlus className="w-4 h-4 text-yellow-300" />}
+        title="NEW PROJECT WIZARD — CREATE STRUCTURED BRIEF"
+        icon={<FolderPlus className="w-4 h-4 text-blue-400" />}
       >
-        <form onSubmit={handleSubmit} className="space-y-5 text-xs text-neutral-900">
+        <form onSubmit={handleSubmit} className="space-y-6 text-xs text-slate-200">
           {/* Section 1: Basic Info */}
-          <div className="win95-window p-3 bg-white space-y-3">
-            <h3 className="font-bold text-xs font-mono text-[#000080] border-b border-neutral-300 pb-1 flex items-center gap-1.5">
-              <span>01. PROJECT OVERVIEW &amp; FORMAT</span>
+          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
+            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 uppercase tracking-wide">
+              01. Project Overview &amp; Format
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2">
-                <label className="block font-mono font-bold mb-1">
+                <label className="block font-semibold mb-1.5 text-slate-300">
                   Project Title:
                 </label>
                 <input
@@ -135,12 +132,12 @@ export default function NewProjectPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Inside Quantum Computing Episode 2"
-                  className="win95-sunken w-full px-2.5 py-1.5 text-xs text-neutral-900"
+                  className="win95-sunken w-full"
                 />
               </div>
 
               <div>
-                <label className="block font-mono font-bold mb-1">
+                <label className="block font-semibold mb-1.5 text-slate-300">
                   Video Category:
                 </label>
                 <select
@@ -148,7 +145,7 @@ export default function NewProjectPage() {
                   onChange={(e) =>
                     setCategory(e.target.value as Project['category'])
                   }
-                  className="win95-sunken w-full px-2 py-1.5 text-xs bg-white text-neutral-900"
+                  className="win95-sunken w-full"
                 >
                   <option value="YouTube Long-form">YouTube Long-form (16:9)</option>
                   <option value="Shorts / Reels">Shorts / Reels / TikTok (9:16)</option>
@@ -161,7 +158,7 @@ export default function NewProjectPage() {
             </div>
 
             <div>
-              <label className="block font-mono font-bold mb-1">
+              <label className="block font-semibold mb-1.5 text-slate-300">
                 Detailed Brief &amp; Narrative Goal:
               </label>
               <textarea
@@ -170,26 +167,26 @@ export default function NewProjectPage() {
                 value={brief}
                 onChange={(e) => setBrief(e.target.value)}
                 placeholder="Explain the pacing, hook requirements (first 15 seconds), B-roll tone, and audio vibes..."
-                className="win95-sunken w-full px-2.5 py-1.5 text-xs text-neutral-900"
+                className="win95-sunken w-full"
               />
             </div>
           </div>
 
           {/* Section 2: Technical Deliverables Specs */}
-          <div className="win95-window p-3 bg-white space-y-3">
-            <h3 className="font-bold text-xs font-mono text-[#000080] border-b border-neutral-300 pb-1 flex items-center gap-1.5">
-              <span>02. DELIVERABLES SPECIFICATION</span>
+          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
+            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 uppercase tracking-wide">
+              02. Deliverables Specification
             </h3>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block font-mono font-bold mb-1">Aspect Ratio:</label>
+                <label className="block font-semibold mb-1.5 text-slate-300">Aspect Ratio:</label>
                 <select
                   value={aspectRatio}
                   onChange={(e) =>
                     setAspectRatio(e.target.value as DeliverableSpec['aspect_ratio'])
                   }
-                  className="win95-sunken w-full px-2 py-1 text-xs bg-white"
+                  className="win95-sunken w-full"
                 >
                   <option value="16:9">16:9 (Horizontal)</option>
                   <option value="9:16">9:16 (Vertical)</option>
@@ -199,25 +196,25 @@ export default function NewProjectPage() {
               </div>
 
               <div>
-                <label className="block font-mono font-bold mb-1">Target Duration (Mins):</label>
+                <label className="block font-semibold mb-1.5 text-slate-300">Target Duration (Mins):</label>
                 <input
                   type="number"
                   min="1"
                   max="180"
                   value={targetDuration}
                   onChange={(e) => setTargetDuration(parseInt(e.target.value) || 10)}
-                  className="win95-sunken w-full px-2 py-1 text-xs"
+                  className="win95-sunken w-full"
                 />
               </div>
 
               <div>
-                <label className="block font-mono font-bold mb-1">Master Resolution:</label>
+                <label className="block font-semibold mb-1.5 text-slate-300">Master Resolution:</label>
                 <select
                   value={resolution}
                   onChange={(e) =>
                     setResolution(e.target.value as DeliverableSpec['resolution'])
                   }
-                  className="win95-sunken w-full px-2 py-1 text-xs bg-white"
+                  className="win95-sunken w-full"
                 >
                   <option value="4K (3840x2160)">4K (3840x2160)</option>
                   <option value="1080p (1920x1080)">1080p FHD</option>
@@ -226,11 +223,11 @@ export default function NewProjectPage() {
               </div>
 
               <div>
-                <label className="block font-mono font-bold mb-1">Included Revisions:</label>
+                <label className="block font-semibold mb-1.5 text-slate-300">Included Revisions:</label>
                 <select
                   value={revisionLimit}
                   onChange={(e) => setRevisionLimit(parseInt(e.target.value))}
-                  className="win95-sunken w-full px-2 py-1 text-xs bg-white"
+                  className="win95-sunken w-full"
                 >
                   <option value={1}>1 Revision Round</option>
                   <option value={2}>2 Revision Rounds (Standard)</option>
@@ -239,55 +236,59 @@ export default function NewProjectPage() {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-neutral-200 grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px]">
-              <label className="flex items-center gap-1.5 cursor-pointer">
+            <div className="pt-3 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={captionsIncluded}
                   onChange={(e) => setCaptionsIncluded(e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span>Dynamic Captions</span>
+                <span className="text-slate-300">Dynamic Captions</span>
               </label>
 
-              <label className="flex items-center gap-1.5 cursor-pointer">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={soundDesign}
                   onChange={(e) => setSoundDesign(e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span>Full Sound Design</span>
+                <span className="text-slate-300">Full Sound Design</span>
               </label>
 
-              <label className="flex items-center gap-1.5 cursor-pointer">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={colorGrading}
                   onChange={(e) => setColorGrading(e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span>Color Grading LUT</span>
+                <span className="text-slate-300">Color Grading LUT</span>
               </label>
 
-              <label className="flex items-center gap-1.5 cursor-pointer">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={thumbnailConcept}
                   onChange={(e) => setThumbnailConcept(e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span>Thumbnail Concept</span>
+                <span className="text-slate-300">Thumbnail Concept</span>
               </label>
             </div>
           </div>
 
           {/* Section 3: Budget & Milestone Split */}
-          <div className="win95-window p-3 bg-white space-y-3">
-            <h3 className="font-bold text-xs font-mono text-[#000080] border-b border-neutral-300 pb-1 flex items-center justify-between">
-              <span>03. BUDGET &amp; 30/70 MILESTONE PROTECTION</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
+            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 flex items-center justify-between uppercase tracking-wide">
+              <span>03. Budget &amp; 30/70 Milestone Protection</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block font-mono font-bold mb-1">
+                <label className="block font-semibold mb-1.5 text-slate-300">
                   Agreed Project Budget ($ USD):
                 </label>
                 <input
@@ -296,62 +297,62 @@ export default function NewProjectPage() {
                   step="25"
                   value={budget}
                   onChange={(e) => setBudget(parseInt(e.target.value) || 300)}
-                  className="win95-sunken w-full px-2 py-1 text-xs font-mono font-bold"
+                  className="win95-sunken w-full font-mono font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block font-mono font-bold mb-1">
+                <label className="block font-semibold mb-1.5 text-slate-300">
                   Estimated Delivery Deadline:
                 </label>
                 <input
                   type="date"
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}
-                  className="win95-sunken w-full px-2 py-1 text-xs"
+                  className="win95-sunken w-full"
                 />
               </div>
 
-              <div className="bg-neutral-50 p-2 border border-neutral-300 font-mono text-[11px] space-y-1">
+              <div className="bg-slate-950/70 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span>Milestone 1 (30% Upfront):</span>
-                  <strong className="text-blue-900">${upfrontAmount} USD</strong>
+                  <span className="text-slate-400">Milestone 1 (30% Upfront):</span>
+                  <strong className="text-blue-400 font-mono">${upfrontAmount} USD</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span>Milestone 2 (70% Master):</span>
-                  <strong className="text-amber-900">${finalAmount} USD</strong>
+                  <span className="text-slate-400">Milestone 2 (70% Master):</span>
+                  <strong className="text-amber-400 font-mono">${finalAmount} USD</strong>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Section 4: Assets & References */}
-          <div className="win95-window p-3 bg-white space-y-3">
-            <h3 className="font-bold text-xs font-mono text-[#000080] border-b border-neutral-300 pb-1">
-              04. ASSETS &amp; REFERENCE LINKS
+          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
+            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 uppercase tracking-wide">
+              04. Assets &amp; Reference Links
             </h3>
 
             <div>
-              <label className="block font-mono font-bold mb-1">
+              <label className="block font-semibold mb-1.5 text-slate-300">
                 Raw Footage / Assets Folder URL (Drive, Dropbox, Frame.io):
               </label>
               <textarea
                 rows={2}
                 value={rawFootageLinks}
                 onChange={(e) => setRawFootageLinks(e.target.value)}
-                className="win95-sunken w-full px-2.5 py-1 text-xs font-mono"
+                className="win95-sunken w-full font-mono"
               />
             </div>
 
             <div>
-              <label className="block font-mono font-bold mb-1">
+              <label className="block font-semibold mb-1.5 text-slate-300">
                 Style References / Video Links (One per line):
               </label>
               <textarea
                 rows={2}
                 value={references}
                 onChange={(e) => setReferences(e.target.value)}
-                className="win95-sunken w-full px-2.5 py-1 text-xs font-mono"
+                className="win95-sunken w-full font-mono"
               />
             </div>
           </div>
@@ -360,14 +361,14 @@ export default function NewProjectPage() {
           <div className="pt-2 flex justify-between items-center">
             <Link
               href="/projects"
-              className="win95-button px-4 py-2 font-mono font-bold"
+              className="win95-button px-4 py-2 font-semibold"
             >
               Cancel
             </Link>
 
             <button
               type="submit"
-              className="win95-button win95-button-primary px-6 py-2 text-xs font-mono font-bold flex items-center gap-2 text-yellow-300 shadow-md"
+              className="win95-button win95-button-primary px-6 py-2.5 text-xs font-semibold flex items-center gap-2 shadow-md"
             >
               <span>Initialize Project &amp; Fund Escrow</span>
               <ArrowRight className="w-4 h-4" />

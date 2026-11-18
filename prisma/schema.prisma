@@ -1,0 +1,244 @@
+// EditBridge - Next-Generation Creator–Editor Collaboration Platform
+// Database Schema based on Blueprint Section 12
+// Ready for SQLite (Local zero-config) or PostgreSQL (Supabase / Neon free tiers)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Change to "postgresql" for production Supabase / Neon deployment
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CREATOR
+  EDITOR
+  ADMIN
+}
+
+enum ProjectStatus {
+  DRAFT
+  PAYMENT_PENDING
+  PAID
+  EDITOR_ASSIGNED
+  EDITING
+  REVIEW_REQUESTED
+  CHANGES_REQUESTED
+  FINAL_RENDER
+  FINAL_UPLOADED
+  FINAL_PAYMENT_PENDING
+  COMPLETED
+  DISPUTED
+}
+
+enum MilestoneStatus {
+  PENDING
+  FUNDED
+  RELEASED
+  REFUNDED
+}
+
+enum RevisionStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum FeedbackCategory {
+  CUT
+  PACING
+  AUDIO
+  B_ROLL
+  COLOR
+  TEXT_GRAPHICS
+  GENERAL
+}
+
+// 1. Core User Model
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  fullName      String
+  role          UserRole  @default(CREATOR)
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  creatorProfile CreatorProfile?
+  editorProfile  EditorProfile?
+  createdProjects Project[]       @relation("CreatorProjects")
+  editedProjects  Project[]       @relation("EditorProjects")
+  sentMessages    Message[]
+  revisions       Revision[]
+  reviewsWritten  Review[]        @relation("ReviewsWritten")
+  reviewsReceived Review[]        @relation("ReviewsReceived")
+  payments        Payment[]
+
+  @@index([email])
+}
+
+// 2. Creator Specific Profile
+model CreatorProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelName    String
+  platform       String   @default("YouTube")
+  subscriberTier String   @default("100K_TO_500K")
+  totalSpend     Float    @default(0.0)
+  verifiedBadge  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+// 3. Editor Specific Profile
+model EditorProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio             String
+  hourlyRate      Float    @default(45.0)
+  niches          String   // Comma-separated or JSON array in SQLite
+  primarySoftware String   @default("Premiere Pro")
+  portfolioUrls   String   // Comma-separated or JSON array
+  totalEarnings   Float    @default(0.0)
+  rating          Float    @default(5.0)
+  verifiedBadge   Boolean  @default(false)
+  disputeRate     Float    @default(0.0)
+  turnaroundDays  Int      @default(3)
+  createdAt       DateTime @default(now())
+}
+
+// 4. Project Workspace Model
+model Project {
+  id               String        @id @default(cuid())
+  title            String
+  creatorId        String
+  creator          User          @relation("CreatorProjects", fields: [creatorId], references: [id])
+  editorId         String?
+  editor           User?         @relation("EditorProjects", fields: [editorId], references: [id])
+  briefDescription String
+  aspectRatio      String        @default("16:9")
+  targetDuration   String        @default("10-15 min")
+  totalBudget      Float
+  status           ProjectStatus @default(DRAFT)
+  activeDraftUrl   String?
+  watermarkActive  Boolean       @default(true)
+  currentRound     Int           @default(1)
+  maxRounds        Int           @default(3)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  milestones       Milestone[]
+  revisions        Revision[]
+  files            ProjectFile[]
+  messages         Message[]
+  payments         Payment[]
+  review           Review?
+
+  @@index([creatorId])
+  @@index([editorId])
+  @@index([status])
+}
+
+// 5. Escrow Milestones (30% Upfront / 70% Final Master)
+model Milestone {
+  id          String          @id @default(cuid())
+  projectId   String
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  percentage  Int             // 30 or 70
+  amount      Float
+  status      MilestoneStatus @default(PENDING)
+  releasedAt  DateTime?
+  payments    Payment[]
+
+  @@index([projectId])
+}
+
+// 6. Frame-Accurate Revision Feedback
+model Revision {
+  id          String           @id @default(cuid())
+  projectId   String
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  roundNumber Int              @default(1)
+  authorId    String
+  author      User             @relation(fields: [authorId], references: [id])
+  timeSeconds Float
+  category    FeedbackCategory @default(GENERAL)
+  comment     String
+  status      RevisionStatus   @default(PENDING)
+  createdAt   DateTime         @default(now())
+  resolvedAt  DateTime?
+
+  @@index([projectId])
+  @@index([status])
+}
+
+// 7. Project File Vault (With Master File Locking)
+model ProjectFile {
+  id               String   @id @default(cuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name             String
+  fileType         String
+  sizeBytes        Int
+  storageUrl       String
+  isMasterDelivery Boolean  @default(false)
+  isLocked         Boolean  @default(false)
+  uploadedBy       String
+  createdAt        DateTime @default(now())
+
+  @@index([projectId])
+}
+
+// 8. Project Messaging & Audit Trail
+model Message {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+// 9. Payment & Escrow Settlement Transactions
+model Payment {
+  id              String    @id @default(cuid())
+  projectId       String
+  project         Project   @relation(fields: [projectId], references: [id])
+  milestoneId     String?
+  milestone       Milestone? @relation(fields: [milestoneId], references: [id])
+  payerId         String
+  payer           User      @relation(fields: [payerId], references: [id])
+  amount          Float
+  platformFee     Float     @default(0.0)
+  status          String    @default("SETTLED")
+  transactionHash String    @unique
+  createdAt       DateTime  @default(now())
+
+  @@index([projectId])
+}
+
+// 10. Verified Review & Rating (Section 13)
+model Review {
+  id             String   @id @default(cuid())
+  projectId      String   @unique
+  project        Project  @relation(fields: [projectId], references: [id])
+  reviewerId     String
+  reviewer       User     @relation("ReviewsWritten", fields: [reviewerId], references: [id])
+  revieweeId     String
+  reviewee       User     @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+  rating         Int      @default(5)
+  comment        String
+  tags           String   // Comma-separated badges (e.g. "Superb Pacing, Fast Turnaround")
+  verifiedOnChain Boolean @default(true)
+  createdAt      DateTime @default(now())
+
+  @@index([reviewerId])
+  @@index([revieweeId])
+}

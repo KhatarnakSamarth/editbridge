@@ -62,76 +62,81 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-      <div className="win95-window max-w-lg w-full">
-        <div className="win95-titlebar">
-          <span className="flex items-center gap-1 font-bold">
-            <Award className="w-4 h-4 text-yellow-300" />
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="win95-window max-w-lg w-full bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+        <div className="win95-titlebar px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+          <span className="flex items-center gap-2 font-bold text-xs text-slate-200">
+            <Award className="w-4 h-4 text-amber-400" />
             SUBMIT VERIFIED PROJECT REVIEW &amp; RATING
           </span>
           <button
             onClick={onClose}
-            className="w-5 h-5 bg-[#c0c0c0] text-black border border-black text-xs font-bold"
+            className="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition-colors flex items-center justify-center"
+            title="Close"
+            aria-label="Close"
           >
             ✕
           </button>
         </div>
 
-        <div className="p-4 bg-[#c0c0c0] text-xs font-sans space-y-3">
+        <div className="p-5 text-sm space-y-4">
           {submitted ? (
-            <div className="p-4 bg-green-50 border-2 border-green-600 text-green-900 font-mono text-center space-y-2">
-              <CheckCircle2 className="w-8 h-8 text-green-700 mx-auto" />
-              <p className="font-bold text-sm">Review Recorded on EditBridge Chain!</p>
-              <p className="text-xs">
-                Your feedback has been added to {activeProject.editor_name}&apos;s verified track record.
+            <div className="p-5 bg-emerald-950/40 border border-emerald-800/60 rounded-lg text-emerald-200 text-center space-y-3">
+              <CheckCircle2 className="w-9 h-9 text-emerald-400 mx-auto" />
+              <p className="font-bold text-sm text-emerald-300">Review Recorded on EditBridge Chain!</p>
+              <p className="text-xs text-emerald-100">
+                Your feedback has been verified and added to {activeProject.editor_name}&apos;s verified track record.
               </p>
               <button
                 onClick={() => {
                   setSubmitted(false);
                   onClose();
                 }}
-                className="win95-button win95-button-primary px-4 py-1 text-xs font-bold"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors"
               >
                 Close
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <span className="font-bold font-mono text-neutral-800 block mb-1">
+                <span className="font-semibold text-slate-300 text-xs block mb-2">
                   Overall Rating for {activeProject.editor_name}:
                 </span>
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      type="button"
-                      key={star}
-                      onClick={() => {
-                        retroSound.playClick();
-                        setRating(star);
-                      }}
-                      className="p-1 text-amber-500 hover:scale-110"
-                    >
-                      <Star
-                        className={`w-6 h-6 ${
-                          star <= rating
-                            ? 'fill-amber-400 text-amber-600'
-                            : 'text-neutral-400'
-                        }`}
-                      />
-                    </button>
-                  ))}
-                  <span className="font-mono font-bold text-sm text-neutral-800 ml-2">
+                <div className="flex items-center gap-2 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => {
+                          retroSound.playClick();
+                          setRating(star);
+                        }}
+                        className="p-1 text-amber-400 hover:scale-115 transition-transform"
+                        title={`${star} stars`}
+                      >
+                        <Star
+                          className={`w-6 h-6 ${
+                            star <= rating
+                              ? 'fill-amber-400 text-amber-400'
+                              : 'text-slate-600'
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <span className="font-mono font-bold text-sm text-amber-300 ml-2">
                     {rating}.0 / 5.0
                   </span>
                 </div>
               </div>
 
               <div>
-                <span className="font-bold font-mono text-neutral-800 block mb-1">
+                <span className="font-semibold text-slate-300 text-xs block mb-2">
                   Select Highlight Badges:
                 </span>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1.5">
                   {TAG_OPTIONS.map((tag) => {
                     const isSelected = selectedTags.includes(tag);
                     return (
@@ -139,13 +144,13 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                         type="button"
                         key={tag}
                         onClick={() => toggleTag(tag)}
-                        className={`win95-button px-2 py-0.5 text-[10px] font-mono ${
+                        className={`px-2.5 py-1 rounded text-xs transition-colors border ${
                           isSelected
-                            ? 'bg-[#000080] text-white border-blue-400 font-bold'
-                            : 'text-neutral-800'
+                            ? 'bg-blue-600 border-blue-500 text-white font-medium'
+                            : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
                         }`}
                       >
-                        {isSelected ? '✓ ' : ''}
+                        {isSelected ? '✓ ' : '+ '}
                         {tag}
                       </button>
                     );
@@ -154,7 +159,7 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
               </div>
 
               <div>
-                <label className="block font-bold text-neutral-800 font-mono mb-1">
+                <label className="block font-semibold text-slate-300 text-xs mb-1.5">
                   Written Feedback:
                 </label>
                 <textarea
@@ -163,21 +168,21 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Share details about pacing, communication, and adherence to brief..."
-                  className="win95-sunken w-full px-2 py-1.5 text-xs text-neutral-900"
+                  className="w-full px-3 py-2 text-xs text-slate-100 bg-slate-950 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 placeholder-slate-500"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-2 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="win95-button px-3 py-1 font-bold font-mono"
+                  className="px-3.5 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="win95-button win95-button-primary px-4 py-1 font-bold font-mono"
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg text-xs font-bold shadow-sm transition-colors"
                 >
                   Submit Review
                 </button>
