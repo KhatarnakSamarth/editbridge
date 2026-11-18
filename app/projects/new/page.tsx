@@ -17,7 +17,7 @@ import { retroSound } from '@/lib/soundEffects';
 
 export default function NewProjectPage() {
   const router = useRouter();
-  const { createProject, currentUser } = useEditBridge();
+  const { createProject, currentUser, isAuthenticated, loginAsDemo } = useEditBridge();
 
   const [title, setTitle] = useState('');
   const [brief, setBrief] = useState('');
@@ -97,6 +97,40 @@ export default function NewProjectPage() {
 
     router.push('/workspace');
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16">
+        <div className="bg-white dark:bg-[#0c1222] border border-cyan-500/30 rounded-3xl p-8 sm:p-12 shadow-2xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-3xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center mx-auto">
+            <FolderPlus className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">
+              Sign In to Post a Video Project Brief
+            </h1>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Only authenticated creators can fund escrow milestones and assign video editors.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => loginAsDemo('CREATOR')}
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs cursor-pointer shadow-md shadow-blue-500/20"
+            >
+              Instant Login as Creator (Marcus)
+            </button>
+            <Link
+              href="/signin"
+              className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center justify-center"
+            >
+              Sign In with Password
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 font-sans">

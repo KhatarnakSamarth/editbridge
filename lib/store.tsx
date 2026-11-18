@@ -80,8 +80,6 @@ interface EditBridgeContextType {
   editors: EditorProfile[];
 
   // Modern Theme & Audio Controls
-  crtMode: boolean;
-  toggleCrtMode: () => void;
   soundEnabled: boolean;
   toggleSound: () => void;
   themeMode: 'DARK' | 'LIGHT';
@@ -99,7 +97,7 @@ const STORAGE_KEY = 'editbridge_state_v3';
 
 export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [activeRole, setActiveRole] = useState<UserRole>('CREATOR');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [customUser, setCustomUser] = useState<User | null>(null);
 
   const [activeProjectId, setActiveProjectId] = useState<string>('proj-demo-1');
@@ -108,7 +106,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [files, setFiles] = useState<ProjectFile[]>(INITIAL_FILES);
   const [messages, setMessages] = useState<ProjectMessage[]>(INITIAL_MESSAGES);
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
-  const [crtMode, setCrtMode] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [themeMode, setThemeMode] = useState<'DARK' | 'LIGHT'>('DARK');
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -196,10 +193,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     setThemeMode((prev) => (prev === 'DARK' ? 'LIGHT' : 'DARK'));
   };
 
-  const toggleCrtMode = () => {
-    setCrtMode(false);
-  };
-
   // Sound sync
   const toggleSound = () => {
     const next = !soundEnabled;
@@ -217,15 +210,27 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     setReviews(INITIAL_REVIEWS);
     setActiveProjectId('proj-demo-1');
     setActiveRole('CREATOR');
-    setIsAuthenticated(true);
+    setIsAuthenticated(false);
     setCustomUser(null);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {}
   };
 
-  // Derive Current User based on role or logged in custom user
+  // Derive Current User based on authentication and active role
   const currentUser: User = useMemo(() => {
+    if (!isAuthenticated) {
+      return {
+        id: 'guest',
+        name: 'Guest Visitor',
+        email: 'guest@editbridge.network',
+        role: 'CREATOR',
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        created_at: new Date().toISOString(),
+        account_status: 'ACTIVE',
+        badge: 'Guest (Sign in to unlock)',
+      };
+    }
     if (customUser && customUser.role === activeRole) {
       return customUser;
     }
@@ -235,13 +240,12 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     if (activeRole === 'EDITOR') {
       return INITIAL_USERS[1]; // Alex Rivera
     }
-    return INITIAL_USERS[5]; // System Admin (Elena Drake)
-  }, [activeRole, customUser]);
+    return INITIAL_USERS[5]; // Elena Drake (Root Admin)
+  }, [isAuthenticated, activeRole, customUser]);
 
   const switchRole = (role: UserRole) => {
     retroSound.playClick();
     setActiveRole(role);
-    setIsAuthenticated(true);
   };
 
   const loginAsDemo = (role: UserRole) => {
@@ -584,8 +588,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         reviews,
         submitReview,
         editors: INITIAL_EDITORS,
-        crtMode,
-        toggleCrtMode,
         soundEnabled,
         toggleSound,
         themeMode,

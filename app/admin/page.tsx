@@ -54,7 +54,7 @@ interface LiveUser {
 }
 
 export default function AdminOpsPage() {
-  const { activeRole, currentUser, loginAsDemo } = useEditBridge();
+  const { activeRole, currentUser, loginAsDemo, isAuthenticated } = useEditBridge();
 
   const [metrics, setMetrics] = useState({
     totalUsers: 4,
@@ -151,8 +151,8 @@ export default function AdminOpsPage() {
     );
   };
 
-  // RBAC Barrier: Non-Admins cannot access this operational page
-  if (activeRole !== 'ADMIN') {
+  // RBAC Barrier: Non-Admins & unauthenticated guests cannot access this operational page
+  if (!isAuthenticated || activeRole !== 'ADMIN') {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 space-y-6">
         <div className="bg-white dark:bg-[#0c1222] border border-amber-500/30 dark:border-amber-500/20 rounded-3xl p-8 sm:p-12 shadow-2xl text-center space-y-6 relative overflow-hidden">

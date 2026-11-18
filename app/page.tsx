@@ -71,10 +71,7 @@ export default function LandingPage() {
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
               <Link
                 href="/workspace"
-                onClick={() => {
-                  retroSound.playDing();
-                  switchRole('CREATOR');
-                }}
+                onClick={() => retroSound.playDing()}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all hover:scale-102 active:scale-98"
               >
                 <span>Launch Creator Workspace</span>
@@ -82,14 +79,11 @@ export default function LandingPage() {
               </Link>
 
               <Link
-                href="/workspace"
-                onClick={() => {
-                  retroSound.playDing();
-                  switchRole('EDITOR');
-                }}
+                href="/editors"
+                onClick={() => retroSound.playDing()}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 transition-all hover:scale-102 active:scale-98"
               >
-                <span>Enter as Editor (Alex)</span>
+                <span>Discover Vetted Editors</span>
                 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>

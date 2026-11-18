@@ -20,6 +20,7 @@ import {
   ArrowRight,
   ShieldCheck,
   HardDrive,
+  Lock,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { TimestampPlayer } from '@/components/TimestampPlayer';
@@ -55,6 +56,8 @@ function ProjectWorkspaceContent() {
     updateProjectStatus,
     activeRole,
     releaseFinalMilestone,
+    isAuthenticated,
+    loginAsDemo,
   } = useEditBridge();
 
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('REVIEW');
@@ -62,6 +65,74 @@ function ProjectWorkspaceContent() {
   const [isLiveReviewOpen, setIsLiveReviewOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  // Authentication Gate: Users must be logged in to access workstation & escrow vaults
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16">
+        <div className="bg-white dark:bg-[#0c1222] border border-cyan-500/30 dark:border-cyan-500/20 rounded-3xl p-8 sm:p-12 shadow-2xl text-center space-y-6 relative overflow-hidden">
+          <div className="w-16 h-16 rounded-3xl bg-cyan-500/10 dark:bg-cyan-500/20 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mx-auto shadow-inner">
+            <Lock className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-2 max-w-lg mx-auto">
+            <span className="text-[11px] font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+              Authentication Required
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+              Sign In to Enter Project Workspace
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Video assets, frame-accurate timeline reviews, and 30/70 escrow payment releases are securely restricted to authenticated project members.
+            </p>
+          </div>
+
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md mx-auto text-left space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              <span>Instant Hackathon 1-Click Access:</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <button
+                onClick={() => loginAsDemo('CREATOR')}
+                className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] transition-all cursor-pointer shadow-xs text-center"
+              >
+                👤 Creator (Marcus)
+              </button>
+              <button
+                onClick={() => loginAsDemo('EDITOR')}
+                className="p-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] transition-all cursor-pointer shadow-xs text-center"
+              >
+                🎬 Editor (Alex)
+              </button>
+              <button
+                onClick={() => loginAsDemo('ADMIN')}
+                className="p-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-[11px] transition-all cursor-pointer shadow-xs text-center"
+              >
+                🛡️ Admin (Elena)
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Link
+              href="/signin"
+              className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
+            >
+              <span>Sign In with Password</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/signup"
+              className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 transition-all"
+            >
+              <span>Create Free Account</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!activeProject) {
     return (

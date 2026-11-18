@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // Set to "postgresql" for cloud deployment
+  provider = "postgresql" // Ready for Supabase / Neon Cloud PostgreSQL
   url      = env("DATABASE_URL")
 }
 

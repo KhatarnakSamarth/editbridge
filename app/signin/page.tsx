@@ -78,10 +78,14 @@ export default function SignInPage() {
     try {
       const result = await login(email, password);
       if (result.success) {
-        setSuccessMessage('Authentication verified! Redirecting to workspace...');
+        setSuccessMessage('Authentication verified! Redirecting...');
         setTimeout(() => {
-          router.push('/workspace');
-        }, 600);
+          if (email.toLowerCase().includes('admin') || email.toLowerCase().includes('ops')) {
+            router.push('/admin');
+          } else {
+            router.push('/workspace');
+          }
+        }, 500);
       } else {
         setErrorMessage(result.error || 'Invalid credentials. Please try sample accounts below.');
       }
