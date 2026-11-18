@@ -233,6 +233,28 @@ function ProjectWorkspaceContent() {
             })}
           </div>
         </div>
+
+        {/* Dynamic Role Workspace Context Banner */}
+        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between flex-wrap gap-2 text-xs">
+          {activeRole === 'CREATOR' && (
+            <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 px-3.5 py-1.5 rounded-xl w-full">
+              <span className="font-bold">👤 Creator Perspective:</span>
+              <span>You hold 30/70 escrow release authority. Review video frames, log feedback markers, and approve final master delivery.</span>
+            </div>
+          )}
+          {activeRole === 'EDITOR' && (
+            <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/60 px-3.5 py-1.5 rounded-xl w-full">
+              <span className="font-bold">🎬 Editor Perspective:</span>
+              <span>Check off revision pins in the checklist, upload watermarked draft cuts, and deposit locked master deliverables to trigger the 70% payout.</span>
+            </div>
+          )}
+          {activeRole === 'ADMIN' && (
+            <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 px-3.5 py-1.5 rounded-xl w-full">
+              <span className="font-bold">🛡️ Platform Ops Inspector:</span>
+              <span>Monitoring project escrow, revision round limits, and file integrity. For dispute arbitration, visit <Link href="/admin" className="underline font-bold">Admin Ops</Link>.</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modern Workspace Navigation Tabs */}

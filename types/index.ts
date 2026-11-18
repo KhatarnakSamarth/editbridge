@@ -102,6 +102,7 @@ export interface ProjectFile {
   version: string;
   url: string;
   is_locked?: boolean;
+  is_master_delivery?: boolean;
   lock_reason?: string;
   created_at: string;
   checksum?: string;
@@ -127,6 +128,17 @@ export interface DeliverableSpec {
   color_grading: boolean;
 }
 
+export interface EscrowInfo {
+  total_budget: number;
+  upfront_percentage: number;
+  upfront_amount: number;
+  upfront_released: boolean;
+  final_percentage: number;
+  final_amount: number;
+  final_released: boolean;
+  platform_fee_percent?: number;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -150,6 +162,8 @@ export interface Project {
   references: string[];
   raw_footage_links: string[];
   milestones: Milestone[];
+  escrow?: EscrowInfo;
+  watermark_active?: boolean;
   created_at: string;
   updated_at: string;
   active_draft_url?: string;

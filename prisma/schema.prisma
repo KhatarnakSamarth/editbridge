@@ -1,58 +1,14 @@
 // EditBridge - Next-Generation Creator–Editor Collaboration Platform
 // Database Schema based on Blueprint Section 12
-// Ready for SQLite (Local zero-config) or PostgreSQL (Supabase / Neon free tiers)
+// Ready for SQLite (Local zero-config dev.db) or PostgreSQL (Supabase / Neon free tiers)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite" // Change to "postgresql" for production Supabase / Neon deployment
+  provider = "sqlite" // Set to "postgresql" for cloud deployment
   url      = env("DATABASE_URL")
-}
-
-enum UserRole {
-  CREATOR
-  EDITOR
-  ADMIN
-}
-
-enum ProjectStatus {
-  DRAFT
-  PAYMENT_PENDING
-  PAID
-  EDITOR_ASSIGNED
-  EDITING
-  REVIEW_REQUESTED
-  CHANGES_REQUESTED
-  FINAL_RENDER
-  FINAL_UPLOADED
-  FINAL_PAYMENT_PENDING
-  COMPLETED
-  DISPUTED
-}
-
-enum MilestoneStatus {
-  PENDING
-  FUNDED
-  RELEASED
-  REFUNDED
-}
-
-enum RevisionStatus {
-  PENDING
-  IN_PROGRESS
-  RESOLVED
-}
-
-enum FeedbackCategory {
-  CUT
-  PACING
-  AUDIO
-  B_ROLL
-  COLOR
-  TEXT_GRAPHICS
-  GENERAL
 }
 
 // 1. Core User Model
@@ -61,7 +17,7 @@ model User {
   email         String    @unique
   passwordHash  String
   fullName      String
-  role          UserRole  @default(CREATOR)
+  role          String    @default("CREATOR") // CREATOR, EDITOR, ADMIN
   avatarUrl     String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -99,9 +55,9 @@ model EditorProfile {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   bio             String
   hourlyRate      Float    @default(45.0)
-  niches          String   // Comma-separated or JSON array in SQLite
+  niches          String   // Comma-separated or JSON string
   primarySoftware String   @default("Premiere Pro")
-  portfolioUrls   String   // Comma-separated or JSON array
+  portfolioUrls   String   // Comma-separated or JSON string
   totalEarnings   Float    @default(0.0)
   rating          Float    @default(5.0)
   verifiedBadge   Boolean  @default(false)
@@ -122,7 +78,7 @@ model Project {
   aspectRatio      String        @default("16:9")
   targetDuration   String        @default("10-15 min")
   totalBudget      Float
-  status           ProjectStatus @default(DRAFT)
+  status           String        @default("DRAFT") // DRAFT, PAID, EDITING, REVIEW_REQUESTED, CHANGES_REQUESTED, FINAL_RENDER, FINAL_UPLOADED, FINAL_PAYMENT_PENDING, COMPLETED, DISPUTED
   activeDraftUrl   String?
   watermarkActive  Boolean       @default(true)
   currentRound     Int           @default(1)
@@ -144,13 +100,13 @@ model Project {
 
 // 5. Escrow Milestones (30% Upfront / 70% Final Master)
 model Milestone {
-  id          String          @id @default(cuid())
+  id          String    @id @default(cuid())
   projectId   String
-  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   title       String
-  percentage  Int             // 30 or 70
+  percentage  Int       // 30 or 70
   amount      Float
-  status      MilestoneStatus @default(PENDING)
+  status      String    @default("PENDING") // PENDING, FUNDED, RELEASED, REFUNDED
   releasedAt  DateTime?
   payments    Payment[]
 
@@ -159,17 +115,17 @@ model Milestone {
 
 // 6. Frame-Accurate Revision Feedback
 model Revision {
-  id          String           @id @default(cuid())
+  id          String    @id @default(cuid())
   projectId   String
-  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  roundNumber Int              @default(1)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  roundNumber Int       @default(1)
   authorId    String
-  author      User             @relation(fields: [authorId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id])
   timeSeconds Float
-  category    FeedbackCategory @default(GENERAL)
+  category    String    @default("GENERAL") // B_ROLL, AUDIO, PACING, TEXT_GRAPHICS, COLOR, GENERAL
   comment     String
-  status      RevisionStatus   @default(PENDING)
-  createdAt   DateTime         @default(now())
+  status      String    @default("PENDING") // PENDING, IN_PROGRESS, RESOLVED
+  createdAt   DateTime  @default(now())
   resolvedAt  DateTime?
 
   @@index([projectId])
@@ -182,7 +138,7 @@ model ProjectFile {
   projectId        String
   project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name             String
-  fileType         String
+  fileType         String   // RAW_FOOTAGE, DRAFT_VIDEO, FINAL_MASTER, ASSET, REFERENCE
   sizeBytes        Int
   storageUrl       String
   isMasterDelivery Boolean  @default(false)
@@ -208,18 +164,18 @@ model Message {
 
 // 9. Payment & Escrow Settlement Transactions
 model Payment {
-  id              String    @id @default(cuid())
+  id              String     @id @default(cuid())
   projectId       String
-  project         Project   @relation(fields: [projectId], references: [id])
+  project         Project    @relation(fields: [projectId], references: [id])
   milestoneId     String?
   milestone       Milestone? @relation(fields: [milestoneId], references: [id])
   payerId         String
-  payer           User      @relation(fields: [payerId], references: [id])
+  payer           User       @relation(fields: [payerId], references: [id])
   amount          Float
-  platformFee     Float     @default(0.0)
-  status          String    @default("SETTLED")
-  transactionHash String    @unique
-  createdAt       DateTime  @default(now())
+  platformFee     Float      @default(0.0)
+  status          String     @default("SETTLED")
+  transactionHash String     @unique
+  createdAt       DateTime   @default(now())
 
   @@index([projectId])
 }

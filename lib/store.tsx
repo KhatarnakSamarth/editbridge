@@ -28,10 +28,14 @@ import {
 import { retroSound } from '@/lib/soundEffects';
 
 interface EditBridgeContextType {
-  // Roles & Current User
+  // Roles & Authentication
   currentUser: User;
   activeRole: UserRole;
+  isAuthenticated: boolean;
   switchRole: (role: UserRole) => void;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  loginAsDemo: (role: UserRole) => void;
+  logout: () => void;
 
   // Projects
   projects: Project[];
@@ -59,7 +63,7 @@ interface EditBridgeContextType {
   addProjectFile: (file: Omit<ProjectFile, 'id' | 'created_at'>) => void;
   unlockMasterFile: (projectId: string) => void;
 
-  // Messages / Retro Chat
+  // Messages / Chat
   messages: ProjectMessage[];
   activeProjectMessages: ProjectMessage[];
   sendMessage: (projectId: string, text: string) => void;
@@ -91,10 +95,13 @@ interface EditBridgeContextType {
 
 const EditBridgeContext = createContext<EditBridgeContextType | null>(null);
 
-const STORAGE_KEY = 'editbridge_state_v2';
+const STORAGE_KEY = 'editbridge_state_v3';
 
 export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [activeRole, setActiveRole] = useState<UserRole>('CREATOR');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [customUser, setCustomUser] = useState<User | null>(null);
+
   const [activeProjectId, setActiveProjectId] = useState<string>('proj-demo-1');
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [revisionComments, setRevisionComments] = useState<RevisionComment[]>(INITIAL_REVISION_COMMENTS);
@@ -128,6 +135,8 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         if (parsed.messages) setMessages(parsed.messages);
         if (parsed.reviews) setReviews(parsed.reviews);
         if (parsed.activeRole) setActiveRole(parsed.activeRole);
+        if (parsed.isAuthenticated !== undefined) setIsAuthenticated(parsed.isAuthenticated);
+        if (parsed.customUser) setCustomUser(parsed.customUser);
         if (parsed.themeMode === 'DARK' || parsed.themeMode === 'LIGHT') {
           setThemeMode(parsed.themeMode);
         }
@@ -153,6 +162,8 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
           messages,
           reviews,
           activeRole,
+          isAuthenticated,
+          customUser,
           themeMode,
           soundEnabled,
         })
@@ -160,7 +171,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
-  }, [projects, revisionComments, files, messages, reviews, activeRole, themeMode, soundEnabled]);
+  }, [projects, revisionComments, files, messages, reviews, activeRole, isAuthenticated, customUser, themeMode, soundEnabled]);
 
   // Apply dark / light class to root document & body
   useEffect(() => {
@@ -186,7 +197,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleCrtMode = () => {
-    // Legacy stub preserved for API compatibility
     setCrtMode(false);
   };
 
@@ -207,25 +217,81 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     setReviews(INITIAL_REVIEWS);
     setActiveProjectId('proj-demo-1');
     setActiveRole('CREATOR');
+    setIsAuthenticated(true);
+    setCustomUser(null);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {}
   };
 
-  // Derive Current User based on role
+  // Derive Current User based on role or logged in custom user
   const currentUser: User = useMemo(() => {
+    if (customUser && customUser.role === activeRole) {
+      return customUser;
+    }
     if (activeRole === 'CREATOR') {
       return INITIAL_USERS[0]; // Marcus Sterling
     }
     if (activeRole === 'EDITOR') {
       return INITIAL_USERS[1]; // Alex Rivera
     }
-    return INITIAL_USERS[5]; // System Admin
-  }, [activeRole]);
+    return INITIAL_USERS[5]; // System Admin (Elena Drake)
+  }, [activeRole, customUser]);
 
   const switchRole = (role: UserRole) => {
     retroSound.playClick();
     setActiveRole(role);
+    setIsAuthenticated(true);
+  };
+
+  const loginAsDemo = (role: UserRole) => {
+    retroSound.playDing();
+    setActiveRole(role);
+    setIsAuthenticated(true);
+    setCustomUser(null);
+  };
+
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.user) {
+        retroSound.playDing();
+        setCustomUser(data.user);
+        setActiveRole(data.user.role as UserRole);
+        setIsAuthenticated(true);
+        return { success: true };
+      } else {
+        return { success: false, error: data.error || 'Invalid credentials' };
+      }
+    } catch (err: any) {
+      // Fallback for offline demo
+      const normalized = email.toLowerCase().trim();
+      if (normalized.includes('creator') || normalized.includes('marcus')) {
+        loginAsDemo('CREATOR');
+        return { success: true };
+      }
+      if (normalized.includes('editor') || normalized.includes('alex')) {
+        loginAsDemo('EDITOR');
+        return { success: true };
+      }
+      if (normalized.includes('admin') || normalized.includes('ops')) {
+        loginAsDemo('ADMIN');
+        return { success: true };
+      }
+      return { success: false, error: 'Authentication service unavailable' };
+    }
+  };
+
+  const logout = () => {
+    retroSound.playClick();
+    setIsAuthenticated(false);
+    setCustomUser(null);
   };
 
   // Active Project
@@ -233,54 +299,65 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     return projects.find((p) => p.id === activeProjectId) || projects[0];
   }, [projects, activeProjectId]);
 
+  // Active Project Comments
   const activeProjectComments = useMemo(() => {
-    return revisionComments.filter((c) => c.project_id === activeProjectId);
+    return revisionComments
+      .filter((c) => c.project_id === activeProjectId)
+      .sort((a, b) => a.timestamp_seconds - b.timestamp_seconds);
   }, [revisionComments, activeProjectId]);
 
+  // Active Project Files
   const activeProjectFiles = useMemo(() => {
     return files.filter((f) => f.project_id === activeProjectId);
   }, [files, activeProjectId]);
 
+  // Active Project Messages
   const activeProjectMessages = useMemo(() => {
-    return messages.filter((m) => m.project_id === activeProjectId);
+    return messages
+      .filter((m) => m.project_id === activeProjectId)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   }, [messages, activeProjectId]);
 
-  // Project Status Transitions
+  // Update Project Status
   const updateProjectStatus = (projectId: string, newStatus: ProjectStatus) => {
     retroSound.playDing();
     setProjects((prev) =>
-      prev.map((proj) => {
-        if (proj.id === projectId) {
-          return {
-            ...proj,
-            status: newStatus,
-            updated_at: new Date().toISOString(),
-          };
-        }
-        return proj;
-      })
+      prev.map((p) => (p.id === projectId ? { ...p, status: newStatus, updated_at: new Date().toISOString() } : p))
     );
+
+    // Call API in background
+    fetch(`/api/projects/${projectId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    }).catch(() => {});
   };
 
-  // Create Project Brief
-  const createProject = (
-    newProject: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'revisions_used'>
-  ): string => {
+  // Create Project
+  const createProject = (newProjectData: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'revisions_used'>) => {
     retroSound.playDing();
-    const id = `proj-${Date.now()}`;
-    const fullProject: Project = {
-      ...newProject,
-      id,
+    const newId = `proj-${Date.now()}`;
+    const newProj: Project = {
+      ...newProjectData,
+      id: newId,
       revisions_used: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    setProjects((prev) => [fullProject, ...prev]);
-    setActiveProjectId(id);
-    return id;
+    setProjects((prev) => [newProj, ...prev]);
+    setActiveProjectId(newId);
+
+    // Call API in background
+    fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newProj),
+    }).catch(() => {});
+
+    return newId;
   };
 
-  // Add Timestamp Comment
+  // Add Revision Comment
   const addRevisionComment = (data: {
     projectId: string;
     videoVersion: string;
@@ -288,163 +365,174 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     comment: string;
     category: CommentCategory;
   }) => {
-    retroSound.playClick();
+    retroSound.playDing();
     const mins = Math.floor(data.timestampSeconds / 60);
     const secs = Math.floor(data.timestampSeconds % 60);
-    const formatted_time = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
     const newComment: RevisionComment = {
       id: `rev-${Date.now()}`,
       project_id: data.projectId,
       video_version: data.videoVersion,
       timestamp_seconds: data.timestampSeconds,
-      formatted_time,
+      formatted_time: formatted,
       comment: data.comment,
       category: data.category,
       status: 'PENDING',
       created_by_name: currentUser.name,
-      created_by_role: currentUser.role,
+      created_by_role: activeRole,
       created_at: new Date().toISOString(),
     };
 
-    setRevisionComments((prev) => [newComment, ...prev]);
+    setRevisionComments((prev) => [...prev, newComment]);
 
-    // Automatically advance project status to CHANGES_REQUESTED if currently in REVIEW_REQUESTED
-    const targetProj = projects.find((p) => p.id === data.projectId);
-    if (targetProj && targetProj.status === 'REVIEW_REQUESTED') {
-      updateProjectStatus(data.projectId, 'CHANGES_REQUESTED');
-    }
+    // Send to API
+    fetch('/api/revisions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_id: data.projectId,
+        time_seconds: data.timestampSeconds,
+        comment: data.comment,
+        category: data.category,
+        author_id: currentUser.id,
+      }),
+    }).catch(() => {});
   };
 
-  // Update Comment Status (Pending -> In Progress -> Resolved)
+  // Update Comment Status
   const updateCommentStatus = (commentId: string, status: RevisionCommentStatus) => {
     retroSound.playClick();
     setRevisionComments((prev) =>
-      prev.map((c) => {
-        if (c.id === commentId) {
-          return {
-            ...c,
-            status,
-            resolved_at: status === 'RESOLVED' ? new Date().toISOString() : undefined,
-          };
-        }
-        return c;
-      })
+      prev.map((c) =>
+        c.id === commentId
+          ? { ...c, status, resolved_at: status === 'RESOLVED' ? new Date().toISOString() : undefined }
+          : c
+      )
     );
+
+    fetch('/api/revisions', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: commentId, status }),
+    }).catch(() => {});
   };
 
-  // File Upload
-  const addProjectFile = (file: Omit<ProjectFile, 'id' | 'created_at'>) => {
+  // Add Project File
+  const addProjectFile = (fileData: Omit<ProjectFile, 'id' | 'created_at'>) => {
     retroSound.playDing();
     const newFile: ProjectFile = {
-      ...file,
+      ...fileData,
       id: `file-${Date.now()}`,
       created_at: new Date().toISOString(),
     };
-    setFiles((prev) => [newFile, ...prev]);
+    setFiles((prev) => [...prev, newFile]);
   };
 
   // Unlock Master File
   const unlockMasterFile = (projectId: string) => {
+    retroSound.playDing();
     setFiles((prev) =>
-      prev.map((f) => {
-        if (f.project_id === projectId && f.file_type === 'FINAL_MASTER') {
-          return {
-            ...f,
-            is_locked: false,
-            lock_reason: undefined,
-          };
-        }
-        return f;
-      })
+      prev.map((f) =>
+        f.project_id === projectId && (f.file_type === 'FINAL_MASTER' || f.is_master_delivery)
+          ? { ...f, is_locked: false }
+          : f
+      )
     );
   };
 
-  // Chat / Messages
+  // Send Message
   const sendMessage = (projectId: string, text: string) => {
-    if (!text.trim()) return;
-    retroSound.playClick();
+    retroSound.playDing();
     const newMsg: ProjectMessage = {
       id: `msg-${Date.now()}`,
       project_id: projectId,
       sender_id: currentUser.id,
       sender_name: currentUser.name,
-      sender_role: currentUser.role,
       sender_avatar: currentUser.avatar,
-      message: text.trim(),
+      sender_role: activeRole,
+      message: text,
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, newMsg]);
+
+    fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_id: projectId,
+        sender_id: currentUser.id,
+        text,
+      }),
+    }).catch(() => {});
   };
 
-  // Milestone 1 (30% Upfront Funding)
+  // Fund Upfront Milestone
   const fundUpfrontMilestone = (projectId: string) => {
-    retroSound.playKaChing();
+    retroSound.playDing();
     setProjects((prev) =>
       prev.map((p) => {
         if (p.id === projectId) {
-          const updatedMilestones = p.milestones.map((m, idx) => {
-            if (idx === 0) {
-              return { ...m, status: 'ESCROW_FUNDED' as const, released_at: new Date().toISOString() };
-            }
-            return m;
-          });
+          const updatedMilestones = p.milestones.map((m) =>
+            m.percentage === 30 ? { ...m, status: 'RELEASED' as const, released_at: new Date().toISOString() } : m
+          );
           return {
             ...p,
-            status: 'EDITOR_ASSIGNED',
+            status: 'EDITING',
             milestones: updatedMilestones,
-            updated_at: new Date().toISOString(),
+            escrow: {
+              total_budget: p.budget,
+              upfront_percentage: 30,
+              upfront_amount: p.budget * 0.3,
+              final_percentage: 70,
+              final_amount: p.budget * 0.7,
+              final_released: p.escrow?.final_released ?? false,
+              ...p.escrow,
+              upfront_released: true,
+            },
           };
         }
         return p;
       })
     );
+    try {
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+    } catch {}
   };
 
-  // Milestone 2 (70% Final Delivery Payout) - THE CROWN JEWEL HACKATHON EVENT!
+  // Release Final Milestone (Master File Unlocked!)
   const releaseFinalMilestone = (projectId: string) => {
-    retroSound.playKaChing();
-
-    // Trigger celebration confetti
-    try {
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#00ff66', '#00f0ff', '#ff9900', '#ffffff'],
-      });
-    } catch {}
-
-    // Unlock files
-    unlockMasterFile(projectId);
-
-    // Update milestone and project state
+    retroSound.playDing();
     setProjects((prev) =>
       prev.map((p) => {
         if (p.id === projectId) {
-          const updatedMilestones = p.milestones.map((m) => {
-            return {
-              ...m,
-              status: 'RELEASED' as const,
-              released_at: m.released_at || new Date().toISOString(),
-            };
-          });
+          const updatedMilestones = p.milestones.map((m) =>
+            m.percentage === 70 ? { ...m, status: 'RELEASED' as const, released_at: new Date().toISOString() } : m
+          );
           return {
             ...p,
             status: 'COMPLETED',
+            watermark_active: false,
             milestones: updatedMilestones,
-            updated_at: new Date().toISOString(),
+            escrow: {
+              total_budget: p.budget,
+              upfront_percentage: 30,
+              upfront_amount: p.budget * 0.3,
+              upfront_released: p.escrow?.upfront_released ?? true,
+              final_percentage: 70,
+              final_amount: p.budget * 0.7,
+              ...p.escrow,
+              final_released: true,
+            },
           };
         }
         return p;
       })
     );
-
-    // Add automated receipt message
-    sendMessage(
-      projectId,
-      `[SYSTEM NOTIFICATION]: Milestone 2 (70% Final Payment) confirmed by Client. Master uncompressed deliverables unlocked for immediate download. Project marked as COMPLETED!`
-    );
+    unlockMasterFile(projectId);
+    try {
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+    } catch {}
   };
 
   // Submit Review
@@ -469,7 +557,11 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       value={{
         currentUser,
         activeRole,
+        isAuthenticated,
         switchRole,
+        login,
+        loginAsDemo,
+        logout,
         projects,
         activeProjectId,
         activeProject,
