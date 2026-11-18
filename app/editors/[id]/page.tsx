@@ -23,7 +23,7 @@ export default function EditorDetailPage() {
   const { editors, reviews } = useEditBridge();
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
 
-  const editorId = params.id as string;
+  const editorId = (params?.id as string) || '';
   const editor = editors.find((e) => e.user_id === editorId) || editors[0];
 
   const editorReviews = reviews.filter((r) => r.reviewee_id === editor.user_id);
