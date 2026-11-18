@@ -65,7 +65,8 @@ export async function GET(
           final_released: dbProject.milestones.some((m) => m.percentage === 70 && m.status === 'RELEASED'),
           platform_fee_percent: 5,
         },
-        current_draft_url: dbProject.activeDraftUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        active_draft_url: dbProject.activeDraftUrl || '/videos/sample-draft-v1.mp4',
+        current_draft_url: dbProject.activeDraftUrl || '/videos/sample-draft-v1.mp4',
         watermark_active: dbProject.watermarkActive,
         revisions: dbProject.revisions.map((r) => ({
           id: r.id,

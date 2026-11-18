@@ -546,7 +546,7 @@ function ProjectWorkspaceContent() {
               {/* Left 7 Cols: Interactive Video Player */}
               <div className="lg:col-span-7">
                 <RetroWindow
-                  title="VIDEO REVIEW MONITOR — DRAFT V1"
+                  title={`VIDEO REVIEW MONITOR — ${activeProject.title.toUpperCase()}`}
                   icon={<Film className="w-4 h-4 text-cyan-500" />}
                 >
                   <TimestampPlayer

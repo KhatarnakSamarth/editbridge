@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import {
   Play,
   Pause,
@@ -18,9 +18,10 @@ import {
   Upload,
   FolderPlus,
   FileVideo,
+  Lock,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
-import { CommentCategory } from '@/types';
+import { CommentCategory, ProjectFile } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
 
 interface TimestampPlayerProps {
@@ -30,7 +31,7 @@ interface TimestampPlayerProps {
   showSampleSelector?: boolean;
 }
 
-interface CustomVideoCut {
+export interface ProjectVideoCut {
   id: string;
   label: string;
   tag: string;
@@ -39,6 +40,7 @@ interface CustomVideoCut {
   fileName?: string;
   fileSize?: string;
   isCustom?: boolean;
+  isLocked?: boolean;
 }
 
 const CATEGORIES: { label: string; value: CommentCategory; color: string; ringColor: string }[] = [
@@ -50,54 +52,88 @@ const CATEGORIES: { label: string; value: CommentCategory; color: string; ringCo
   { label: 'General Feedback', value: 'GENERAL', color: '#64748b', ringColor: 'ring-slate-400' },
 ];
 
-export const SAMPLE_CUTS: CustomVideoCut[] = [
-  {
-    id: 'draft-v1',
-    label: 'Draft v1 (Cinematic 1080p)',
-    tag: 'Long-Form Cut',
-    url: '/videos/sample-draft-v1.mp4',
-    aspect: '16/9',
-  },
-  {
-    id: 'draft-v2',
-    label: 'Draft v2 (Fast-Paced B-Roll)',
-    tag: 'Alt Revision',
-    url: '/videos/sample-draft-v2.mp4',
-    aspect: '16/9',
-  },
-  {
-    id: 'short-reel',
-    label: 'Shorts Reel (Vertical 9:16)',
-    tag: 'Viral Short',
-    url: '/videos/sample-short-reel.mp4',
-    aspect: '9/16',
-  },
-  {
-    id: 'final-master',
-    label: '4K Master (Final Delivery)',
-    tag: 'Delivery Master',
-    url: '/videos/sample-final-master.mp4',
-    aspect: '16/9',
-  },
-];
-
 export function TimestampPlayer({
   onSelectTimestamp,
   externalSeekSeconds,
   initialVideoUrl,
   showSampleSelector = true,
 }: TimestampPlayerProps) {
-  const { activeProject, activeProjectComments, addRevisionComment, addProjectFile, currentUser } = useEditBridge();
+  const {
+    activeProject,
+    activeProjectFiles,
+    activeProjectComments,
+    addRevisionComment,
+    addProjectFile,
+    currentUser,
+  } = useEditBridge();
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Custom user uploaded video cuts
-  const [customCuts, setCustomCuts] = useState<CustomVideoCut[]>([]);
+  // Derive Project-Specific Video Cuts: ONLY videos belonging to THIS active project!
+  const projectCuts = useMemo<ProjectVideoCut[]>(() => {
+    if (!activeProject) return [];
 
-  // Active cut state
-  const defaultCutUrl = initialVideoUrl || activeProject?.active_draft_url || '/videos/sample-draft-v1.mp4';
+    const cuts: ProjectVideoCut[] = [];
+    const isVertical =
+      activeProject.category === 'Shorts / Reels' ||
+      activeProject.deliverables?.aspect_ratio === '9:16';
+    const aspect = isVertical ? '9/16' : '16/9';
+
+    // 1. Primary active draft video of THIS project (saved in DB on Project table)
+    if (activeProject.active_draft_url) {
+      cuts.push({
+        id: `primary-draft-${activeProject.id}`,
+        label: `${activeProject.title.length > 20 ? activeProject.title.slice(0, 18) + '...' : activeProject.title} (Draft)`,
+        tag: isVertical ? 'Vertical 9:16' : 'Active Draft',
+        url: activeProject.active_draft_url,
+        aspect,
+      });
+    }
+
+    // 2. Video files stored in PostgreSQL database for THIS specific project
+    const videoFiles = activeProjectFiles.filter(
+      (f) =>
+        f.file_type === 'DRAFT_VIDEO' ||
+        f.file_type === 'FINAL_MASTER' ||
+        (f.file_type === 'RAW_FOOTAGE' && f.url && (f.url.endsWith('.mp4') || f.url.startsWith('blob:')))
+    );
+
+    videoFiles.forEach((file) => {
+      // Don't duplicate if URL is already in cuts
+      if (file.url && file.url !== '#' && !cuts.some((c) => c.url === file.url)) {
+        cuts.push({
+          id: file.id,
+          label: file.file_name,
+          tag: file.file_type === 'FINAL_MASTER' ? 'Master Delivery' : file.version || 'Draft Cut',
+          url: file.url,
+          aspect,
+          fileName: file.file_name,
+          fileSize: file.formatted_size,
+          isLocked: file.is_locked,
+        });
+      }
+    });
+
+    // 3. Project fallback if no draft URL is set yet
+    if (cuts.length === 0) {
+      const fallbackUrl = isVertical ? '/videos/sample-short-reel.mp4' : '/videos/sample-draft-v1.mp4';
+      cuts.push({
+        id: `default-${activeProject.id}`,
+        label: `${activeProject.title.length > 20 ? activeProject.title.slice(0, 18) + '...' : activeProject.title} (Cut 1)`,
+        tag: isVertical ? 'Vertical 9:16' : 'Project Cut',
+        url: fallbackUrl,
+        aspect,
+      });
+    }
+
+    return cuts;
+  }, [activeProject, activeProjectFiles]);
+
+  // Active cut state initialized to active project's draft
+  const defaultCutUrl = initialVideoUrl || activeProject?.active_draft_url || projectCuts[0]?.url || '/videos/sample-draft-v1.mp4';
   const [activeVideoUrl, setActiveVideoUrl] = useState<string>(defaultCutUrl);
-  const [selectedCutId, setSelectedCutId] = useState<string>('draft-v1');
+  const [selectedCutId, setSelectedCutId] = useState<string>(projectCuts[0]?.id || 'active-draft');
   const [activeFileName, setActiveFileName] = useState<string | null>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -108,6 +144,23 @@ export function TimestampPlayer({
   const [activeCategory, setActiveCategory] = useState<CommentCategory>('B_ROLL');
   const [commentText, setCommentText] = useState<string>('');
   const [hasError, setHasError] = useState<boolean>(false);
+
+  // When activeProject changes: switch immediately to THAT project's draft and cuts
+  useEffect(() => {
+    if (!activeProject) return;
+
+    const projectTargetUrl = activeProject.active_draft_url || projectCuts[0]?.url || '/videos/sample-draft-v1.mp4';
+    setActiveVideoUrl(projectTargetUrl);
+    setSelectedCutId(projectCuts[0]?.id || `draft-${activeProject.id}`);
+    setActiveFileName(null);
+    setCurrentTime(0);
+    setIsPlaying(false);
+
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.load();
+    }
+  }, [activeProject?.id]);
 
   // Sync external seek requests (e.g. clicking on a comment from the list)
   useEffect(() => {
@@ -120,17 +173,9 @@ export function TimestampPlayer({
     }
   }, [externalSeekSeconds, isPlaying]);
 
-  // Update active video if project changes and user hasn't explicitly chosen another cut
-  useEffect(() => {
-    if (activeProject?.active_draft_url && !initialVideoUrl && !activeFileName) {
-      setActiveVideoUrl(activeProject.active_draft_url);
-    }
-  }, [activeProject?.active_draft_url, initialVideoUrl, activeFileName]);
-
   // Spacebar play/pause listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept spacebar if user is typing in an input or textarea
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
         return;
@@ -164,7 +209,11 @@ export function TimestampPlayer({
   const handleVideoError = () => {
     console.warn('Video failed to load source:', activeVideoUrl, 'falling back to default local sample.');
     setHasError(true);
-    setActiveVideoUrl('/videos/sample-draft-v1.mp4');
+    const fallback =
+      activeProject?.category === 'Shorts / Reels'
+        ? '/videos/sample-short-reel.mp4'
+        : '/videos/sample-draft-v1.mp4';
+    setActiveVideoUrl(fallback);
   };
 
   const togglePlay = () => {
@@ -224,7 +273,7 @@ export function TimestampPlayer({
     setIsMuted(!isMuted);
   };
 
-  const switchSampleCut = (cut: CustomVideoCut) => {
+  const switchSampleCut = (cut: ProjectVideoCut) => {
     retroSound.playClick();
     setSelectedCutId(cut.id);
     setActiveVideoUrl(cut.url);
@@ -237,57 +286,42 @@ export function TimestampPlayer({
     }
   };
 
-  // Upload Real Local Video File
+  // Upload Local Video: Persists to PostgreSQL Database & Displays on Timeline!
   const handleLocalVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !activeProject) return;
 
     retroSound.playDing();
     const objectUrl = URL.createObjectURL(file);
     const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-    const cutId = `custom-${Date.now()}`;
 
-    const newCut: CustomVideoCut = {
-      id: cutId,
-      label: file.name.length > 22 ? `${file.name.slice(0, 20)}...` : file.name,
-      tag: `${sizeMb} MB (Local)`,
-      url: objectUrl,
-      aspect: '16/9',
-      fileName: file.name,
-      fileSize: `${sizeMb} MB`,
-      isCustom: true,
-    };
-
-    setCustomCuts((prev) => [newCut, ...prev]);
-    setSelectedCutId(cutId);
+    // 1. Immediately switch player to the newly uploaded video
     setActiveVideoUrl(objectUrl);
     setActiveFileName(file.name);
+    setSelectedCutId(`local-${file.name}`);
     setIsPlaying(false);
     setCurrentTime(0);
 
-    // Register uploaded file to active project vault
-    if (activeProject) {
-      addProjectFile({
-        project_id: activeProject.id,
-        uploader_id: currentUser?.id || 'user-local',
-        uploader_name: currentUser?.name || 'Local User',
-        file_name: file.name,
-        storage_key: `local-uploads/${file.name}`,
-        file_type: 'DRAFT_VIDEO',
-        size_bytes: file.size,
-        formatted_size: `${sizeMb} MB`,
-        version: 'Custom Local Draft',
-        url: objectUrl,
-        is_locked: false,
-      });
-    }
+    // 2. Persist to PostgreSQL Database via addProjectFile (POSTs to /api/files & updates activeDraftUrl in DB)
+    addProjectFile({
+      project_id: activeProject.id,
+      uploader_id: currentUser?.id || 'user-editor-1',
+      uploader_name: currentUser?.name || 'Project Editor',
+      file_name: file.name,
+      storage_key: `uploads/${file.name}`,
+      file_type: 'DRAFT_VIDEO',
+      size_bytes: file.size,
+      formatted_size: `${sizeMb} MB`,
+      version: 'Uploaded Draft',
+      url: objectUrl,
+      is_locked: false,
+    });
 
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.load();
     }
 
-    // Reset input value so same file can be re-selected if desired
     e.target.value = '';
   };
 
@@ -304,11 +338,7 @@ export function TimestampPlayer({
     if (!commentText.trim() || !activeProject) return;
 
     const versionName = activeFileName
-      ? `Custom (${activeFileName})`
-      : selectedCutId === 'short-reel'
-      ? 'Shorts Cut'
-      : selectedCutId === 'final-master'
-      ? 'Final Master'
+      ? `Cut (${activeFileName.slice(0, 15)})`
       : 'Draft v1';
 
     addRevisionComment({
@@ -323,7 +353,7 @@ export function TimestampPlayer({
     retroSound.playDing();
   };
 
-  // Preset demo timestamp notes to jump to
+  // Dynamic jump timepoints
   const DEMO_TIMESTAMPS = [
     { sec: 15, label: '00:15 - Hook Title' },
     { sec: 43, label: '00:43 - Replace B-Roll' },
@@ -331,22 +361,25 @@ export function TimestampPlayer({
     { sec: 165, label: '02:45 - Punch Zoom' },
   ];
 
-  const allCuts = [...customCuts, ...SAMPLE_CUTS];
+  const isCurrentCutVertical =
+    selectedCutId.includes('short') ||
+    activeProject?.category === 'Shorts / Reels' ||
+    activeProject?.deliverables?.aspect_ratio === '9:16';
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-full">
-      {/* Sample Cut Switcher & Local Video Upload Bar */}
+      {/* Project-Specific Video Cuts Bar */}
       {showSampleSelector && (
         <div className="p-3 bg-slate-100/90 dark:bg-[#070b14]/90 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-2.5 shadow-xs">
           <div className="flex items-center gap-2 shrink-0">
             <Film className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              Active Video Cut:
+              Project Cuts ({projectCuts.length}):
             </span>
           </div>
 
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 w-full md:w-auto scrollbar-none">
-            {allCuts.map((cut) => {
+            {projectCuts.map((cut) => {
               const isSelected = selectedCutId === cut.id;
               return (
                 <button
@@ -360,7 +393,11 @@ export function TimestampPlayer({
                   }`}
                   title={`Switch to ${cut.label}`}
                 >
-                  {cut.isCustom && <FileVideo className="w-3 h-3 text-cyan-300" />}
+                  {cut.isLocked ? (
+                    <Lock className="w-3 h-3 text-rose-400" />
+                  ) : (
+                    <FileVideo className="w-3 h-3 text-cyan-300" />
+                  )}
                   <span className="truncate max-w-[150px]">{cut.label}</span>
                   <span
                     className={`text-[9px] px-1.5 py-0.2 rounded font-mono ${
@@ -384,15 +421,15 @@ export function TimestampPlayer({
               className="hidden"
             />
 
-            {/* Upload Custom Video Button */}
+            {/* Upload Video Button: Directly persists to Database */}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-xs transition-all shrink-0 cursor-pointer active:scale-95"
-              title="Upload your own local .mp4 or .mov video to review in player"
+              title="Upload your video file to database and review on timeline"
             >
               <Upload className="w-3.5 h-3.5" />
-              <span>+ Upload Your Video</span>
+              <span>+ Upload Video to DB</span>
             </button>
           </div>
         </div>
@@ -405,10 +442,10 @@ export function TimestampPlayer({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="bg-black/80 backdrop-blur-md text-cyan-400 font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-cyan-500/40 font-semibold shadow-xs">
               {activeFileName
-                ? `CUSTOM: ${activeFileName.length > 25 ? activeFileName.slice(0, 23) + '...' : activeFileName}`
-                : selectedCutId === 'short-reel'
+                ? `PROJECT FILE: ${activeFileName.length > 25 ? activeFileName.slice(0, 23) + '...' : activeFileName}`
+                : isCurrentCutVertical
                 ? 'VERTICAL 9:16 • SYNCED'
-                : '1080P PRORES 422 • SYNCED'}
+                : '1080P PRORES • SYNCED'}
             </span>
             <span className="bg-black/80 backdrop-blur-md text-emerald-400 font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-emerald-500/40 font-semibold shadow-xs">
               {formatTime(currentTime)} / {formatTime(duration)}
@@ -426,7 +463,7 @@ export function TimestampPlayer({
             ref={videoRef}
             src={activeVideoUrl}
             className={`w-full max-h-[440px] object-contain bg-black cursor-pointer ${
-              selectedCutId === 'short-reel' ? 'max-w-[280px] sm:max-w-[320px] aspect-[9/16]' : 'aspect-video'
+              isCurrentCutVertical ? 'max-w-[280px] sm:max-w-[320px] aspect-[9/16]' : 'aspect-video'
             }`}
             onClick={togglePlay}
             onTimeUpdate={handleTimeUpdate}
@@ -618,7 +655,7 @@ export function TimestampPlayer({
           </div>
 
           <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Pins marker directly to video timeline
+            Pins marker directly to project timeline
           </span>
         </div>
 
@@ -671,7 +708,7 @@ export function TimestampPlayer({
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2.5 flex items-center gap-1.5">
           <Sparkles className="w-3 h-3 text-cyan-500 shrink-0" />
-          <span>Press Space to Play/Pause. Use "+ Upload Your Video" to test your own local clips with frame-accurate timeline revisions.</span>
+          <span>Showing project-specific cuts from database. Uploading new videos saves to PostgreSQL and synchronizes the active timeline.</span>
         </p>
       </div>
     </div>

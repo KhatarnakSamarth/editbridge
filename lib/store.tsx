@@ -44,6 +44,7 @@ interface EditBridgeContextType {
   setActiveProjectId: (id: string) => void;
   updateProjectStatus: (projectId: string, newStatus: ProjectStatus) => void;
   createProject: (newProject: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'revisions_used'>) => string;
+  setProjectActiveDraftUrl: (projectId: string, url: string) => void;
 
   // Revisions & Timestamps
   revisionComments: RevisionComment[];
@@ -146,6 +147,59 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       // ignore
     }
   }, []);
+
+  // Two-way Database Sync: Load live projects from PostgreSQL
+  useEffect(() => {
+    fetch('/api/projects')
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setProjects(res.data);
+        }
+      })
+      .catch((err) => console.warn('Could not sync projects from DB:', err));
+  }, []);
+
+  // Sync files & revisions whenever activeProjectId changes
+  useEffect(() => {
+    if (!activeProjectId) return;
+
+    fetch(`/api/files?projectId=${activeProjectId}`)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setFiles((prev) => {
+            const otherFiles = prev.filter((f) => f.project_id !== activeProjectId);
+            return [...res.data, ...otherFiles];
+          });
+        }
+      })
+      .catch((err) => console.warn('Could not sync files from DB:', err));
+
+    fetch(`/api/revisions?projectId=${activeProjectId}`)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setRevisionComments((prev) => {
+            const otherComments = prev.filter((c) => c.project_id !== activeProjectId);
+            return [...res.data, ...otherComments];
+          });
+        }
+      })
+      .catch((err) => console.warn('Could not sync revisions from DB:', err));
+
+    fetch(`/api/messages?projectId=${activeProjectId}`)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setMessages((prev) => {
+            const otherMessages = prev.filter((m) => m.project_id !== activeProjectId);
+            return [...res.data, ...otherMessages];
+          });
+        }
+      })
+      .catch((err) => console.warn('Could not sync messages from DB:', err));
+  }, [activeProjectId]);
 
   // Save changes
   useEffect(() => {
@@ -423,15 +477,70 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     }).catch(() => {});
   };
 
-  // Add Project File
+  // Add Project File (Persists to PostgreSQL Database & Updates activeDraftUrl if video)
   const addProjectFile = (fileData: Omit<ProjectFile, 'id' | 'created_at'>) => {
     retroSound.playDing();
+    const tempId = `file-${Date.now()}`;
     const newFile: ProjectFile = {
       ...fileData,
-      id: `file-${Date.now()}`,
+      id: tempId,
       created_at: new Date().toISOString(),
     };
-    setFiles((prev) => [...prev, newFile]);
+
+    // Optimistically update local files
+    setFiles((prev) => [newFile, ...prev]);
+
+    // If this is a draft video, update the project's active draft URL immediately!
+    if (fileData.file_type === 'DRAFT_VIDEO') {
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === fileData.project_id
+            ? { ...p, active_draft_url: fileData.url, updated_at: new Date().toISOString() }
+            : p
+        )
+      );
+    }
+
+    // Persist to Database API
+    fetch('/api/files', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fileData),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          setFiles((prev) => prev.map((f) => (f.id === tempId ? res.data : f)));
+          if (res.activeDraftUrl) {
+            setProjects((prev) =>
+              prev.map((p) =>
+                p.id === fileData.project_id
+                  ? { ...p, active_draft_url: res.activeDraftUrl }
+                  : p
+              )
+            );
+          }
+        }
+      })
+      .catch((err) => console.error('Failed to save file to DB:', err));
+  };
+
+  // Set Project Active Draft URL (persists in DB)
+  const setProjectActiveDraftUrl = (projectId: string, url: string) => {
+    retroSound.playDing();
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === projectId
+          ? { ...p, active_draft_url: url, updated_at: new Date().toISOString() }
+          : p
+      )
+    );
+
+    fetch(`/api/projects/${projectId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active_draft_url: url }),
+    }).catch((err) => console.error('Failed to update activeDraftUrl in DB:', err));
   };
 
   // Unlock Master File
@@ -573,6 +682,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         setActiveProjectId,
         updateProjectStatus,
         createProject,
+        setProjectActiveDraftUrl,
         revisionComments,
         activeProjectComments,
         addRevisionComment,

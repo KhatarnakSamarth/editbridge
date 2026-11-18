@@ -158,6 +158,10 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
           <span className="text-[10px] bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-full text-slate-700 dark:text-slate-300 font-mono font-semibold">
             {activeProjectFiles.length} Records
           </span>
+          <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 px-2 py-0.5 rounded-full font-semibold hidden sm:inline flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>PostgreSQL Sync</span>
+          </span>
         </div>
 
         <button
