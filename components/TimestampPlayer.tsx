@@ -15,6 +15,9 @@ import {
   Rewind,
   CheckCircle2,
   Sliders,
+  Upload,
+  FolderPlus,
+  FileVideo,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { CommentCategory } from '@/types';
@@ -27,6 +30,17 @@ interface TimestampPlayerProps {
   showSampleSelector?: boolean;
 }
 
+interface CustomVideoCut {
+  id: string;
+  label: string;
+  tag: string;
+  url: string;
+  aspect: string;
+  fileName?: string;
+  fileSize?: string;
+  isCustom?: boolean;
+}
+
 const CATEGORIES: { label: string; value: CommentCategory; color: string; ringColor: string }[] = [
   { label: 'B-Roll & Visuals', value: 'B_ROLL', color: '#f59e0b', ringColor: 'ring-amber-400' },
   { label: 'Audio / Music', value: 'AUDIO', color: '#00f5ff', ringColor: 'ring-cyan-400' },
@@ -36,7 +50,7 @@ const CATEGORIES: { label: string; value: CommentCategory; color: string; ringCo
   { label: 'General Feedback', value: 'GENERAL', color: '#64748b', ringColor: 'ring-slate-400' },
 ];
 
-export const SAMPLE_CUTS = [
+export const SAMPLE_CUTS: CustomVideoCut[] = [
   {
     id: 'draft-v1',
     label: 'Draft v1 (Cinematic 1080p)',
@@ -60,7 +74,7 @@ export const SAMPLE_CUTS = [
   },
   {
     id: 'final-master',
-    label: '4K ProRes Master (Final Delivery)',
+    label: '4K Master (Final Delivery)',
     tag: 'Delivery Master',
     url: '/videos/sample-final-master.mp4',
     aspect: '16/9',
@@ -73,24 +87,27 @@ export function TimestampPlayer({
   initialVideoUrl,
   showSampleSelector = true,
 }: TimestampPlayerProps) {
-  const { activeProject, activeProjectComments, addRevisionComment } = useEditBridge();
+  const { activeProject, activeProjectComments, addRevisionComment, addProjectFile, currentUser } = useEditBridge();
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Custom user uploaded video cuts
+  const [customCuts, setCustomCuts] = useState<CustomVideoCut[]>([]);
 
   // Active cut state
   const defaultCutUrl = initialVideoUrl || activeProject?.active_draft_url || '/videos/sample-draft-v1.mp4';
   const [activeVideoUrl, setActiveVideoUrl] = useState<string>(defaultCutUrl);
   const [selectedCutId, setSelectedCutId] = useState<string>('draft-v1');
+  const [activeFileName, setActiveFileName] = useState<string | null>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(52);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [volume, setVolume] = useState<number>(1);
   const [playbackRate, setPlaybackRate] = useState<number>(1);
   const [activeCategory, setActiveCategory] = useState<CommentCategory>('B_ROLL');
   const [commentText, setCommentText] = useState<string>('');
   const [hasError, setHasError] = useState<boolean>(false);
-  const [hoverTime, setHoverTime] = useState<number | null>(null);
 
   // Sync external seek requests (e.g. clicking on a comment from the list)
   useEffect(() => {
@@ -105,10 +122,10 @@ export function TimestampPlayer({
 
   // Update active video if project changes and user hasn't explicitly chosen another cut
   useEffect(() => {
-    if (activeProject?.active_draft_url && !initialVideoUrl) {
+    if (activeProject?.active_draft_url && !initialVideoUrl && !activeFileName) {
       setActiveVideoUrl(activeProject.active_draft_url);
     }
-  }, [activeProject?.active_draft_url, initialVideoUrl]);
+  }, [activeProject?.active_draft_url, initialVideoUrl, activeFileName]);
 
   // Spacebar play/pause listener
   useEffect(() => {
@@ -180,7 +197,6 @@ export function TimestampPlayer({
   };
 
   const stepFrame = (delta: number) => {
-    // 0.04s ≈ 1 frame at 24fps
     seekRelative(delta);
   };
 
@@ -208,16 +224,71 @@ export function TimestampPlayer({
     setIsMuted(!isMuted);
   };
 
-  const switchSampleCut = (cut: typeof SAMPLE_CUTS[number]) => {
+  const switchSampleCut = (cut: CustomVideoCut) => {
     retroSound.playClick();
     setSelectedCutId(cut.id);
     setActiveVideoUrl(cut.url);
+    setActiveFileName(cut.fileName || null);
     setIsPlaying(false);
     setCurrentTime(0);
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.load();
     }
+  };
+
+  // Upload Real Local Video File
+  const handleLocalVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    retroSound.playDing();
+    const objectUrl = URL.createObjectURL(file);
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+    const cutId = `custom-${Date.now()}`;
+
+    const newCut: CustomVideoCut = {
+      id: cutId,
+      label: file.name.length > 22 ? `${file.name.slice(0, 20)}...` : file.name,
+      tag: `${sizeMb} MB (Local)`,
+      url: objectUrl,
+      aspect: '16/9',
+      fileName: file.name,
+      fileSize: `${sizeMb} MB`,
+      isCustom: true,
+    };
+
+    setCustomCuts((prev) => [newCut, ...prev]);
+    setSelectedCutId(cutId);
+    setActiveVideoUrl(objectUrl);
+    setActiveFileName(file.name);
+    setIsPlaying(false);
+    setCurrentTime(0);
+
+    // Register uploaded file to active project vault
+    if (activeProject) {
+      addProjectFile({
+        project_id: activeProject.id,
+        uploader_id: currentUser?.id || 'user-local',
+        uploader_name: currentUser?.name || 'Local User',
+        file_name: file.name,
+        storage_key: `local-uploads/${file.name}`,
+        file_type: 'DRAFT_VIDEO',
+        size_bytes: file.size,
+        formatted_size: `${sizeMb} MB`,
+        version: 'Custom Local Draft',
+        url: objectUrl,
+        is_locked: false,
+      });
+    }
+
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.load();
+    }
+
+    // Reset input value so same file can be re-selected if desired
+    e.target.value = '';
   };
 
   const formatTime = (secs: number) => {
@@ -232,9 +303,17 @@ export function TimestampPlayer({
     if (e) e.preventDefault();
     if (!commentText.trim() || !activeProject) return;
 
+    const versionName = activeFileName
+      ? `Custom (${activeFileName})`
+      : selectedCutId === 'short-reel'
+      ? 'Shorts Cut'
+      : selectedCutId === 'final-master'
+      ? 'Final Master'
+      : 'Draft v1';
+
     addRevisionComment({
       projectId: activeProject.id,
-      videoVersion: selectedCutId === 'short-reel' ? 'Shorts Cut' : 'Draft v1',
+      videoVersion: versionName,
       timestampSeconds: Math.floor(currentTime),
       comment: commentText.trim(),
       category: activeCategory,
@@ -252,20 +331,22 @@ export function TimestampPlayer({
     { sec: 165, label: '02:45 - Punch Zoom' },
   ];
 
+  const allCuts = [...customCuts, ...SAMPLE_CUTS];
+
   return (
     <div className="flex flex-col gap-4 w-full max-w-full">
-      {/* Sample Cut Switcher Bar (Playground Mode) */}
+      {/* Sample Cut Switcher & Local Video Upload Bar */}
       {showSampleSelector && (
-        <div className="p-3 bg-slate-100/90 dark:bg-[#070b14]/90 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+        <div className="p-3 bg-slate-100/90 dark:bg-[#070b14]/90 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-2.5 shadow-xs">
           <div className="flex items-center gap-2 shrink-0">
             <Film className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              Sample Video Cut:
+              Active Video Cut:
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto scrollbar-none">
-            {SAMPLE_CUTS.map((cut) => {
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 w-full md:w-auto scrollbar-none">
+            {allCuts.map((cut) => {
               const isSelected = selectedCutId === cut.id;
               return (
                 <button
@@ -279,7 +360,8 @@ export function TimestampPlayer({
                   }`}
                   title={`Switch to ${cut.label}`}
                 >
-                  <span>{cut.label}</span>
+                  {cut.isCustom && <FileVideo className="w-3 h-3 text-cyan-300" />}
+                  <span className="truncate max-w-[150px]">{cut.label}</span>
                   <span
                     className={`text-[9px] px-1.5 py-0.2 rounded font-mono ${
                       isSelected
@@ -292,6 +374,26 @@ export function TimestampPlayer({
                 </button>
               );
             })}
+
+            {/* Hidden Native File Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime,video/m4v,video/*"
+              onChange={handleLocalVideoUpload}
+              className="hidden"
+            />
+
+            {/* Upload Custom Video Button */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-xs transition-all shrink-0 cursor-pointer active:scale-95"
+              title="Upload your own local .mp4 or .mov video to review in player"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>+ Upload Your Video</span>
+            </button>
           </div>
         </div>
       )}
@@ -302,7 +404,11 @@ export function TimestampPlayer({
         <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="bg-black/80 backdrop-blur-md text-cyan-400 font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-cyan-500/40 font-semibold shadow-xs">
-              {selectedCutId === 'short-reel' ? 'VERTICAL 9:16' : '1080P PRORES 422'} • SYNCED TIMELINE
+              {activeFileName
+                ? `CUSTOM: ${activeFileName.length > 25 ? activeFileName.slice(0, 23) + '...' : activeFileName}`
+                : selectedCutId === 'short-reel'
+                ? 'VERTICAL 9:16 • SYNCED'
+                : '1080P PRORES 422 • SYNCED'}
             </span>
             <span className="bg-black/80 backdrop-blur-md text-emerald-400 font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-emerald-500/40 font-semibold shadow-xs">
               {formatTime(currentTime)} / {formatTime(duration)}
@@ -565,7 +671,7 @@ export function TimestampPlayer({
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2.5 flex items-center gap-1.5">
           <Sparkles className="w-3 h-3 text-cyan-500 shrink-0" />
-          <span>Press Space to Play/Pause. Click along the scrubber or use Jump pills to test frame-accurate timestamps.</span>
+          <span>Press Space to Play/Pause. Use "+ Upload Your Video" to test your own local clips with frame-accurate timeline revisions.</span>
         </p>
       </div>
     </div>

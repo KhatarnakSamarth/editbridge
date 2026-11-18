@@ -14,13 +14,19 @@ import {
   Clock,
   Sparkles,
   UserPlus,
+  Share2,
+  Link2,
   Award,
   ChevronDown,
+  ChevronUp,
   Layers,
   ArrowRight,
   ShieldCheck,
   HardDrive,
   Lock,
+  BookOpen,
+  ExternalLink,
+  Youtube,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { TimestampPlayer } from '@/components/TimestampPlayer';
@@ -34,6 +40,7 @@ import { ReviewModal } from '@/components/ReviewModal';
 import { useEditBridge } from '@/lib/store';
 import { ProjectStatus } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
+import { INITIAL_CREATORS } from '@/lib/mockData';
 
 type WorkspaceTab = 'REVIEW' | 'FILES' | 'CHAT' | 'MILESTONES' | 'BRIEF';
 
@@ -65,6 +72,12 @@ function ProjectWorkspaceContent() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [guestPlaygroundMode, setGuestPlaygroundMode] = useState(false);
+  const [isRequirementsOpen, setIsRequirementsOpen] = useState(true);
+
+  // Creator profile info lookup
+  const creatorProfile = activeProject
+    ? INITIAL_CREATORS.find((c) => c.user_id === activeProject.creator_id) || INITIAL_CREATORS[0]
+    : INITIAL_CREATORS[0];
 
   // Authentication Gate: Users must be logged in to access workstation & escrow vaults (unless previewing playground)
   if (!isAuthenticated && !guestPlaygroundMode) {
@@ -158,35 +171,50 @@ function ProjectWorkspaceContent() {
   const getStatusBadge = (status: ProjectStatus) => {
     switch (status) {
       case 'REVIEW_REQUESTED':
-        return <span className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-3 py-1 rounded-full font-bold text-xs animate-pulse">● REVIEW REQUESTED</span>;
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 font-semibold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            Review Requested (Draft v1)
+          </span>
+        );
       case 'CHANGES_REQUESTED':
-        return <span className="bg-orange-500/15 text-orange-700 dark:text-orange-400 border border-orange-500/30 px-3 py-1 rounded-full font-bold text-xs">● CHANGES REQUESTED</span>;
-      case 'FINAL_PAYMENT_PENDING':
-        return <span className="bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full font-bold text-xs animate-pulse">● FINAL PAYMENT DUE</span>;
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 font-semibold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            Changes Requested
+          </span>
+        );
       case 'COMPLETED':
-        return <span className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold text-xs">✓ COMPLETED</span>;
-      case 'EDITING':
-        return <span className="bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-bold text-xs">● IN EDITING</span>;
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30 font-semibold flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            Project Completed &amp; Escrow Released
+          </span>
+        );
       default:
-        return <span className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-3 py-1 rounded-full font-semibold text-xs">{status}</span>;
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold">
+            {status}
+          </span>
+        );
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-24 space-y-6 font-sans">
-      {/* Guest Interactive Playground Notice */}
+    <div className="space-y-6 max-w-7xl mx-auto pb-16">
+      {/* Guest Mode Indicator Banner */}
       {!isAuthenticated && guestPlaygroundMode && (
-        <div className="p-4 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 border border-cyan-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-300">
-          <div className="flex items-center gap-2.5 text-cyan-900 dark:text-cyan-200">
-            <Sparkles className="w-4 h-4 text-cyan-500 shrink-0" />
+        <div className="p-3 bg-gradient-to-r from-cyan-500/15 via-blue-500/10 to-transparent border border-cyan-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-cyan-800 dark:text-cyan-300">
+            <Film className="w-4 h-4 text-cyan-500 shrink-0" />
             <span>
-              <strong>Interactive Video Playground Mode:</strong> You are exploring the video monitor, sample cuts, and revision checklist in guest mode.
+              <strong>Guest Playground Mode:</strong> You are testing the interactive frame-accurate video review monitor. Sign in to post live escrow contracts.
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/signin"
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs transition-all shadow-xs"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-colors"
             >
               Sign In for Full Escrow Access →
             </Link>
@@ -254,24 +282,51 @@ function ProjectWorkspaceContent() {
                 retroSound.playDing();
                 setIsLiveReviewOpen(true);
               }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
               title="Launch synchronized screen & video review session"
             >
               <Video className="w-4 h-4 text-cyan-300" />
               <span>Review Room</span>
             </button>
 
-            {/* Invite Editor */}
-            <button
-              onClick={() => {
-                retroSound.playClick();
-                setIsInviteOpen(true);
-              }}
-              className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs"
-            >
-              <UserPlus className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-              <span>Invite Editor</span>
-            </button>
+            {/* Role-based Invite / Share Collaboration Button */}
+            {activeRole === 'CREATOR' ? (
+              <button
+                onClick={() => {
+                  retroSound.playClick();
+                  setIsInviteOpen(true);
+                }}
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                title="Invite video editor or collaborator"
+              >
+                <UserPlus className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                <span>Invite Editor</span>
+              </button>
+            ) : activeRole === 'EDITOR' ? (
+              <button
+                onClick={() => {
+                  retroSound.playClick();
+                  setIsInviteOpen(true);
+                }}
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                title="Share collaboration invite link with client or reviewer"
+              >
+                <Share2 className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                <span>Share Collab Link</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  retroSound.playClick();
+                  setIsInviteOpen(true);
+                }}
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                title="Generate workspace access link"
+              >
+                <Link2 className="w-4 h-4 text-purple-500" />
+                <span>Workspace Link</span>
+              </button>
+            )}
 
             {/* Leave Review (if completed) */}
             {activeProject.status === 'COMPLETED' ? (
@@ -280,7 +335,7 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsReviewModalOpen(true);
                 }}
-                className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all"
+                className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer"
               >
                 <Award className="w-4 h-4 text-white" />
                 <span>Rate Project</span>
@@ -293,7 +348,7 @@ function ProjectWorkspaceContent() {
                 onClick={() => {
                   releaseFinalMilestone(activeProject.id);
                 }}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-slate-950" />
                 <span>Release 70% ($420)</span>
@@ -319,57 +374,35 @@ function ProjectWorkspaceContent() {
                     isCurrent
                       ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/25 border border-blue-400'
                       : isPast
-                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
-                      : 'bg-slate-50 dark:bg-slate-900/40 text-slate-400 dark:text-slate-600 border border-slate-100 dark:border-slate-800/80'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 font-semibold'
+                      : 'bg-slate-50 dark:bg-slate-800/40 text-slate-400 border border-slate-200 dark:border-slate-800'
                   }`}
                 >
-                  {step.label}
+                  <span className="truncate block">{step.label}</span>
                 </div>
               );
             })}
           </div>
         </div>
-
-        {/* Dynamic Role Workspace Context Banner */}
-        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between flex-wrap gap-2 text-xs">
-          {activeRole === 'CREATOR' && (
-            <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 px-3.5 py-1.5 rounded-xl w-full">
-              <span className="font-bold">👤 Creator Perspective:</span>
-              <span>You hold 30/70 escrow release authority. Review video frames, log feedback markers, and approve final master delivery.</span>
-            </div>
-          )}
-          {activeRole === 'EDITOR' && (
-            <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/60 px-3.5 py-1.5 rounded-xl w-full">
-              <span className="font-bold">🎬 Editor Perspective:</span>
-              <span>Check off revision pins in the checklist, upload watermarked draft cuts, and deposit locked master deliverables to trigger the 70% payout.</span>
-            </div>
-          )}
-          {activeRole === 'ADMIN' && (
-            <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 px-3.5 py-1.5 rounded-xl w-full">
-              <span className="font-bold">🛡️ Platform Ops Inspector:</span>
-              <span>Monitoring project escrow, revision round limits, and file integrity. For dispute arbitration, visit <Link href="/admin" className="underline font-bold">Admin Ops</Link>.</span>
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Modern Workspace Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto select-none no-scrollbar">
+      {/* Tabs Navigation Bar */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/70 dark:bg-[#070b14]/90 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-x-auto shadow-inner">
         <button
           onClick={() => handleTabChange('REVIEW')}
-          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'REVIEW'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
           }`}
         >
           <Film className="w-4 h-4" />
-          <span>Review &amp; Timestamps</span>
+          <span>Interactive Video Monitor</span>
         </button>
 
         <button
           onClick={() => handleTabChange('FILES')}
-          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'FILES'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -381,7 +414,7 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('CHAT')}
-          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'CHAT'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -393,7 +426,7 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('MILESTONES')}
-          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'MILESTONES'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -405,7 +438,7 @@ function ProjectWorkspaceContent() {
 
         <button
           onClick={() => handleTabChange('BRIEF')}
-          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
+          className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'BRIEF'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
@@ -420,60 +453,150 @@ function ProjectWorkspaceContent() {
       <div className="min-h-[500px]">
         {/* Tab 1: Video Review & Timestamp Feedback */}
         {activeTab === 'REVIEW' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            {/* Left 7 Cols: Interactive Video Player */}
-            <div className="lg:col-span-7">
-              <RetroWindow
-                title="VIDEO REVIEW MONITOR — DRAFT V1"
-                icon={<Film className="w-4 h-4 text-cyan-500" />}
+          <div className="space-y-4">
+            {/* Creator Requirements & Style Rules Drawer (Crucial for Editors) */}
+            <div className="glass-panel bg-white/90 dark:bg-[#0e1526]/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm transition-all">
+              <div
+                className="flex items-center justify-between gap-3 cursor-pointer select-none"
+                onClick={() => setIsRequirementsOpen(!isRequirementsOpen)}
               >
-                <TimestampPlayer
-                  externalSeekSeconds={seekSeconds}
-                  onSelectTimestamp={(sec) => setSeekSeconds(sec)}
-                  showSampleSelector={true}
-                />
-              </RetroWindow>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <div className="w-8 h-8 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-800 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-xs text-slate-900 dark:text-slate-100">
+                        {activeRole === 'EDITOR'
+                          ? 'CLIENT CREATIVE BRIEF & STYLE GUIDELINES'
+                          : 'PROJECT CREATIVE DIRECTIVES & SPECS'}
+                      </span>
+                      <span className="text-[10px] bg-cyan-100 dark:bg-cyan-900/60 text-cyan-800 dark:text-cyan-300 px-2 py-0.5 rounded-full font-semibold">
+                        {creatorProfile?.channel_name || activeProject.creator_channel || 'Channel Brief'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Client expectations, pacing rules, and target deliverables for this video cut
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveTab('BRIEF');
+                    }}
+                    className="text-[11px] font-semibold text-blue-600 dark:text-cyan-400 hover:underline hidden sm:inline cursor-pointer"
+                  >
+                    Full Brief →
+                  </button>
+                  <button
+                    type="button"
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    title={isRequirementsOpen ? 'Collapse rules' : 'Expand rules'}
+                  >
+                    {isRequirementsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {isRequirementsOpen && (
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-3.5 animate-in fade-in duration-200">
+                  {/* Creator Pacing & Editing Rules Box */}
+                  <div className="p-3.5 bg-gradient-to-r from-amber-500/10 via-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl">
+                    <div className="flex items-start gap-2.5">
+                      <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          Client Pacing &amp; Aesthetic Directives from {activeProject.creator_name}:
+                        </span>
+                        <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-sans">
+                          &ldquo;{creatorProfile?.requirements || 'Fast-paced documentary style, sophisticated kinetic typography, sound effects for every chart pop.'}&rdquo;
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Summary Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[11px]">
+                    <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
+                      <span className="text-slate-400 block text-[10px] uppercase font-mono">Channel Niche</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{creatorProfile?.niche || 'Finance & Tech'}</strong>
+                    </div>
+                    <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
+                      <span className="text-slate-400 block text-[10px] uppercase font-mono">Target Format</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{activeProject.deliverables.aspect_ratio} • {activeProject.deliverables.target_duration_minutes}m</strong>
+                    </div>
+                    <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
+                      <span className="text-slate-400 block text-[10px] uppercase font-mono">Master Delivery</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{activeProject.deliverables.resolution}</strong>
+                    </div>
+                    <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
+                      <span className="text-slate-400 block text-[10px] uppercase font-mono">Revision Scope</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{activeProject.revisions_used} of {activeProject.revision_limit} Rounds Used</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Right 5 Cols: Revision Checklist & Scope Tracker */}
-            <div className="lg:col-span-5">
-              <RetroWindow
-                title="REVISION CHECKLIST &amp; SCOPE TRACKER"
-                icon={<CheckCircle2 className="w-4 h-4 text-emerald-500" />}
-                bodyClassName="p-4 sm:p-5 overflow-visible"
-              >
-                <RevisionChecklist onSeekToTimestamp={handleSeekFromChecklist} />
-              </RetroWindow>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* Left 7 Cols: Interactive Video Player */}
+              <div className="lg:col-span-7">
+                <RetroWindow
+                  title="VIDEO REVIEW MONITOR — DRAFT V1"
+                  icon={<Film className="w-4 h-4 text-cyan-500" />}
+                >
+                  <TimestampPlayer
+                    externalSeekSeconds={seekSeconds}
+                    onSelectTimestamp={(sec) => setSeekSeconds(sec)}
+                    showSampleSelector={true}
+                  />
+                </RetroWindow>
+              </div>
+
+              {/* Right 5 Cols: Revision Checklist & Scope Tracker */}
+              <div className="lg:col-span-5">
+                <RetroWindow
+                  title="FRAME REVISION CHECKLIST"
+                  icon={<CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                  bodyClassName="p-4 sm:p-5 overflow-visible"
+                >
+                  <RevisionChecklist onSeekToTimestamp={handleSeekFromChecklist} />
+                </RetroWindow>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Tab 2: File & Asset Vault */}
+        {/* Tab 2: Project File & Master Vault */}
         {activeTab === 'FILES' && (
           <RetroWindow
-            title="STORAGE MANAGER — RAW FOOTAGE &amp; MASTER VAULT"
+            title="SECURE ASSET & MASTER DELIVERY VAULT"
             icon={<FolderOpen className="w-4 h-4 text-amber-500" />}
             bodyClassName="p-4 sm:p-5 overflow-visible"
           >
-            <FileVault onRequestReleaseMilestone={() => setActiveTab('MILESTONES')} />
+            <FileVault onRequestReleaseMilestone={() => releaseFinalMilestone(activeProject.id)} />
           </RetroWindow>
         )}
 
-        {/* Tab 3: Project Chat */}
+        {/* Tab 3: Encrypted Project Chat */}
         {activeTab === 'CHAT' && (
           <RetroWindow
-            title="PROJECT COLLABORATION CHANNEL"
+            title="DIRECT PROJECT COMMS & NOTIFICATIONS"
             icon={<MessageSquare className="w-4 h-4 text-cyan-500" />}
-            bodyClassName="p-3 sm:p-4 overflow-visible"
+            bodyClassName="p-4 sm:p-5 overflow-visible flex flex-col h-[600px]"
           >
             <ProjectChat />
           </RetroWindow>
         )}
 
-        {/* Tab 4: Milestones & Settlements */}
+        {/* Tab 4: 30/70 Escrow Milestone Ledger */}
         {activeTab === 'MILESTONES' && (
           <RetroWindow
-            title="ESCROW &amp; MILESTONE SETTLEMENT TERMINAL"
+            title="30/70 ESCROW CONTRACT LEDGER & PAYOUTS"
             icon={<CreditCard className="w-4 h-4 text-emerald-500" />}
             bodyClassName="p-4 sm:p-5 overflow-visible"
           >
@@ -481,21 +604,80 @@ function ProjectWorkspaceContent() {
           </RetroWindow>
         )}
 
-        {/* Tab 5: Brief & Deliverables Specs */}
+        {/* Tab 5: Brief & Comprehensive Deliverables Specs */}
         {activeTab === 'BRIEF' && (
           <RetroWindow
-            title="PROJECT SPECIFICATION BRIEF"
+            title="PROJECT SPECIFICATION & CREATOR BRIEF"
             icon={<FileText className="w-4 h-4 text-blue-500" />}
             bodyClassName="p-4 sm:p-5 overflow-visible"
           >
-            <div className="p-6 bg-white dark:bg-[#070b14] rounded-2xl text-xs space-y-5 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800">
+            <div className="p-6 bg-white dark:bg-[#070b14] rounded-2xl text-xs space-y-6 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800">
+              {/* Creator Profile & Channel Details */}
+              <div className="p-4 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <img
+                    src={activeProject.creator_avatar}
+                    alt={activeProject.creator_name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-cyan-500/40 shrink-0"
+                  />
+                  <div>
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                      {activeProject.creator_name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        {creatorProfile?.channel_name || activeProject.creator_channel || 'Channel'}
+                      </span>
+                      <span>•</span>
+                      <span>{creatorProfile?.subscribers || '480,000'} Subscribers</span>
+                      <span>•</span>
+                      <span className="text-cyan-600 dark:text-cyan-400 font-medium">
+                        {creatorProfile?.niche || 'Finance & Tech'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {creatorProfile?.channel_url && (
+                  <a
+                    href={creatorProfile.channel_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3.5 py-1.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 rounded-xl font-bold flex items-center gap-1.5 text-xs hover:bg-rose-100 self-start sm:self-auto shrink-0 transition-colors"
+                  >
+                    <Youtube className="w-3.5 h-3.5" />
+                    <span>View Channel</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Creator's Editing Guidelines & Rules */}
+              <div className="p-4 bg-gradient-to-r from-amber-500/10 via-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                  <h4 className="font-bold text-xs uppercase tracking-wide text-slate-900 dark:text-white">
+                    Client Pacing &amp; Aesthetic Directives (Editor Rules):
+                  </h4>
+                </div>
+                <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-sans pl-6">
+                  &ldquo;{creatorProfile?.requirements || 'Fast-paced documentary style, sophisticated kinetic typography, sound effects for every chart pop.'}&rdquo;
+                </p>
+                <div className="pl-6 pt-1 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                  Cadence: {creatorProfile?.publishing_frequency || '1 Long-form weekly + 3 Shorts'}
+                </div>
+              </div>
+
+              {/* Narrative Goal */}
               <div className="border-b border-slate-100 dark:border-slate-800/80 pb-4">
-                <h3 className="font-bold text-sm text-cyan-600 dark:text-cyan-400 uppercase tracking-wide">Project Brief &amp; Narrative Goal</h3>
-                <p className="mt-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+                <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
+                  Project Narrative Brief &amp; Story Arc:
+                </h4>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
                   {activeProject.brief}
                 </p>
               </div>
 
+              {/* Deliverables specs */}
               <div>
                 <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-3">
                   Agreed Technical Deliverables:
@@ -534,6 +716,25 @@ function ProjectWorkspaceContent() {
                 </div>
               </div>
 
+              {/* Raw Footage Links */}
+              {activeProject.raw_footage_links && activeProject.raw_footage_links.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
+                    Raw Footage Cloud Links:
+                  </h4>
+                  <ul className="list-disc pl-5 space-y-1.5 text-blue-600 dark:text-cyan-400 font-mono text-[11px]">
+                    {activeProject.raw_footage_links.map((link, idx) => (
+                      <li key={idx}>
+                        <a href={link} target="_blank" rel="noreferrer" className="underline hover:text-cyan-500">
+                          {link}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* References */}
               <div>
                 <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
                   Style References &amp; Visual Inspiration:
@@ -553,12 +754,13 @@ function ProjectWorkspaceContent() {
                 </ul>
               </div>
 
+              {/* Revision Policy */}
               <div>
                 <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
-                  Revision Policy Scope:
+                  Revision Policy Scope &amp; Escrow Boundary:
                 </h4>
                 <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-xl text-amber-900 dark:text-amber-200 text-xs leading-relaxed">
-                  Included Revisions: <strong>{activeProject.revision_limit} rounds</strong>. Changes must be documented through timestamp pins on the review player. Additional revisions beyond scope require written mutual agreement and price adjustment.
+                  Included Revisions: <strong>{activeProject.revision_limit} rounds</strong> (Currently <strong>{activeProject.revisions_used}</strong> used). Changes must be documented through timestamp pins on the review player. Additional revisions beyond scope require written mutual agreement and escrow adjustment.
                 </div>
               </div>
             </div>
@@ -566,7 +768,7 @@ function ProjectWorkspaceContent() {
         )}
       </div>
 
-      {/* Modals */}
+      {/* Modals Mounted via Portal to document.body */}
       <LiveReviewModal
         isOpen={isLiveReviewOpen}
         onClose={() => setIsLiveReviewOpen(false)}
@@ -575,6 +777,8 @@ function ProjectWorkspaceContent() {
       <InviteEditorModal
         isOpen={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
+        role={activeRole}
+        project={activeProject}
       />
 
       <ReviewModal
