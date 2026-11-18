@@ -15,10 +15,10 @@ import { ProjectStatus } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
 
 export default function ProjectsDashboardPage() {
-  const { projects, setActiveProjectId, isAuthenticated } = useEditBridge();
+  const { projects = [], setActiveProjectId, isAuthenticated } = useEditBridge();
   const [filter, setFilter] = useState<string>('ALL');
 
-  const filteredProjects = projects.filter((p) => {
+  const filteredProjects = (projects || []).filter((p) => {
     if (filter === 'ALL') return true;
     if (filter === 'REVIEW_REQUESTED' && p.status === 'REVIEW_REQUESTED') return true;
     if (filter === 'EDITING' && (p.status === 'EDITING' || p.status === 'PAID')) return true;
@@ -95,7 +95,7 @@ export default function ProjectsDashboardPage() {
               <Filter className="w-3.5 h-3.5" /> Filter:
             </span>
             {[
-              { id: 'ALL', label: `All (${projects.length})` },
+              { id: 'ALL', label: `All (${(projects || []).length})` },
               { id: 'REVIEW_REQUESTED', label: 'Review Drafts' },
               { id: 'EDITING', label: 'Active In Editing' },
               { id: 'FINAL_PAYMENT_PENDING', label: 'Pending Payout' },
@@ -121,8 +121,8 @@ export default function ProjectsDashboardPage() {
           {/* Project Cards List */}
           <div className="space-y-4">
             {filteredProjects.map((project) => {
-              const ms1 = project.milestones[0];
-              const ms2 = project.milestones[1];
+              const ms1Amount = project.milestones?.[0]?.amount ?? Math.round((project.budget || 500) * 0.3);
+              const ms2Amount = project.milestones?.[1]?.amount ?? Math.round((project.budget || 500) * 0.7);
               const isFeatured = project.id === 'proj-demo-1';
 
               return (
@@ -172,7 +172,7 @@ export default function ProjectsDashboardPage() {
                     <div className="text-xs text-right">
                       <span className="text-slate-500 dark:text-slate-400 block text-[11px] font-medium">MILESTONE ESCROW:</span>
                       <span className="text-slate-800 dark:text-slate-200 font-mono font-bold">
-                        30% [${ms1?.amount}] + 70% [${ms2?.amount}]
+                        30% [${ms1Amount}] + 70% [${ms2Amount}]
                       </span>
                     </div>
 

@@ -27,6 +27,8 @@ import {
   BookOpen,
   ExternalLink,
   Youtube,
+  Edit3,
+  X,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { TimestampPlayer } from '@/components/TimestampPlayer';
@@ -37,6 +39,7 @@ import { MilestoneCard } from '@/components/MilestoneCard';
 import { LiveReviewModal } from '@/components/LiveReviewModal';
 import { InviteEditorModal } from '@/components/InviteEditorModal';
 import { ReviewModal } from '@/components/ReviewModal';
+import { Portal } from '@/components/Portal';
 import { useEditBridge } from '@/lib/store';
 import { ProjectStatus } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
@@ -61,6 +64,7 @@ function ProjectWorkspaceContent() {
     projects,
     setActiveProjectId,
     updateProjectStatus,
+    updateProjectBrief,
     activeRole,
     releaseFinalMilestone,
     isAuthenticated,
@@ -73,6 +77,55 @@ function ProjectWorkspaceContent() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [guestPlaygroundMode, setGuestPlaygroundMode] = useState(false);
   const [isRequirementsOpen, setIsRequirementsOpen] = useState(true);
+
+  // Creative brief editing state
+  const [isEditingBrief, setIsEditingBrief] = useState(false);
+  const [briefFormText, setBriefFormText] = useState('');
+  const [briefAspectRatio, setBriefAspectRatio] = useState<'16:9' | '9:16'>('16:9');
+  const [briefTargetDuration, setBriefTargetDuration] = useState(10);
+  const [briefResolution, setBriefResolution] = useState('4K (3840x2160)');
+  const [briefReferencesText, setBriefReferencesText] = useState('');
+  const [briefFootageLinksText, setBriefFootageLinksText] = useState('');
+  const [isSavingBrief, setIsSavingBrief] = useState(false);
+
+  const openBriefEditor = () => {
+    retroSound.playClick();
+    if (activeProject) {
+      setBriefFormText(activeProject.brief || '');
+      setBriefAspectRatio(activeProject.deliverables?.aspect_ratio === '9:16' ? '9:16' : '16:9');
+      setBriefTargetDuration(activeProject.deliverables?.target_duration_minutes || 10);
+      setBriefResolution(activeProject.deliverables?.resolution || '4K (3840x2160)');
+      setBriefReferencesText((activeProject.references || []).join('\n'));
+      setBriefFootageLinksText((activeProject.raw_footage_links || []).join('\n'));
+    }
+    setIsEditingBrief(true);
+  };
+
+  const handleSaveBrief = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeProject) return;
+    setIsSavingBrief(true);
+    const refs = briefReferencesText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const footage = briefFootageLinksText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    updateProjectBrief(activeProject.id, {
+      brief: briefFormText,
+      aspectRatio: briefAspectRatio,
+      targetDuration: Number(briefTargetDuration) || 10,
+      resolution: briefResolution,
+      references: refs,
+      rawFootageLinks: footage,
+    });
+
+    setIsSavingBrief(false);
+    setIsEditingBrief(false);
+  };
 
   // Creator profile info lookup
   const creatorProfile = activeProject
@@ -486,6 +539,17 @@ function ProjectWorkspaceContent() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
+                      openBriefEditor();
+                    }}
+                    className="text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                    <span>Edit Brief</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setActiveTab('BRIEF');
                     }}
                     className="text-[11px] font-semibold text-blue-600 dark:text-cyan-400 hover:underline hidden sm:inline cursor-pointer"
@@ -527,15 +591,21 @@ function ProjectWorkspaceContent() {
                     </div>
                     <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
                       <span className="text-slate-400 block text-[10px] uppercase font-mono">Target Format</span>
-                      <strong className="text-slate-800 dark:text-slate-200">{activeProject.deliverables.aspect_ratio} • {activeProject.deliverables.target_duration_minutes}m</strong>
+                      <strong className="text-slate-800 dark:text-slate-200">
+                        {activeProject.deliverables?.aspect_ratio || '16:9'} • {activeProject.deliverables?.target_duration_minutes || 10}m
+                      </strong>
                     </div>
                     <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
                       <span className="text-slate-400 block text-[10px] uppercase font-mono">Master Delivery</span>
-                      <strong className="text-slate-800 dark:text-slate-200">{activeProject.deliverables.resolution}</strong>
+                      <strong className="text-slate-800 dark:text-slate-200">
+                        {activeProject.deliverables?.resolution || '4K (3840x2160)'}
+                      </strong>
                     </div>
                     <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
                       <span className="text-slate-400 block text-[10px] uppercase font-mono">Revision Scope</span>
-                      <strong className="text-slate-800 dark:text-slate-200">{activeProject.revisions_used} of {activeProject.revision_limit} Rounds Used</strong>
+                      <strong className="text-slate-800 dark:text-slate-200">
+                        {activeProject.revisions_used ?? 0} of {activeProject.revision_limit ?? 2} Rounds Used
+                      </strong>
                     </div>
                   </div>
                 </div>
@@ -612,17 +682,38 @@ function ProjectWorkspaceContent() {
             bodyClassName="p-4 sm:p-5 overflow-visible"
           >
             <div className="p-6 bg-white dark:bg-[#070b14] rounded-2xl text-xs space-y-6 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800">
+              {/* Brief Controls & Action Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-blue-500" />
+                    <span>Creative Brief &amp; Deliverables Blueprint</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Production specifications, narrative directives, reference cuts, and raw cloud footage repositories.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={openBriefEditor}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer shrink-0 active:scale-95 self-start sm:self-auto"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>{activeProject.brief ? 'Edit / Update Creative Brief' : 'Add Creative Brief'}</span>
+                </button>
+              </div>
+
               {/* Creator Profile & Channel Details */}
               <div className="p-4 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
                   <img
-                    src={activeProject.creator_avatar}
-                    alt={activeProject.creator_name}
+                    src={activeProject.creator_avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
+                    alt={activeProject.creator_name || 'Creator'}
                     className="w-12 h-12 rounded-full object-cover border-2 border-cyan-500/40 shrink-0"
                   />
                   <div>
                     <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                      {activeProject.creator_name}
+                      {activeProject.creator_name || 'Content Creator'}
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
                       <span className="font-semibold text-slate-700 dark:text-slate-300">
@@ -669,11 +760,21 @@ function ProjectWorkspaceContent() {
 
               {/* Narrative Goal */}
               <div className="border-b border-slate-100 dark:border-slate-800/80 pb-4">
-                <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
-                  Project Narrative Brief &amp; Story Arc:
-                </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
-                  {activeProject.brief}
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300">
+                    Project Narrative Brief &amp; Story Arc:
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={openBriefEditor}
+                    className="text-[11px] text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                    <span>Edit</span>
+                  </button>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans whitespace-pre-wrap">
+                  {activeProject.brief || 'No detailed brief narrative provided yet. Click "Edit / Update Creative Brief" above to set narrative directives.'}
                 </p>
               </div>
 
@@ -685,32 +786,32 @@ function ProjectWorkspaceContent() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
                   <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Aspect Ratio:</span>
-                    <strong className="text-slate-900 dark:text-white text-xs">{activeProject.deliverables.aspect_ratio}</strong>
+                    <strong className="text-slate-900 dark:text-white text-xs">{activeProject.deliverables?.aspect_ratio || '16:9'}</strong>
                   </div>
                   <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Target Duration:</span>
-                    <strong className="text-slate-900 dark:text-white text-xs">{activeProject.deliverables.target_duration_minutes} minutes</strong>
+                    <strong className="text-slate-900 dark:text-white text-xs">{activeProject.deliverables?.target_duration_minutes || 10} minutes</strong>
                   </div>
                   <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Master Resolution:</span>
-                    <strong className="text-slate-900 dark:text-white text-xs">{activeProject.deliverables.resolution}</strong>
+                    <strong className="text-slate-900 dark:text-white text-xs">{activeProject.deliverables?.resolution || '4K (3840x2160)'}</strong>
                   </div>
                   <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Captions:</span>
                     <strong className="text-slate-900 dark:text-white text-xs">
-                      {activeProject.deliverables.captions_included ? 'Included (SRT + Burned)' : 'No'}
+                      {activeProject.deliverables?.captions_included ? 'Included (SRT + Burned)' : 'No'}
                     </strong>
                   </div>
                   <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Sound Design:</span>
                     <strong className="text-slate-900 dark:text-white text-xs">
-                      {activeProject.deliverables.sound_design ? 'Full Foley & Riser Mix' : 'Basic'}
+                      {activeProject.deliverables?.sound_design ? 'Full Foley & Riser Mix' : 'Basic'}
                     </strong>
                   </div>
                   <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Color Grading:</span>
                     <strong className="text-slate-900 dark:text-white text-xs">
-                      {activeProject.deliverables.color_grading ? 'Custom Film Emulation' : 'Standard'}
+                      {activeProject.deliverables?.color_grading ? 'Custom Film Emulation' : 'Standard'}
                     </strong>
                   </div>
                 </div>
@@ -740,7 +841,7 @@ function ProjectWorkspaceContent() {
                   Style References &amp; Visual Inspiration:
                 </h4>
                 <ul className="list-disc pl-5 space-y-1.5 text-blue-600 dark:text-cyan-400">
-                  {activeProject.references.length > 0 ? (
+                  {activeProject.references && activeProject.references.length > 0 ? (
                     activeProject.references.map((ref, idx) => (
                       <li key={idx}>
                         <a href={ref} target="_blank" rel="noreferrer" className="underline hover:text-cyan-500">
@@ -749,7 +850,7 @@ function ProjectWorkspaceContent() {
                       </li>
                     ))
                   ) : (
-                    <li className="text-slate-500">None specified</li>
+                    <li className="text-slate-500 list-none italic">None specified</li>
                   )}
                 </ul>
               </div>
@@ -760,7 +861,7 @@ function ProjectWorkspaceContent() {
                   Revision Policy Scope &amp; Escrow Boundary:
                 </h4>
                 <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-xl text-amber-900 dark:text-amber-200 text-xs leading-relaxed">
-                  Included Revisions: <strong>{activeProject.revision_limit} rounds</strong> (Currently <strong>{activeProject.revisions_used}</strong> used). Changes must be documented through timestamp pins on the review player. Additional revisions beyond scope require written mutual agreement and escrow adjustment.
+                  Included Revisions: <strong>{activeProject.revision_limit ?? 2} rounds</strong> (Currently <strong>{activeProject.revisions_used ?? 0}</strong> used). Changes must be documented through timestamp pins on the review player. Additional revisions beyond scope require written mutual agreement and escrow adjustment.
                 </div>
               </div>
             </div>
@@ -785,6 +886,149 @@ function ProjectWorkspaceContent() {
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
       />
+
+      {/* Edit / Add Creative Brief Modal Mounted via Portal */}
+      {isEditingBrief && (
+        <Portal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-[#0c1222] border border-cyan-500/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col p-6 space-y-5">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-cyan-400 flex items-center justify-center">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                      Edit / Add Creative Brief
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Directives, story arc, deliverables specs, and raw assets for {activeProject.title}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingBrief(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveBrief} className="space-y-4 text-xs">
+                {/* Brief Narrative */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-900 dark:text-slate-200 block">
+                    Story Arc &amp; Creative Directive
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={briefFormText}
+                    onChange={(e) => setBriefFormText(e.target.value)}
+                    placeholder="Describe the storyline, hook, pacing, tone of voice, visual energy, motion graphics style, and core call to action..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-cyan-500 font-sans leading-relaxed"
+                    required
+                  />
+                </div>
+
+                {/* Technical Specs Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700 dark:text-slate-300 block">Aspect Ratio</label>
+                    <select
+                      value={briefAspectRatio}
+                      onChange={(e) => setBriefAspectRatio(e.target.value as any)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:border-cyan-500"
+                    >
+                      <option value="16:9">16:9 (Landscape YouTube)</option>
+                      <option value="9:16">9:16 (Vertical Shorts/Reels)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700 dark:text-slate-300 block">Target Duration (min)</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={briefTargetDuration}
+                      onChange={(e) => setBriefTargetDuration(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:border-cyan-500 font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700 dark:text-slate-300 block">Master Resolution</label>
+                    <select
+                      value={briefResolution}
+                      onChange={(e) => setBriefResolution(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:border-cyan-500"
+                    >
+                      <option value="4K (3840x2160)">4K (3840x2160)</option>
+                      <option value="1080p (1920x1080)">1080p (1920x1080)</option>
+                      <option value="1440p (2560x1440)">1440p 2K</option>
+                      <option value="8K Master">8K Master</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Raw Footage Links */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-900 dark:text-slate-200 block">
+                    Raw Footage Cloud Links (Google Drive, Dropbox, S3)
+                  </label>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Enter one URL per line.
+                  </p>
+                  <textarea
+                    rows={2}
+                    value={briefFootageLinksText}
+                    onChange={(e) => setBriefFootageLinksText(e.target.value)}
+                    placeholder="https://drive.google.com/drive/folders/sample-raw-footage&#10;https://storage.editbridge.network/raw/a-cam.mp4"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 font-mono text-[11px] focus:outline-hidden focus:border-cyan-500"
+                  />
+                </div>
+
+                {/* Style References */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-900 dark:text-slate-200 block">
+                    Style References &amp; Visual Inspiration Links
+                  </label>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    YouTube or Vimeo links representing desired pacing or graphics (one per line).
+                  </p>
+                  <textarea
+                    rows={2}
+                    value={briefReferencesText}
+                    onChange={(e) => setBriefReferencesText(e.target.value)}
+                    placeholder="https://youtube.com/watch?v=sample-vox-explainer&#10;https://youtube.com/watch?v=sample-visual-pacing"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 font-mono text-[11px] focus:outline-hidden focus:border-cyan-500"
+                  />
+                </div>
+
+                {/* Action Footer */}
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingBrief(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingBrief}
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{isSavingBrief ? 'Saving to Database...' : 'Save & Sync Brief'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </Portal>
+      )}
     </div>
   );
 }

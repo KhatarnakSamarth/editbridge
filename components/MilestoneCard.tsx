@@ -31,8 +31,20 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
 
   if (!activeProject) return null;
 
-  const ms1 = activeProject.milestones[0];
-  const ms2 = activeProject.milestones[1];
+  const ms1 = activeProject.milestones?.[0] || {
+    id: 'ms-1',
+    name: 'Milestone 1: 30% Upfront Kickoff',
+    percentage: 30,
+    amount: Math.round(activeProject.budget * 0.3),
+    status: 'ESCROW_FUNDED',
+  };
+  const ms2 = activeProject.milestones?.[1] || {
+    id: 'ms-2',
+    name: 'Milestone 2: 70% Final Master Release',
+    percentage: 70,
+    amount: Math.round(activeProject.budget * 0.7),
+    status: 'PENDING',
+  };
 
   const isMs1Released = ms1 && (ms1.status === 'RELEASED' || ms1.status === 'ESCROW_FUNDED');
   const isMs2Released = ms2 && ms2.status === 'RELEASED';

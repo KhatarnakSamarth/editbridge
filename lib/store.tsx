@@ -15,6 +15,8 @@ import {
   EditorProfile,
   Review,
   Notification,
+  Milestone,
+  DeliverableSpec,
 } from '@/types';
 import {
   INITIAL_USERS,
@@ -45,6 +47,17 @@ interface EditBridgeContextType {
   updateProjectStatus: (projectId: string, newStatus: ProjectStatus) => void;
   createProject: (newProject: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'revisions_used'>) => string;
   setProjectActiveDraftUrl: (projectId: string, url: string) => void;
+  updateProjectBrief: (
+    projectId: string,
+    data: {
+      brief: string;
+      aspectRatio?: '16:9' | '9:16';
+      targetDuration?: number;
+      resolution?: string;
+      references?: string[];
+      rawFootageLinks?: string[];
+    }
+  ) => void;
 
   // Revisions & Timestamps
   revisionComments: RevisionComment[];
@@ -396,8 +409,48 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const createProject = (newProjectData: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'revisions_used'>) => {
     retroSound.playDing();
     const newId = `proj-${Date.now()}`;
+
+    const deliverables: DeliverableSpec = Object.assign(
+      {
+        aspect_ratio: '16:9' as const,
+        target_duration_minutes: 10,
+        resolution: '4K (3840x2160)' as const,
+        captions_included: true,
+        thumbnail_concept: true,
+        sound_design: true,
+        color_grading: true,
+      },
+      newProjectData.deliverables
+    );
+
+    const milestones: Milestone[] =
+      newProjectData.milestones && newProjectData.milestones.length > 0
+        ? newProjectData.milestones
+        : [
+            {
+              id: `ms-${newId}-1`,
+              name: 'Milestone 1: 30% Upfront Kickoff',
+              description: '30% Kickoff Escrow',
+              percentage: 30,
+              amount: Math.round((newProjectData.budget || 500) * 0.3),
+              status: 'ESCROW_FUNDED',
+            },
+            {
+              id: `ms-${newId}-2`,
+              name: 'Milestone 2: 70% Final Master Release',
+              description: '70% Final Master Release',
+              percentage: 70,
+              amount: Math.round((newProjectData.budget || 500) * 0.7),
+              status: 'PENDING',
+            },
+          ];
+
     const newProj: Project = {
       ...newProjectData,
+      deliverables,
+      milestones,
+      references: newProjectData.references || [],
+      raw_footage_links: newProjectData.raw_footage_links || [],
       id: newId,
       revisions_used: 0,
       created_at: new Date().toISOString(),
@@ -543,6 +596,49 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     }).catch((err) => console.error('Failed to update activeDraftUrl in DB:', err));
   };
 
+  // Update Project Brief (persists in DB)
+  const updateProjectBrief = (
+    projectId: string,
+    data: {
+      brief: string;
+      aspectRatio?: '16:9' | '9:16';
+      targetDuration?: number;
+      resolution?: string;
+      references?: string[];
+      rawFootageLinks?: string[];
+    }
+  ) => {
+    retroSound.playDing();
+    setProjects((prev) =>
+      prev.map((p) => {
+        if (p.id !== projectId) return p;
+        return {
+          ...p,
+          brief: data.brief,
+          deliverables: {
+            ...p.deliverables,
+            aspect_ratio: data.aspectRatio || p.deliverables?.aspect_ratio || '16:9',
+            target_duration_minutes: data.targetDuration || p.deliverables?.target_duration_minutes || 10,
+            resolution: (data.resolution as any) || p.deliverables?.resolution || '4K (3840x2160)',
+          },
+          references: data.references || p.references || [],
+          raw_footage_links: data.rawFootageLinks || p.raw_footage_links || [],
+          updated_at: new Date().toISOString(),
+        };
+      })
+    );
+
+    fetch(`/api/projects/${projectId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        brief: data.brief,
+        aspectRatio: data.aspectRatio,
+        targetDuration: data.targetDuration ? `${data.targetDuration} min` : undefined,
+      }),
+    }).catch((err) => console.error('Failed to update brief in DB:', err));
+  };
+
   // Unlock Master File
   const unlockMasterFile = (projectId: string) => {
     retroSound.playDing();
@@ -683,6 +779,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         updateProjectStatus,
         createProject,
         setProjectActiveDraftUrl,
+        updateProjectBrief,
         revisionComments,
         activeProjectComments,
         addRevisionComment,
