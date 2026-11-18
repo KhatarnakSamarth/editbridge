@@ -8,6 +8,7 @@ import {
   ArrowRight,
   ShieldCheck,
   ChevronLeft,
+  Sparkles,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { useEditBridge } from '@/lib/store';
@@ -103,7 +104,7 @@ export default function NewProjectPage() {
         <Link
           href="/projects"
           onClick={() => retroSound.playClick()}
-          className="win95-button px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1.5 text-slate-300"
+          className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:border-cyan-500 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Back to Projects</span>
@@ -112,18 +113,18 @@ export default function NewProjectPage() {
 
       <RetroWindow
         title="NEW PROJECT WIZARD — CREATE STRUCTURED BRIEF"
-        icon={<FolderPlus className="w-4 h-4 text-blue-400" />}
+        icon={<FolderPlus className="w-4 h-4 text-cyan-500" />}
       >
-        <form onSubmit={handleSubmit} className="space-y-6 text-xs text-slate-200">
+        <form onSubmit={handleSubmit} className="space-y-6 text-xs text-slate-800 dark:text-slate-200">
           {/* Section 1: Basic Info */}
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
-            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 uppercase tracking-wide">
+          <div className="p-6 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4">
+            <h3 className="font-bold text-xs text-cyan-600 dark:text-cyan-400 border-b border-slate-200 dark:border-slate-800 pb-2 uppercase tracking-wide">
               01. Project Overview &amp; Format
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2">
-                <label className="block font-semibold mb-1.5 text-slate-300">
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                   Project Title:
                 </label>
                 <input
@@ -132,12 +133,12 @@ export default function NewProjectPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Inside Quantum Computing Episode 2"
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-1.5 text-slate-300">
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                   Video Category:
                 </label>
                 <select
@@ -145,7 +146,7 @@ export default function NewProjectPage() {
                   onChange={(e) =>
                     setCategory(e.target.value as Project['category'])
                   }
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 >
                   <option value="YouTube Long-form">YouTube Long-form (16:9)</option>
                   <option value="Shorts / Reels">Shorts / Reels / TikTok (9:16)</option>
@@ -158,7 +159,7 @@ export default function NewProjectPage() {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1.5 text-slate-300">
+              <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                 Detailed Brief &amp; Narrative Goal:
               </label>
               <textarea
@@ -167,26 +168,26 @@ export default function NewProjectPage() {
                 value={brief}
                 onChange={(e) => setBrief(e.target.value)}
                 placeholder="Explain the pacing, hook requirements (first 15 seconds), B-roll tone, and audio vibes..."
-                className="win95-sunken w-full"
+                className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
               />
             </div>
           </div>
 
           {/* Section 2: Technical Deliverables Specs */}
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
-            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 uppercase tracking-wide">
+          <div className="p-6 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4">
+            <h3 className="font-bold text-xs text-cyan-600 dark:text-cyan-400 border-b border-slate-200 dark:border-slate-800 pb-2 uppercase tracking-wide">
               02. Deliverables Specification
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block font-semibold mb-1.5 text-slate-300">Aspect Ratio:</label>
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Aspect Ratio:</label>
                 <select
                   value={aspectRatio}
                   onChange={(e) =>
                     setAspectRatio(e.target.value as DeliverableSpec['aspect_ratio'])
                   }
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 >
                   <option value="16:9">16:9 (Horizontal)</option>
                   <option value="9:16">9:16 (Vertical)</option>
@@ -196,25 +197,25 @@ export default function NewProjectPage() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-1.5 text-slate-300">Target Duration (Mins):</label>
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Target Duration (Mins):</label>
                 <input
                   type="number"
                   min="1"
                   max="180"
                   value={targetDuration}
                   onChange={(e) => setTargetDuration(parseInt(e.target.value) || 10)}
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-1.5 text-slate-300">Master Resolution:</label>
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Master Resolution:</label>
                 <select
                   value={resolution}
                   onChange={(e) =>
                     setResolution(e.target.value as DeliverableSpec['resolution'])
                   }
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 >
                   <option value="4K (3840x2160)">4K (3840x2160)</option>
                   <option value="1080p (1920x1080)">1080p FHD</option>
@@ -223,11 +224,11 @@ export default function NewProjectPage() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-1.5 text-slate-300">Included Revisions:</label>
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">Included Revisions:</label>
                 <select
                   value={revisionLimit}
                   onChange={(e) => setRevisionLimit(parseInt(e.target.value))}
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 >
                   <option value={1}>1 Revision Round</option>
                   <option value={2}>2 Revision Rounds (Standard)</option>
@@ -236,7 +237,7 @@ export default function NewProjectPage() {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -244,7 +245,7 @@ export default function NewProjectPage() {
                   onChange={(e) => setCaptionsIncluded(e.target.checked)}
                   className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-slate-300">Dynamic Captions</span>
+                <span className="text-slate-700 dark:text-slate-300">Dynamic Captions</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -254,7 +255,7 @@ export default function NewProjectPage() {
                   onChange={(e) => setSoundDesign(e.target.checked)}
                   className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-slate-300">Full Sound Design</span>
+                <span className="text-slate-700 dark:text-slate-300">Full Sound Design</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -264,7 +265,7 @@ export default function NewProjectPage() {
                   onChange={(e) => setColorGrading(e.target.checked)}
                   className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-slate-300">Color Grading LUT</span>
+                <span className="text-slate-700 dark:text-slate-300">Color Grading LUT</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -274,21 +275,21 @@ export default function NewProjectPage() {
                   onChange={(e) => setThumbnailConcept(e.target.checked)}
                   className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-slate-300">Thumbnail Concept</span>
+                <span className="text-slate-700 dark:text-slate-300">Thumbnail Concept</span>
               </label>
             </div>
           </div>
 
           {/* Section 3: Budget & Milestone Split */}
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
-            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 flex items-center justify-between uppercase tracking-wide">
+          <div className="p-6 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4">
+            <h3 className="font-bold text-xs text-cyan-600 dark:text-cyan-400 border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center justify-between uppercase tracking-wide">
               <span>03. Budget &amp; 30/70 Milestone Protection</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block font-semibold mb-1.5 text-slate-300">
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                   Agreed Project Budget ($ USD):
                 </label>
                 <input
@@ -297,62 +298,62 @@ export default function NewProjectPage() {
                   step="25"
                   value={budget}
                   onChange={(e) => setBudget(parseInt(e.target.value) || 300)}
-                  className="win95-sunken w-full font-mono font-semibold"
+                  className="w-full px-3.5 py-2 text-xs font-mono font-bold text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-1.5 text-slate-300">
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                   Estimated Delivery Deadline:
                 </label>
                 <input
                   type="date"
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 />
               </div>
 
-              <div className="bg-slate-950/70 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
+              <div className="bg-white dark:bg-[#0e1526] p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Milestone 1 (30% Upfront):</span>
-                  <strong className="text-blue-400 font-mono">${upfrontAmount} USD</strong>
+                  <span className="text-slate-500 dark:text-slate-400">Milestone 1 (30% Upfront):</span>
+                  <strong className="text-blue-600 dark:text-cyan-400 font-mono">${upfrontAmount} USD</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Milestone 2 (70% Master):</span>
-                  <strong className="text-amber-400 font-mono">${finalAmount} USD</strong>
+                  <span className="text-slate-500 dark:text-slate-400">Milestone 2 (70% Master):</span>
+                  <strong className="text-amber-600 dark:text-amber-400 font-mono">${finalAmount} USD</strong>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Section 4: Assets & References */}
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-lg space-y-4">
-            <h3 className="font-bold text-xs text-blue-400 border-b border-slate-800 pb-2 uppercase tracking-wide">
+          <div className="p-6 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4">
+            <h3 className="font-bold text-xs text-cyan-600 dark:text-cyan-400 border-b border-slate-200 dark:border-slate-800 pb-2 uppercase tracking-wide">
               04. Assets &amp; Reference Links
             </h3>
 
             <div>
-              <label className="block font-semibold mb-1.5 text-slate-300">
+              <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                 Raw Footage / Assets Folder URL (Drive, Dropbox, Frame.io):
               </label>
               <textarea
                 rows={2}
                 value={rawFootageLinks}
                 onChange={(e) => setRawFootageLinks(e.target.value)}
-                className="win95-sunken w-full font-mono"
+                className="w-full px-3.5 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
               />
             </div>
 
             <div>
-              <label className="block font-semibold mb-1.5 text-slate-300">
+              <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                 Style References / Video Links (One per line):
               </label>
               <textarea
                 rows={2}
                 value={references}
                 onChange={(e) => setReferences(e.target.value)}
-                className="win95-sunken w-full font-mono"
+                className="w-full px-3.5 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
               />
             </div>
           </div>
@@ -361,14 +362,14 @@ export default function NewProjectPage() {
           <div className="pt-2 flex justify-between items-center">
             <Link
               href="/projects"
-              className="win95-button px-4 py-2 font-semibold"
+              className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl transition-colors"
             >
               Cancel
             </Link>
 
             <button
               type="submit"
-              className="win95-button win95-button-primary px-6 py-2.5 text-xs font-semibold flex items-center gap-2 shadow-md"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-2.5 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-md shadow-blue-500/25 transition-all"
             >
               <span>Initialize Project &amp; Fund Escrow</span>
               <ArrowRight className="w-4 h-4" />

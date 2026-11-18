@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Receipt,
   FileCheck,
+  Sparkles,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
@@ -38,17 +39,17 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Escrow summary banner */}
-      <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-lg border border-indigo-900/60 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-5 bg-gradient-to-r from-blue-900/40 via-indigo-950/60 to-purple-900/40 dark:from-blue-950/60 dark:via-[#0e1526] dark:to-purple-950/60 text-slate-900 dark:text-white rounded-2xl border border-blue-500/20 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
         <div>
-          <div className="flex items-center gap-2 text-amber-300 font-semibold text-xs tracking-wide">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>TRANSPARENT MILESTONE PROTECTION</span>
+          <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-bold text-xs tracking-wider uppercase">
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <span>TRANSPARENT 30/70 ESCROW PROTECTION</span>
           </div>
-          <p className="text-sm text-slate-200 mt-1">
-            Total Project Budget: <strong className="text-white font-mono text-base">${activeProject.budget}.00 USD</strong>
+          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mt-1.5">
+            Total Project Budget: <strong className="text-slate-950 dark:text-white font-mono text-base">${activeProject.budget}.00 USD</strong>
           </p>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Structured 30% / 70% payment milestone protects both Creator &amp; Editor against scope creep and non-payment.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Structured milestone protection prevents scope creep and guarantees payment security for both creator and editor.
           </p>
         </div>
 
@@ -58,15 +59,15 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
               retroSound.playDing();
               setShowReceiptModal(true);
             }}
-            className="win95-button win95-button-success px-4 py-2 text-xs font-semibold flex items-center gap-1.5 self-start sm:self-center shadow-xs"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 self-start sm:self-center shadow-md shadow-emerald-500/20 transition-all active:scale-95"
           >
             <Receipt className="w-4 h-4" />
             <span>View Receipt &amp; Invoice</span>
           </button>
         ) : (
-          <div className="bg-slate-950/70 border border-slate-800 rounded-lg px-4 py-2 text-xs text-right">
-            <span className="text-slate-400 block text-[10px] font-mono">PENDING FINAL PAYOUT:</span>
-            <span className="text-amber-400 font-bold font-mono text-sm">
+          <div className="bg-white/80 dark:bg-[#070b14]/80 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-right shadow-xs">
+            <span className="text-slate-500 dark:text-slate-400 block text-[10px] font-mono uppercase font-semibold">Pending Final Payout:</span>
+            <span className="text-amber-600 dark:text-amber-400 font-bold font-mono text-base">
               ${ms2 ? ms2.amount : 0}.00 USD
             </span>
           </div>
@@ -77,39 +78,39 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Milestone 1 */}
         <div
-          className={`p-4 rounded-lg border flex flex-col justify-between transition-all ${
+          className={`p-5 rounded-2xl border flex flex-col justify-between transition-all ${
             isMs1Released
-              ? 'bg-slate-900/90 border-slate-800'
-              : 'bg-slate-900 border-slate-700/80 shadow-xs'
+              ? 'bg-white dark:bg-[#0e1526] border-slate-200 dark:border-slate-800 shadow-sm'
+              : 'bg-white dark:bg-[#0e1526] border-blue-400/40 dark:border-blue-500/40 shadow-md shadow-blue-500/10'
           }`}
         >
           <div>
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-              <span className="font-semibold text-xs text-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+              <span className="font-bold text-xs text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                 MILESTONE 1 (30%)
               </span>
-              <span className="font-mono font-bold text-xs text-blue-400">
+              <span className="font-mono font-bold text-xs text-blue-600 dark:text-cyan-400">
                 ${ms1 ? ms1.amount : 0}.00 USD
               </span>
             </div>
 
-            <p className="text-xs text-slate-200 mt-2.5 font-medium">
+            <p className="text-xs text-slate-800 dark:text-slate-200 mt-3 font-semibold">
               Kickoff Deposit &amp; Raw Footage Access
             </p>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
               Secures editor&apos;s schedule and authorizes raw footage and project asset downloads.
             </p>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
+          <div className="mt-6 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
             <span
               className={`text-xs font-semibold flex items-center gap-1.5 ${
-                isMs1Released ? 'text-emerald-400' : 'text-amber-400'
+                isMs1Released ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
               }`}
             >
               {isMs1Released ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>FUNDED IN ESCROW</span>
                 </>
               ) : (
@@ -125,7 +126,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
                 onClick={() => {
                   fundUpfrontMilestone(activeProject.id);
                 }}
-                className="win95-button win95-button-primary px-3.5 py-1.5 text-xs font-semibold"
+                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl shadow-sm transition-all"
               >
                 Deposit 30% (${ms1?.amount})
               </button>
@@ -135,39 +136,39 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
 
         {/* Milestone 2 */}
         <div
-          className={`p-4 rounded-lg border flex flex-col justify-between transition-all ${
+          className={`p-5 rounded-2xl border flex flex-col justify-between transition-all ${
             isMs2Released
-              ? 'bg-slate-900/90 border-emerald-800/80'
-              : 'bg-slate-900 border-amber-700/60 shadow-xs'
+              ? 'bg-white dark:bg-[#0e1526] border-emerald-400/50 dark:border-emerald-600/50 shadow-md shadow-emerald-500/10'
+              : 'bg-white dark:bg-[#0e1526] border-amber-300 dark:border-amber-600/40 shadow-sm'
           }`}
         >
           <div>
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-              <span className="font-semibold text-xs text-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+              <span className="font-bold text-xs text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                 MILESTONE 2 (70%)
               </span>
-              <span className="font-mono font-bold text-xs text-blue-400">
+              <span className="font-mono font-bold text-xs text-blue-600 dark:text-cyan-400">
                 ${ms2 ? ms2.amount : 0}.00 USD
               </span>
             </div>
 
-            <p className="text-xs text-slate-200 mt-2.5 font-medium">
+            <p className="text-xs text-slate-800 dark:text-slate-200 mt-3 font-semibold">
               Final Master Approval &amp; Commercial Delivery
             </p>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
               Releasing this payout grants the creator immediate download access to uncompressed 4K master files and marks project complete.
             </p>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
+          <div className="mt-6 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
             <span
               className={`text-xs font-semibold flex items-center gap-1.5 ${
-                isMs2Released ? 'text-emerald-400' : 'text-amber-400'
+                isMs2Released ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
               }`}
             >
               {isMs2Released ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>RELEASED TO EDITOR</span>
                 </>
               ) : (
@@ -183,7 +184,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
                 onClick={() => {
                   releaseFinalMilestone(activeProject.id);
                 }}
-                className="win95-button win95-button-amber px-4 py-1.5 text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-amber-500/25 active:scale-95 transition-all"
               >
                 <Unlock className="w-3.5 h-3.5" />
                 <span>Release 70% (${ms2?.amount})</span>
@@ -195,73 +196,73 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
 
       {/* Receipt Modal */}
       {showReceiptModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="win95-window max-w-lg w-full border border-slate-700 shadow-2xl">
-            <div className="win95-titlebar">
-              <span className="flex items-center gap-2 font-semibold text-slate-100">
-                <Receipt className="w-4 h-4 text-emerald-400" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel max-w-lg w-full bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <span className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs">
+                <Receipt className="w-4 h-4 text-emerald-500" />
                 OFFICIAL EDITBRIDGE TRANSACTION RECEIPT
               </span>
               <button
                 onClick={() => setShowReceiptModal(false)}
-                className="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold"
+                className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors"
               >
                 ✕
               </button>
             </div>
-            <div className="p-5 font-sans text-xs space-y-4 text-slate-200">
-              <div className="border-b border-slate-700 pb-3 flex justify-between items-start">
+            <div className="p-6 font-sans text-xs space-y-4 text-slate-700 dark:text-slate-200">
+              <div className="border-b border-slate-200 dark:border-slate-800 pb-3.5 flex justify-between items-start">
                 <div>
-                  <h3 className="font-bold text-sm text-white">EDITBRIDGE SETTLEMENT INVOICE</h3>
-                  <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">EDITBRIDGE SETTLEMENT INVOICE</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                     Receipt ID: EB-INV-{activeProject.id.toUpperCase()}
                   </p>
-                  <p className="text-[11px] text-slate-400 font-mono">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                     Date: {new Date().toLocaleDateString()}
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="bg-emerald-950 text-emerald-300 border border-emerald-700 px-2.5 py-0.5 rounded font-semibold text-[11px]">
+                  <span className="bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 px-3 py-1 rounded-full font-bold text-[11px]">
                     PAID IN FULL
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Project:</span>
-                  <span className="font-semibold text-white">{activeProject.title}</span>
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                  <span className="text-slate-500 dark:text-slate-400">Project:</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">{activeProject.title}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Client / Creator:</span>
-                  <span className="text-white">{activeProject.creator_name}</span>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                  <span className="text-slate-500 dark:text-slate-400">Client / Creator:</span>
+                  <span className="text-slate-900 dark:text-white">{activeProject.creator_name}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Assigned Editor:</span>
-                  <span className="text-white">{activeProject.editor_name}</span>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                  <span className="text-slate-500 dark:text-slate-400">Assigned Editor:</span>
+                  <span className="text-slate-900 dark:text-white">{activeProject.editor_name}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Milestone 1 (30% Upfront):</span>
-                  <span className="font-mono text-emerald-400">${ms1?.amount}.00 USD (Settled)</span>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                  <span className="text-slate-500 dark:text-slate-400">Milestone 1 (30% Upfront):</span>
+                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">${ms1?.amount}.00 USD (Settled)</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Milestone 2 (70% Final Master):</span>
-                  <span className="font-mono text-emerald-400">${ms2?.amount}.00 USD (Settled)</span>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/80">
+                  <span className="text-slate-500 dark:text-slate-400">Milestone 2 (70% Final Master):</span>
+                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">${ms2?.amount}.00 USD (Settled)</span>
                 </div>
-                <div className="flex justify-between py-2 border-t border-slate-700 font-bold text-sm">
-                  <span className="text-white">TOTAL SETTLED:</span>
-                  <span className="font-mono text-emerald-300">${activeProject.budget}.00 USD</span>
+                <div className="flex justify-between py-2 border-t border-slate-200 dark:border-slate-700 font-bold text-sm">
+                  <span className="text-slate-900 dark:text-white">TOTAL SETTLED:</span>
+                  <span className="font-mono text-emerald-600 dark:text-emerald-400 text-base">${activeProject.budget}.00 USD</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded text-[11px] text-slate-400 leading-relaxed">
-                ✓ Master 4K files, project archives, and full commercial distribution rights transferred to client.
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                ✓ Master 4K ProRes files, project archives, and full commercial distribution rights transferred to client.
               </div>
 
               <div className="pt-2 flex justify-end">
                 <button
                   onClick={() => setShowReceiptModal(false)}
-                  className="win95-button win95-button-primary px-4 py-1.5 text-xs font-semibold"
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl transition-all"
                 >
                   Close Receipt
                 </button>

@@ -5,9 +5,9 @@ import { RetroHeader } from '@/components/RetroHeader';
 import { RetroStatusBar } from '@/components/RetroStatusBar';
 
 export const metadata: Metadata = {
-  title: 'EditBridge — Creator–Editor Collaboration Platform [90s OS]',
+  title: 'EditBridge — Next-Gen Creator–Editor Video Collaboration Platform',
   description:
-    'One structured 90s digital workspace for content creators and video editors. Discover editors, manage briefs, timestamp reviews, revision limits, and milestone payments.',
+    'Modern, high-retention video production workspace with frame-accurate timestamp feedback, 30/70 milestone escrow, locked master deliveries, and verified editor roster.',
 };
 
 export default function RootLayout({
@@ -16,16 +16,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#008080] antialiased flex flex-col selection:bg-[#000080] selection:text-white">
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 antialiased flex flex-col selection:bg-cyan-500 selection:text-white transition-colors duration-200">
         <EditBridgeProvider>
-          {/* Top Retro Navigation & Control Bar */}
+          {/* Top Modern Navigation & Control Bar */}
           <RetroHeader />
 
           {/* Main App Content Area */}
-          <main className="flex-1 pb-12">{children}</main>
+          <main className="flex-1 pb-16">{children}</main>
 
-          {/* Bottom Desktop Taskbar / Status Bar */}
+          {/* Bottom Workstation Status Bar */}
           <RetroStatusBar />
         </EditBridgeProvider>
       </body>

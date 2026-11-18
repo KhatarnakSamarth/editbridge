@@ -2,284 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================================
+   EDITBRIDGE NEON DESIGN SYSTEM (DARK & LIGHT MODES)
+   ======================================================== */
+
 :root {
-  --canvas-bg: #0b0f19;
-  --panel-bg: #111827;
-  --panel-border: #1f2937;
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
+  --bg-canvas: #070b14;
+  --bg-surface: #0e1526;
+  --bg-surface-elevated: #131c33;
+  --border-subtle: #1e293b;
+  --border-neon: rgba(0, 245, 255, 0.3);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-cyan: #00f5ff;
+  --accent-purple: #a855f7;
   --accent-blue: #3b82f6;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
 }
 
+html.light,
+body.light {
+  --bg-canvas: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --border-neon: rgba(2, 132, 199, 0.3);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent-cyan: #0284c7;
+  --accent-purple: #7c3aed;
+  --accent-blue: #2563eb;
+  --accent-emerald: #059669;
+  --accent-amber: #d97706;
+}
+
 body {
-  background-color: #0b0f19;
-  color: #f3f4f6;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ========================================================
-   DEFAULT THEME: MODERN CLEAN & ACCESSIBLE WORKSPACE
+   NEON & GLASS UTILITIES
    ======================================================== */
 
-.win95-window {
-  background-color: #111827;
-  border: 1px solid #1f2937;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+.neon-border {
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.win95-titlebar {
-  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
-  color: #f1f5f9;
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.25px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #334155;
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.neon-border:hover {
+  border-color: rgba(0, 245, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.15);
 }
 
-.win95-titlebar-inactive {
-  background: #1e293b;
-  color: #94a3b8;
+html.light .neon-border:hover {
+  border-color: rgba(2, 132, 199, 0.5);
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.12);
 }
 
-.win95-button {
-  background-color: #1e293b;
-  color: #f1f5f9;
-  border: 1px solid #334155;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  user-select: none;
-  padding: 6px 12px;
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+.neon-glow-cyan {
+  box-shadow: 0 0 16px rgba(0, 245, 255, 0.35), 0 0 32px rgba(0, 245, 255, 0.15);
 }
 
-.win95-button:hover {
-  background-color: #334155;
-  border-color: #475569;
+.neon-glow-purple {
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35), 0 0 32px rgba(168, 85, 247, 0.15);
 }
 
-.win95-button:active {
-  transform: translateY(1px);
+.neon-glow-emerald {
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35), 0 0 32px rgba(16, 185, 129, 0.15);
 }
 
-.win95-button:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+.neon-glow-blue {
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.35), 0 0 32px rgba(59, 130, 246, 0.15);
 }
 
-.win95-button-primary {
-  background-color: #2563eb;
-  color: #ffffff;
-  border: 1px solid #3b82f6;
-}
-.win95-button-primary:hover {
-  background-color: #1d4ed8;
-  border-color: #60a5fa;
-}
-
-.win95-button-success {
-  background-color: #059669;
-  color: #ffffff;
-  border: 1px solid #10b981;
-}
-.win95-button-success:hover {
-  background-color: #047857;
-  border-color: #34d399;
+/* Modern Card Frame */
+.glass-panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  backdrop-filter: blur(12px);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.win95-button-amber {
-  background-color: #d97706;
-  color: #ffffff;
-  border: 1px solid #f59e0b;
-}
-.win95-button-amber:hover {
-  background-color: #b45309;
-  border-color: #fbbf24;
+/* Accessibility Focus Ring */
+*:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 2px !important;
 }
 
-/* Accessible Inputs */
-.win95-sunken {
-  background-color: #0f172a;
-  color: #f8fafc;
-  border: 1px solid #334155;
-  border-radius: 0.5rem;
-  padding: 8px 12px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.win95-sunken:focus,
-.win95-sunken:focus-visible {
-  border-color: #3b82f6;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-}
-
-.win95-sunken-dark {
-  background-color: #030712;
-  color: #34d399;
-  border: 1px solid #1f2937;
-  border-radius: 0.5rem;
-}
-
-.win95-raised {
-  border: 1px solid #334155;
-  border-radius: 0.5rem;
-}
-
-.win95-statusbar-cell {
-  background-color: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 0.375rem;
-  padding: 3px 8px;
-  font-size: 11px;
-  color: #cbd5e1;
-}
-
-/* ========================================================
-   OPTIONAL: 1990s CLASSIC RETRO WORKSTATION SKIN
-   ======================================================== */
-
-body.theme-retro {
-  background-color: #008080 !important;
-  color: #1a1a1a !important;
-}
-
-body.theme-retro .win95-window {
-  background-color: #c0c0c0 !important;
-  box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #000000,
-              inset 2px 2px 0px #dfdfdf, inset -2px -2px 0px #808080,
-              4px 4px 12px rgba(0, 0, 0, 0.4) !important;
-  border: 1px solid #000000 !important;
-  border-radius: 0 !important;
-  color: #000000 !important;
-}
-
-body.theme-retro .win95-titlebar {
-  background: linear-gradient(90deg, #000080 0%, #1084d0 100%) !important;
-  color: #ffffff !important;
-  border-radius: 0 !important;
-  padding: 4px 6px !important;
-}
-
-body.theme-retro .win95-button {
-  background-color: #c0c0c0 !important;
-  color: #000000 !important;
-  border-top: 2px solid #ffffff !important;
-  border-left: 2px solid #ffffff !important;
-  border-right: 2px solid #000000 !important;
-  border-bottom: 2px solid #000000 !important;
-  box-shadow: inset -1px -1px 0px #808080, inset 1px 1px 0px #dfdfdf !important;
-  border-radius: 0 !important;
-}
-
-body.theme-retro .win95-button:active {
-  border-top: 2px solid #000000 !important;
-  border-left: 2px solid #000000 !important;
-  border-right: 2px solid #ffffff !important;
-  border-bottom: 2px solid #ffffff !important;
-  transform: none !important;
-}
-
-body.theme-retro .win95-button-primary {
-  background-color: #000080 !important;
-  color: #ffffff !important;
-  border-top: 2px solid #4a80e8 !important;
-  border-left: 2px solid #4a80e8 !important;
-  border-right: 2px solid #000040 !important;
-  border-bottom: 2px solid #000040 !important;
-}
-
-body.theme-retro .win95-button-success {
-  background-color: #008000 !important;
-  color: #ffffff !important;
-  border-top: 2px solid #40d040 !important;
-  border-left: 2px solid #40d040 !important;
-  border-right: 2px solid #004000 !important;
-  border-bottom: 2px solid #004000 !important;
-}
-
-body.theme-retro .win95-button-amber {
-  background-color: #b87000 !important;
-  color: #ffffff !important;
-  border-top: 2px solid #ffaa22 !important;
-  border-left: 2px solid #ffaa22 !important;
-  border-right: 2px solid #503000 !important;
-  border-bottom: 2px solid #503000 !important;
-}
-
-body.theme-retro .win95-sunken {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  border-top: 2px solid #808080 !important;
-  border-left: 2px solid #808080 !important;
-  border-right: 2px solid #ffffff !important;
-  border-bottom: 2px solid #ffffff !important;
-  border-radius: 0 !important;
-  box-shadow: inset 1px 1px 0px #000000 !important;
-}
-
-body.theme-retro .win95-statusbar-cell {
-  background-color: #c0c0c0 !important;
-  color: #1e293b !important;
-  border-top: 1px solid #808080 !important;
-  border-left: 1px solid #808080 !important;
-  border-right: 1px solid #ffffff !important;
-  border-bottom: 1px solid #ffffff !important;
-  border-radius: 0 !important;
-}
-
-/* CRT and Scanlines overlay */
-.crt-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 99999;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  ),
-  linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 0.03),
-    rgba(0, 255, 0, 0.01),
-    rgba(0, 0, 255, 0.03)
-  );
-  background-size: 100% 3px, 6px 100%;
-  opacity: 0.85;
-}
-
-/* Custom Scrollbars */
+/* Custom Sleek Scrollbars */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: var(--bg-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #334155;
-  border-radius: 5px;
+  background-color: var(--border-subtle);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #475569;
+  background-color: var(--accent-cyan);
+}
+
+/* Smooth Video Timeline Scrubber */
+.video-timeline-glow {
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.6);
 }

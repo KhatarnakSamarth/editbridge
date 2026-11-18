@@ -62,16 +62,16 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="win95-window max-w-lg w-full bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
-        <div className="win95-titlebar px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-          <span className="flex items-center gap-2 font-bold text-xs text-slate-200">
-            <Award className="w-4 h-4 text-amber-400" />
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="glass-panel max-w-lg w-full bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xl transition-colors">
+        <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <span className="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-slate-100">
+            <Award className="w-4 h-4 text-amber-500" />
             SUBMIT VERIFIED PROJECT REVIEW &amp; RATING
           </span>
           <button
             onClick={onClose}
-            className="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition-colors flex items-center justify-center"
+            className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors flex items-center justify-center"
             title="Close"
             aria-label="Close"
           >
@@ -79,12 +79,12 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
           </button>
         </div>
 
-        <div className="p-5 text-sm space-y-4">
+        <div className="p-6 text-sm space-y-4">
           {submitted ? (
-            <div className="p-5 bg-emerald-950/40 border border-emerald-800/60 rounded-lg text-emerald-200 text-center space-y-3">
-              <CheckCircle2 className="w-9 h-9 text-emerald-400 mx-auto" />
-              <p className="font-bold text-sm text-emerald-300">Review Recorded on EditBridge Chain!</p>
-              <p className="text-xs text-emerald-100">
+            <div className="p-5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-900 dark:text-emerald-200 text-center space-y-3">
+              <CheckCircle2 className="w-9 h-9 text-emerald-500 mx-auto" />
+              <p className="font-bold text-sm text-emerald-600 dark:text-emerald-300">Review Recorded on EditBridge Chain!</p>
+              <p className="text-xs text-emerald-800 dark:text-emerald-100">
                 Your feedback has been verified and added to {activeProject.editor_name}&apos;s verified track record.
               </p>
               <button
@@ -92,7 +92,7 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                   setSubmitted(false);
                   onClose();
                 }}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-xs font-bold transition-colors"
               >
                 Close
               </button>
@@ -100,10 +100,10 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <span className="font-semibold text-slate-300 text-xs block mb-2">
+                <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs block mb-2">
                   Overall Rating for {activeProject.editor_name}:
                 </span>
-                <div className="flex items-center gap-2 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-[#070b14] p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -120,20 +120,20 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                           className={`w-6 h-6 ${
                             star <= rating
                               ? 'fill-amber-400 text-amber-400'
-                              : 'text-slate-600'
+                              : 'text-slate-300 dark:text-slate-700'
                           }`}
                         />
                       </button>
                     ))}
                   </div>
-                  <span className="font-mono font-bold text-sm text-amber-300 ml-2">
+                  <span className="font-mono font-bold text-sm text-amber-500 ml-2">
                     {rating}.0 / 5.0
                   </span>
                 </div>
               </div>
 
               <div>
-                <span className="font-semibold text-slate-300 text-xs block mb-2">
+                <span className="font-semibold text-slate-700 dark:text-slate-300 text-xs block mb-2">
                   Select Highlight Badges:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -144,10 +144,10 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                         type="button"
                         key={tag}
                         onClick={() => toggleTag(tag)}
-                        className={`px-2.5 py-1 rounded text-xs transition-colors border ${
+                        className={`px-3 py-1 rounded-xl text-xs transition-colors border ${
                           isSelected
-                            ? 'bg-blue-600 border-blue-500 text-white font-medium'
-                            : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            ? 'bg-blue-600 border-blue-500 text-white font-medium shadow-xs'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
                         }`}
                       >
                         {isSelected ? '✓ ' : '+ '}
@@ -159,7 +159,7 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 text-xs mb-1.5">
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 text-xs mb-1.5">
                   Written Feedback:
                 </label>
                 <textarea
@@ -168,7 +168,7 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Share details about pacing, communication, and adherence to brief..."
-                  className="w-full px-3 py-2 text-xs text-slate-100 bg-slate-950 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 placeholder-slate-500"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
@@ -176,13 +176,13 @@ export function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-3.5 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg text-xs font-bold shadow-sm transition-colors"
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-sm transition-colors"
                 >
                   Submit Review
                 </button>

@@ -75,12 +75,12 @@ interface EditBridgeContextType {
   // Editors Directory
   editors: EditorProfile[];
 
-  // Retro Workspace Controls
+  // Modern Theme & Audio Controls
   crtMode: boolean;
   toggleCrtMode: () => void;
   soundEnabled: boolean;
   toggleSound: () => void;
-  themeMode: 'MODERN' | 'RETRO';
+  themeMode: 'DARK' | 'LIGHT';
   toggleThemeMode: () => void;
   resetDemoData: () => void;
 
@@ -91,7 +91,7 @@ interface EditBridgeContextType {
 
 const EditBridgeContext = createContext<EditBridgeContextType | null>(null);
 
-const STORAGE_KEY = 'editbridge_state_v1';
+const STORAGE_KEY = 'editbridge_state_v2';
 
 export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [activeRole, setActiveRole] = useState<UserRole>('CREATOR');
@@ -103,7 +103,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [crtMode, setCrtMode] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
-  const [themeMode, setThemeMode] = useState<'MODERN' | 'RETRO'>('MODERN');
+  const [themeMode, setThemeMode] = useState<'DARK' | 'LIGHT'>('DARK');
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 'notif-1',
@@ -128,8 +128,9 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         if (parsed.messages) setMessages(parsed.messages);
         if (parsed.reviews) setReviews(parsed.reviews);
         if (parsed.activeRole) setActiveRole(parsed.activeRole);
-        if (parsed.crtMode !== undefined) setCrtMode(parsed.crtMode);
-        if (parsed.themeMode !== undefined) setThemeMode(parsed.themeMode);
+        if (parsed.themeMode === 'DARK' || parsed.themeMode === 'LIGHT') {
+          setThemeMode(parsed.themeMode);
+        }
         if (parsed.soundEnabled !== undefined) {
           setSoundEnabled(parsed.soundEnabled);
           retroSound.enabled = parsed.soundEnabled;
@@ -152,7 +153,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
           messages,
           reviews,
           activeRole,
-          crtMode,
           themeMode,
           soundEnabled,
         })
@@ -160,22 +160,34 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
-  }, [projects, revisionComments, files, messages, reviews, activeRole, crtMode, themeMode, soundEnabled]);
+  }, [projects, revisionComments, files, messages, reviews, activeRole, themeMode, soundEnabled]);
 
-  // Apply theme class to document body
+  // Apply dark / light class to root document & body
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      if (themeMode === 'RETRO') {
-        document.body.classList.add('theme-retro');
+      const root = document.documentElement;
+      if (themeMode === 'DARK') {
+        root.classList.add('dark');
+        root.classList.remove('light');
+        document.body.classList.add('dark');
+        document.body.classList.remove('light', 'theme-retro');
       } else {
-        document.body.classList.remove('theme-retro');
+        root.classList.add('light');
+        root.classList.remove('dark');
+        document.body.classList.add('light');
+        document.body.classList.remove('dark', 'theme-retro');
       }
     }
   }, [themeMode]);
 
   const toggleThemeMode = () => {
     retroSound.playClick();
-    setThemeMode((prev) => (prev === 'MODERN' ? 'RETRO' : 'MODERN'));
+    setThemeMode((prev) => (prev === 'DARK' ? 'LIGHT' : 'DARK'));
+  };
+
+  const toggleCrtMode = () => {
+    // Legacy stub preserved for API compatibility
+    setCrtMode(false);
   };
 
   // Sound sync
@@ -184,11 +196,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     setSoundEnabled(next);
     retroSound.enabled = next;
     if (next) retroSound.playDing();
-  };
-
-  const toggleCrtMode = () => {
-    retroSound.playClick();
-    setCrtMode((prev) => !prev);
   };
 
   const resetDemoData = () => {

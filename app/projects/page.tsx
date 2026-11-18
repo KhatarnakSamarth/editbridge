@@ -7,6 +7,7 @@ import {
   FolderPlus,
   ArrowRight,
   Filter,
+  Sparkles,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { useEditBridge } from '@/lib/store';
@@ -29,17 +30,17 @@ export default function ProjectsDashboardPage() {
   const getStatusBadge = (status: ProjectStatus) => {
     switch (status) {
       case 'REVIEW_REQUESTED':
-        return <span className="bg-amber-950/70 text-amber-300 border border-amber-500/60 px-2 py-0.5 rounded font-semibold text-[11px] animate-pulse">● REVIEW REQUESTED</span>;
+        return <span className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px] animate-pulse">● REVIEW REQUESTED</span>;
       case 'CHANGES_REQUESTED':
-        return <span className="bg-orange-950/70 text-orange-300 border border-orange-500/60 px-2 py-0.5 rounded font-semibold text-[11px]">● CHANGES REQUESTED</span>;
+        return <span className="bg-orange-500/15 text-orange-700 dark:text-orange-400 border border-orange-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● CHANGES REQUESTED</span>;
       case 'FINAL_PAYMENT_PENDING':
-        return <span className="bg-purple-950/70 text-purple-300 border border-purple-500/60 px-2 py-0.5 rounded font-semibold text-[11px] animate-pulse">● FINAL PAYMENT DUE</span>;
+        return <span className="bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px] animate-pulse">● FINAL PAYMENT DUE</span>;
       case 'COMPLETED':
-        return <span className="bg-emerald-950/70 text-emerald-300 border border-emerald-500/60 px-2 py-0.5 rounded font-semibold text-[11px]">✓ COMPLETED</span>;
+        return <span className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px]">✓ COMPLETED</span>;
       case 'EDITING':
-        return <span className="bg-blue-950/70 text-blue-300 border border-blue-500/60 px-2 py-0.5 rounded font-semibold text-[11px]">● IN EDITING</span>;
+        return <span className="bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● IN EDITING</span>;
       default:
-        return <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded font-semibold text-[11px]">{status}</span>;
+        return <span className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-full font-semibold text-[11px]">{status}</span>;
     }
   };
 
@@ -47,16 +48,16 @@ export default function ProjectsDashboardPage() {
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 font-sans">
       <RetroWindow
         title="COLLABORATION PROJECT DIRECTORY"
-        icon={<FolderKanban className="w-4 h-4 text-blue-400" />}
+        icon={<FolderKanban className="w-4 h-4 text-cyan-500" />}
       >
-        <div className="space-y-5">
+        <div className="space-y-6">
           {/* Header Strip with New Project button */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h2 className="font-bold text-base text-white">
+              <h2 className="font-extrabold text-lg text-slate-900 dark:text-white">
                 ACTIVE PRODUCTION PROJECTS
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Manage briefs, review drafts, milestone escrow, and final deliverables.
               </p>
             </div>
@@ -64,7 +65,7 @@ export default function ProjectsDashboardPage() {
             <Link
               href="/projects/new"
               onClick={() => retroSound.playDing()}
-              className="win95-button win95-button-primary px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 self-start sm:self-center shadow-sm"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 self-start sm:self-center shadow-sm transition-all"
             >
               <FolderPlus className="w-4 h-4" />
               <span>Create New Project Brief</span>
@@ -73,7 +74,7 @@ export default function ProjectsDashboardPage() {
 
           {/* Filter Pills */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-slate-400 text-xs flex items-center gap-1 mr-1">
+            <span className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1 mr-1 font-medium">
               <Filter className="w-3.5 h-3.5" /> Filter:
             </span>
             {[
@@ -89,10 +90,10 @@ export default function ProjectsDashboardPage() {
                   retroSound.playClick();
                   setFilter(f.id);
                 }}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                   filter === f.id
-                    ? 'bg-blue-600 text-white font-semibold shadow-xs'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-750 border border-slate-700/80'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                 }`}
               >
                 {f.label}
@@ -101,7 +102,7 @@ export default function ProjectsDashboardPage() {
           </div>
 
           {/* Project Cards List */}
-          <div className="space-y-3.5">
+          <div className="space-y-4">
             {filteredProjects.map((project) => {
               const ms1 = project.milestones[0];
               const ms2 = project.milestones[1];
@@ -110,50 +111,50 @@ export default function ProjectsDashboardPage() {
               return (
                 <div
                   key={project.id}
-                  className={`p-4 sm:p-5 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
+                  className={`p-5 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
                     isHeroDemo
-                      ? 'border-blue-500/80 bg-slate-900 shadow-md ring-1 ring-blue-500/20'
-                      : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                      ? 'border-cyan-400 dark:border-cyan-500/80 bg-white dark:bg-[#0e1526] shadow-lg shadow-cyan-500/10'
+                      : 'bg-white dark:bg-[#0e1526] border-slate-200 dark:border-slate-800 shadow-sm hover:border-cyan-500/40'
                   }`}
                 >
                   {/* Left Column: Title & Meta */}
                   <div className="space-y-2 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] font-mono bg-blue-950 text-blue-300 px-2 py-0.5 rounded border border-blue-800 font-semibold uppercase">
+                      <span className="text-[10px] font-mono bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 px-2.5 py-0.5 rounded-full border border-cyan-300 dark:border-cyan-500/30 font-semibold uppercase">
                         {project.category}
                       </span>
                       {getStatusBadge(project.status)}
                       {isHeroDemo && (
-                        <span className="bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 text-[10px] rounded font-semibold">
+                        <span className="bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 px-2.5 py-0.5 text-[10px] rounded-full font-bold">
                           ★ HACKATHON HERO DEMO
                         </span>
                       )}
                     </div>
 
-                    <h3 className="font-bold text-base text-white truncate">
+                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white truncate">
                       {project.title}
                     </h3>
 
-                    <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed font-sans">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed font-sans">
                       {project.brief}
                     </p>
 
-                    <div className="pt-1 flex items-center gap-3 text-xs text-slate-400 flex-wrap">
-                      <span>Client: <strong className="text-slate-200">{project.creator_name}</strong></span>
+                    <div className="pt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+                      <span>Client: <strong className="text-slate-800 dark:text-slate-200">{project.creator_name}</strong></span>
                       <span>•</span>
-                      <span>Editor: <strong className="text-slate-200">{project.editor_name || 'Unassigned'}</strong></span>
+                      <span>Editor: <strong className="text-slate-800 dark:text-slate-200">{project.editor_name || 'Unassigned'}</strong></span>
                       <span>•</span>
-                      <span>Budget: <strong className="text-emerald-400 font-mono">${project.budget} USD</strong></span>
+                      <span>Budget: <strong className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">${project.budget} USD</strong></span>
                       <span>•</span>
-                      <span>Due: <strong className="text-slate-200">{project.deadline}</strong></span>
+                      <span>Due: <strong className="text-slate-800 dark:text-slate-200">{project.deadline}</strong></span>
                     </div>
                   </div>
 
                   {/* Right Column: Escrow & CTA */}
-                  <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end justify-between gap-3 flex-shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800">
+                  <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end justify-between gap-3 flex-shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
                     <div className="text-xs text-right">
-                      <span className="text-slate-400 block text-[11px]">MILESTONE ESCROW:</span>
-                      <span className="text-slate-200 font-mono font-semibold">
+                      <span className="text-slate-500 dark:text-slate-400 block text-[11px] font-medium">MILESTONE ESCROW:</span>
+                      <span className="text-slate-800 dark:text-slate-200 font-mono font-bold">
                         30% [${ms1?.amount}] + 70% [${ms2?.amount}]
                       </span>
                     </div>
@@ -164,7 +165,7 @@ export default function ProjectsDashboardPage() {
                         retroSound.playDing();
                         setActiveProjectId(project.id);
                       }}
-                      className="win95-button win95-button-primary px-4 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                      className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all"
                     >
                       <span>Open Workspace</span>
                       <ArrowRight className="w-3.5 h-3.5" />

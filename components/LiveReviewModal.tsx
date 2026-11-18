@@ -31,9 +31,9 @@ export function LiveReviewModal({ isOpen, onClose }: LiveReviewModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 backdrop-blur-sm">
-      <div className="win95-window max-w-4xl w-full h-[85vh] flex flex-col bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+      <div className="glass-panel max-w-4xl w-full h-[85vh] flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
         {/* Titlebar */}
-        <div className="win95-titlebar px-4 py-2.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+        <div className="px-5 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Video className="w-4 h-4 text-emerald-400" />
             <span className="font-mono font-bold text-xs text-slate-200">
@@ -45,7 +45,7 @@ export function LiveReviewModal({ isOpen, onClose }: LiveReviewModalProps) {
               retroSound.playClick();
               onClose();
             }}
-            className="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition-colors flex items-center justify-center"
+            className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition-colors flex items-center justify-center"
             title="Close modal"
             aria-label="Close"
           >

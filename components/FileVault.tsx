@@ -10,6 +10,7 @@ import {
   Download,
   Upload,
   HardDrive,
+  Sparkles,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { ProjectFile } from '@/types';
@@ -68,24 +69,24 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
       case 'RAW_FOOTAGE':
       case 'DRAFT_VIDEO':
       case 'FINAL_MASTER':
-        return <FileVideo className="w-5 h-5 text-blue-400" />;
+        return <FileVideo className="w-5 h-5 text-blue-500 dark:text-cyan-400" />;
       case 'ASSET':
-        return <FileArchive className="w-5 h-5 text-amber-400" />;
+        return <FileArchive className="w-5 h-5 text-amber-500" />;
       default:
         return <FileText className="w-5 h-5 text-slate-400" />;
     }
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3.5">
       {/* Vault header with upload button */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <HardDrive className="w-4 h-4 text-blue-400" />
-          <span className="font-semibold text-xs text-slate-200 uppercase tracking-wide">
+          <HardDrive className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+          <span className="font-bold text-xs text-slate-900 dark:text-slate-100 uppercase tracking-wide">
             Project File Storage &amp; Asset Vault
           </span>
-          <span className="text-[10px] bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-slate-300 font-mono">
+          <span className="text-[10px] bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-full text-slate-700 dark:text-slate-300 font-mono font-semibold">
             {activeProjectFiles.length} Records
           </span>
         </div>
@@ -95,7 +96,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
             retroSound.playClick();
             setShowUploadModal(true);
           }}
-          className="win95-button win95-button-primary px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5"
+          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95"
         >
           <Upload className="w-3.5 h-3.5" />
           <span>Upload File / Master</span>
@@ -103,44 +104,44 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
       </div>
 
       {/* Files Table / List */}
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {activeProjectFiles.map((file) => {
           const isFinalLocked = file.is_locked;
 
           return (
             <div
               key={file.id}
-              className={`p-3.5 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-3 transition-all ${
+              className={`p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3.5 transition-all ${
                 isFinalLocked
-                  ? 'border-red-900/80 bg-red-950/20'
-                  : 'bg-slate-900 border-slate-700/80'
+                  ? 'border-rose-300 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 shadow-xs'
+                  : 'bg-white dark:bg-[#0e1526] border-slate-200 dark:border-slate-800 shadow-sm hover:border-cyan-500/40'
               }`}
             >
               {/* File Info */}
-              <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className="p-2.5 bg-slate-800 rounded-lg border border-slate-700 flex-shrink-0 mt-0.5">
+              <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex-shrink-0 mt-0.5 shadow-xs">
                   {getFileIcon(file.file_type)}
                 </div>
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-xs text-slate-100 truncate">
+                    <span className="font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
                       {file.file_name}
                     </span>
-                    <span className="bg-slate-800 border border-slate-700 text-[10px] px-1.5 py-0.2 rounded font-mono text-slate-300">
+                    <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] px-2 py-0.5 rounded-md font-mono text-slate-700 dark:text-slate-300">
                       {file.version}
                     </span>
-                    <span className="text-[11px] font-mono text-slate-400">
+                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                       [{file.formatted_size}]
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
-                    <span>Uploaded by: <strong className="text-slate-300">{file.uploader_name}</strong></span>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                    <span>Uploaded by: <strong className="text-slate-700 dark:text-slate-300">{file.uploader_name}</strong></span>
                     <span>•</span>
                     <span>Type: {file.file_type}</span>
                     {file.checksum && (
-                      <span className="text-slate-500 font-mono hidden sm:inline">
+                      <span className="text-slate-400 font-mono hidden sm:inline">
                         • Hash: {file.checksum}
                       </span>
                     )}
@@ -148,8 +149,8 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
 
                   {/* Lock Warning Notice */}
                   {isFinalLocked && (
-                    <div className="mt-2 p-2 bg-red-950/50 border border-red-800 text-red-300 text-xs rounded flex items-center gap-2">
-                      <Lock className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+                    <div className="mt-2.5 p-2.5 bg-rose-100/70 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs rounded-xl flex items-center gap-2">
+                      <Lock className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 flex-shrink-0" />
                       <span>
                         <strong>ACCESS PROTECTED:</strong> {file.lock_reason}
                       </span>
@@ -167,14 +168,14 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                         retroSound.playDing();
                         onRequestReleaseMilestone?.();
                       }}
-                      className="win95-button win95-button-amber px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5 animate-pulse"
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-amber-500/20 animate-pulse transition-all"
                     >
                       <Unlock className="w-3.5 h-3.5" />
                       <span>Release Milestone 2 to Unlock</span>
                     </button>
                   ) : (
-                    <span className="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-xs text-slate-400 flex items-center gap-1.5">
-                      <Lock className="w-3 h-3 text-red-400" />
+                    <span className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+                      <Lock className="w-3.5 h-3.5 text-rose-500" />
                       Awaiting Client Payment
                     </span>
                   )
@@ -184,7 +185,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => retroSound.playClick()}
-                    className="win95-button win95-button-success px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Download File</span>
@@ -198,23 +199,23 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="win95-window max-w-md w-full border border-slate-700 shadow-2xl">
-            <div className="win95-titlebar">
-              <span className="flex items-center gap-2 font-semibold text-slate-100">
-                <Upload className="w-4 h-4 text-blue-400" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel max-w-md w-full bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <span className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs">
+                <Upload className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 UPLOAD PROJECT ASSET / VIDEO FILE
               </span>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold"
+                className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors"
               >
                 ✕
               </button>
             </div>
-            <form onSubmit={handleSimulateUpload} className="p-5 space-y-3.5 text-xs text-slate-200">
+            <form onSubmit={handleSimulateUpload} className="p-6 space-y-4 text-xs text-slate-800 dark:text-slate-200">
               <div>
-                <label className="block font-semibold mb-1 text-slate-300">
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                   File Name:
                 </label>
                 <input
@@ -223,12 +224,12 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                   value={newFileName}
                   onChange={(e) => setNewFileName(e.target.value)}
                   placeholder="e.g. AI_Bubble_Final_Export_v2.mov"
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-1 text-slate-300">
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                   File Category:
                 </label>
                 <select
@@ -236,7 +237,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                   onChange={(e) =>
                     setNewFileType(e.target.value as ProjectFile['file_type'])
                   }
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 >
                   <option value="DRAFT_VIDEO">Draft Video Version</option>
                   <option value="FINAL_MASTER">Final Master Export (Locked until payment)</option>
@@ -247,32 +248,32 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               </div>
 
               <div>
-                <label className="block font-semibold mb-1 text-slate-300">
+                <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
                   Version Label:
                 </label>
                 <input
                   type="text"
                   value={newVersion}
                   onChange={(e) => setNewVersion(e.target.value)}
-                  className="win95-sunken w-full"
+                  className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
                 />
               </div>
 
-              <div className="p-3 bg-blue-950/60 border border-blue-800 text-blue-200 rounded-lg text-xs leading-relaxed">
+              <div className="p-3 bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-900 dark:text-cyan-200 rounded-xl text-xs leading-relaxed">
                 🔒 In production, large files are streamed to private S3/GCS buckets via signed URLs.
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-2 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="win95-button px-3.5 py-1.5"
+                  className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="win95-button win95-button-primary px-4 py-1.5 font-semibold"
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl shadow-sm transition-all"
                 >
                   Confirm Upload
                 </button>
