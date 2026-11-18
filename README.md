@@ -122,6 +122,7 @@ Follow the exact **Section 19 Hackathon Demo Scenario** built right into the pla
     └── index.ts               # Full TypeScript data models matching Section 12
 ```
 
+
 ---
 
 Good luck with your Hackathon! 🚀
