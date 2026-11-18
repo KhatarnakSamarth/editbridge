@@ -43,28 +43,6 @@ body.light {
   --primary-accent: #0284c7;
 }
 
-/* Accent Color Themes */
-html.theme-purple {
-  --primary-accent: #a855f7;
-  --border-neon: rgba(168, 85, 247, 0.4);
-}
-html.theme-emerald {
-  --primary-accent: #10b981;
-  --border-neon: rgba(16, 185, 129, 0.4);
-}
-html.theme-amber {
-  --primary-accent: #f59e0b;
-  --border-neon: rgba(245, 158, 11, 0.4);
-}
-html.theme-rose {
-  --primary-accent: #f43f5e;
-  --border-neon: rgba(244, 63, 94, 0.4);
-}
-html.theme-cyan {
-  --primary-accent: #00f5ff;
-  --border-neon: rgba(0, 245, 255, 0.3);
-}
-
 body {
   background-color: var(--bg-canvas);
   color: var(--text-primary);

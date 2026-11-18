@@ -3,6 +3,7 @@ import './globals.css';
 import { EditBridgeProvider } from '@/lib/store';
 import { RetroHeader } from '@/components/RetroHeader';
 import { RetroStatusBar } from '@/components/RetroStatusBar';
+import { CursorFollower } from '@/components/CursorFollower';
 
 export const metadata: Metadata = {
   title: 'EditBridge — Next-Gen Creator–Editor Video Collaboration Platform',
@@ -19,6 +20,9 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="min-h-screen bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 antialiased flex flex-col selection:bg-cyan-500 selection:text-white transition-colors duration-200">
         <EditBridgeProvider>
+          {/* Global Ambient Cursor Follower */}
+          <CursorFollower />
+
           {/* Top Modern Navigation & Control Bar */}
           <RetroHeader />
 

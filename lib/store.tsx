@@ -15,7 +15,6 @@ import {
   EditorProfile,
   Review,
   Notification,
-  AccentTheme,
 } from '@/types';
 import {
   INITIAL_USERS,
@@ -85,8 +84,6 @@ interface EditBridgeContextType {
   toggleSound: () => void;
   themeMode: 'DARK' | 'LIGHT';
   toggleThemeMode: () => void;
-  accentTheme: AccentTheme;
-  setAccentTheme: (theme: AccentTheme) => void;
   resetDemoData: () => void;
 
   // Notifications
@@ -111,7 +108,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [themeMode, setThemeMode] = useState<'DARK' | 'LIGHT'>('DARK');
-  const [accentTheme, setAccentThemeState] = useState<AccentTheme>('CYAN');
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 'notif-1',
@@ -145,13 +141,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
           setSoundEnabled(parsed.soundEnabled);
           retroSound.enabled = parsed.soundEnabled;
         }
-        if (parsed.accentTheme) {
-          setAccentThemeState(parsed.accentTheme);
-        }
-      }
-      const savedTheme = localStorage.getItem('editbridge_accent_theme') as AccentTheme | null;
-      if (savedTheme && ['CYAN', 'PURPLE', 'EMERALD', 'AMBER', 'ROSE'].includes(savedTheme)) {
-        setAccentThemeState(savedTheme);
       }
     } catch {
       // ignore
@@ -173,19 +162,19 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
           isAuthenticated,
           customUser,
           themeMode,
-          accentTheme,
           soundEnabled,
         })
       );
     } catch {
       // ignore
     }
-  }, [projects, revisionComments, files, messages, reviews, activeRole, isAuthenticated, customUser, themeMode, accentTheme, soundEnabled]);
+  }, [projects, revisionComments, files, messages, reviews, activeRole, isAuthenticated, customUser, themeMode, soundEnabled]);
 
   // Apply dark / light class to root document & body
   useEffect(() => {
     if (typeof document !== 'undefined') {
       const root = document.documentElement;
+      root.classList.remove('theme-cyan', 'theme-purple', 'theme-emerald', 'theme-amber', 'theme-rose');
       if (themeMode === 'DARK') {
         root.classList.add('dark');
         root.classList.remove('light');
@@ -199,23 +188,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [themeMode]);
-
-  // Apply accent color theme class
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      const root = document.documentElement;
-      root.classList.remove('theme-cyan', 'theme-purple', 'theme-emerald', 'theme-amber', 'theme-rose');
-      root.classList.add(`theme-${accentTheme.toLowerCase()}`);
-      try {
-        localStorage.setItem('editbridge_accent_theme', accentTheme);
-      } catch {}
-    }
-  }, [accentTheme]);
-
-  const setAccentTheme = (theme: AccentTheme) => {
-    retroSound.playClick();
-    setAccentThemeState(theme);
-  };
 
   const toggleThemeMode = () => {
     retroSound.playClick();
@@ -621,8 +593,6 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
         toggleSound,
         themeMode,
         toggleThemeMode,
-        accentTheme,
-        setAccentTheme,
         resetDemoData,
         notifications,
         markNotificationRead,

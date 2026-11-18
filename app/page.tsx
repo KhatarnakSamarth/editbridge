@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { Hero3DVisual } from '@/components/Hero3DVisual';
-import { CursorFollower } from '@/components/CursorFollower';
 import { useEditBridge } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
 
@@ -47,9 +46,6 @@ export default function LandingPage() {
 
   return (
     <div className="relative max-w-6xl mx-auto px-4 py-8 space-y-8 font-sans">
-      {/* Interactive Cursor Glow (Automatically disabled on mobile touch devices) */}
-      <CursorFollower />
-
       {/* Hero Container */}
       <RetroWindow
         title="EDITBRIDGE WORKSPACE — CREATOR &amp; EDITOR COLLABORATION HUB"
@@ -57,54 +53,58 @@ export default function LandingPage() {
         className="w-full shadow-2xl relative overflow-hidden"
       >
         <div className="space-y-6">
-          {/* Main Hero Banner with 3D Cyber Grid */}
-          <div className="bg-grid-cyber bg-gradient-to-b from-blue-950/40 via-indigo-950/20 to-slate-900/40 dark:from-[#0b1329] dark:via-[#090e1c] dark:to-[#070b14] text-slate-900 dark:text-white p-6 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center relative overflow-hidden transition-colors">
+          {/* Main Hero Banner with Ambient 3D Prop in Background */}
+          <div className="bg-grid-cyber bg-gradient-to-b from-blue-950/20 via-indigo-950/10 to-slate-900/20 dark:from-[#0b1329] dark:via-[#090e1c] dark:to-[#070b14] text-slate-900 dark:text-white p-6 sm:p-12 md:p-16 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center relative overflow-hidden transition-colors min-h-[480px] sm:min-h-[520px] justify-center">
+            
+            {/* Ambient 3D Perspective Studio Prop in the Background */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
+              <Hero3DVisual inBackground={true} />
+            </div>
+
             {/* Ambient Background Glow Effect */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-gradient-to-b from-cyan-500/20 to-transparent blur-3xl pointer-events-none -z-0" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 sm:w-[600px] h-64 bg-gradient-to-b from-cyan-500/15 via-blue-500/10 to-transparent blur-3xl pointer-events-none z-0" />
 
-            <div className="inline-flex items-center gap-2 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-xs z-10">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>THE DIGITAL WORKSPACE FOR MODERN VIDEO CREATORS &amp; EDITORS</span>
-            </div>
+            {/* Foreground Content */}
+            <div className="relative z-10 flex flex-col items-center max-w-4xl">
+              <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-cyan-950/70 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-xs backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>THE DIGITAL WORKSPACE FOR MODERN VIDEO CREATORS &amp; EDITORS</span>
+              </div>
 
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-tight z-10">
-              One Workspace to Brief, Review &amp; Deliver High-Retention Videos.
-            </h1>
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-tight">
+                One Workspace to Brief, Review &amp; Deliver High-Retention Videos.
+              </h1>
 
-            <p className="mt-4 text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-2xl font-sans leading-relaxed z-10">
-              Stop scattering instructions across WhatsApp, Drive links, and messy notes. EditBridge brings editor discovery, timestamp video feedback, revision limits, and 30/70 milestone payments into one structured workspace.
-            </p>
+              <p className="mt-4 text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-2xl font-sans leading-relaxed">
+                Stop scattering instructions across WhatsApp, Drive links, and messy notes. EditBridge brings editor discovery, timestamp video feedback, revision limits, and 30/70 milestone payments into one structured workspace.
+              </p>
 
-            {/* Two Action Paths */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg z-10">
-              <Link
-                href="/workspace"
-                onClick={() => retroSound.playDing()}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all hover:scale-102 active:scale-98"
-              >
-                <span>Launch Creator Workspace</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {/* Two Action Paths */}
+              <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
+                <Link
+                  href="/workspace"
+                  onClick={() => retroSound.playDing()}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all hover:scale-102 active:scale-98"
+                >
+                  <span>Launch Creator Workspace</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
 
-              <Link
-                href="/editors"
-                onClick={() => retroSound.playDing()}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 transition-all hover:scale-102 active:scale-98"
-              >
-                <span>Discover Vetted Editors</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
+                <Link
+                  href="/editors"
+                  onClick={() => retroSound.playDing()}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 transition-all hover:scale-102 active:scale-98"
+                >
+                  <span>Discover Vetted Editors</span>
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
 
-            {/* Interactive 3D Video Studio Perspective Visual */}
-            <div className="w-full mt-8 z-10">
-              <Hero3DVisual />
-            </div>
-
-            {/* Production trust pill */}
-            <div className="mt-6 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold z-10">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Production Infrastructure • 30/70 Escrow Protocol • Supabase Cloud Active</span>
+              {/* Production trust pill */}
+              <div className="mt-8 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-white/70 dark:bg-slate-950/70 px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Production Infrastructure • 30/70 Escrow Protocol • Supabase Cloud Active</span>
+              </div>
             </div>
           </div>
 
