@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Ready for Supabase / Neon Cloud PostgreSQL
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // 1. Core User Model
@@ -139,7 +140,7 @@ model ProjectFile {
   project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name             String
   fileType         String   // RAW_FOOTAGE, DRAFT_VIDEO, FINAL_MASTER, ASSET, REFERENCE
-  sizeBytes        Int
+  sizeBytes        Float
   storageUrl       String
   isMasterDelivery Boolean  @default(false)
   isLocked         Boolean  @default(false)
