@@ -7,7 +7,7 @@ import {
   FolderPlus,
   ArrowRight,
   Filter,
-  Sparkles,
+  Lock,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { useEditBridge } from '@/lib/store';
@@ -15,7 +15,7 @@ import { ProjectStatus } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
 
 export default function ProjectsDashboardPage() {
-  const { projects, setActiveProjectId, isAuthenticated, loginAsDemo } = useEditBridge();
+  const { projects, setActiveProjectId, isAuthenticated } = useEditBridge();
   const [filter, setFilter] = useState<string>('ALL');
 
   const filteredProjects = projects.filter((p) => {
@@ -73,21 +73,15 @@ export default function ProjectsDashboardPage() {
           </div>
 
           {!isAuthenticated && (
-            <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2.5 text-amber-800 dark:text-amber-300">
-                <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>You are in <strong>Guest Preview Mode</strong>. Sign in as Creator or Editor to access private briefs and release payments.</span>
+            <div className="p-4 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
+                <Lock className="w-4 h-4 text-cyan-500 shrink-0" />
+                <span>You are browsing as <strong>Guest</strong>. Sign in as Creator or Editor to manage private deliverables and release payments.</span>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => loginAsDemo('CREATOR')}
-                  className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
-                >
-                  Demo Login
-                </button>
                 <Link
                   href="/signin"
-                  className="px-3 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-semibold"
+                  className="px-4 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-semibold shadow-xs"
                 >
                   Sign In
                 </Link>
@@ -129,13 +123,13 @@ export default function ProjectsDashboardPage() {
             {filteredProjects.map((project) => {
               const ms1 = project.milestones[0];
               const ms2 = project.milestones[1];
-              const isHeroDemo = project.id === 'proj-demo-1';
+              const isFeatured = project.id === 'proj-demo-1';
 
               return (
                 <div
                   key={project.id}
                   className={`p-5 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
-                    isHeroDemo
+                    isFeatured
                       ? 'border-cyan-400 dark:border-cyan-500/80 bg-white dark:bg-[#0e1526] shadow-lg shadow-cyan-500/10'
                       : 'bg-white dark:bg-[#0e1526] border-slate-200 dark:border-slate-800 shadow-sm hover:border-cyan-500/40'
                   }`}
@@ -147,9 +141,9 @@ export default function ProjectsDashboardPage() {
                         {project.category}
                       </span>
                       {getStatusBadge(project.status)}
-                      {isHeroDemo && (
-                        <span className="bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 px-2.5 py-0.5 text-[10px] rounded-full font-bold">
-                          ★ HACKATHON HERO DEMO
+                      {isFeatured && (
+                        <span className="bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 px-2.5 py-0.5 text-[10px] rounded-full font-bold">
+                          ★ FEATURED PRODUCTION
                         </span>
                       )}
                     </div>

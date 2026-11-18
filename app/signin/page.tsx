@@ -8,21 +8,18 @@ import {
   KeyRound,
   Mail,
   ArrowRight,
-  Sparkles,
-  UserCheck,
-  Film,
-  Scissors,
   CheckCircle2,
   AlertCircle,
   Eye,
   EyeOff,
+  Lock,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
 
 export default function SignInPage() {
   const router = useRouter();
-  const { login, loginAsDemo } = useEditBridge();
+  const { login } = useEditBridge();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,39 +27,6 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  const sampleAccounts = [
-    {
-      role: 'CREATOR' as const,
-      name: 'Marcus Sterling',
-      badge: 'Creator (480K Subs)',
-      email: 'marcus@sterlingcapital.yt',
-      password: 'creator123',
-      color: 'blue',
-      icon: Film,
-      desc: 'Escrow release, revision review, editor hiring',
-    },
-    {
-      role: 'EDITOR' as const,
-      name: 'Alex Rivera',
-      badge: 'Top Rated Pro Editor',
-      email: 'alex@riverafilm.com',
-      password: 'editor123',
-      color: 'purple',
-      icon: Scissors,
-      desc: 'Timecode checklist, master uploads, payout vault',
-    },
-    {
-      role: 'ADMIN' as const,
-      name: 'Elena Drake',
-      badge: 'Chief Ops Arbiter',
-      email: 'ops@editbridge.network',
-      password: 'admin123',
-      color: 'amber',
-      icon: Shield,
-      desc: 'GMV audit, dispute resolution, editor verification',
-    },
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,27 +51,13 @@ export default function SignInPage() {
           }
         }, 500);
       } else {
-        setErrorMessage(result.error || 'Invalid credentials. Please try sample accounts below.');
+        setErrorMessage(result.error || 'Invalid email or password. Please verify your credentials.');
       }
     } catch {
-      setErrorMessage('Unable to reach server. You can click 1-Click Demo Login below.');
+      setErrorMessage('Unable to reach authentication service. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleQuickLogin = (role: 'CREATOR' | 'EDITOR' | 'ADMIN', credEmail: string, credPass: string) => {
-    setEmail(credEmail);
-    setPassword(credPass);
-    loginAsDemo(role);
-    setSuccessMessage(`Logged in as ${credEmail}! Redirecting...`);
-    setTimeout(() => {
-      if (role === 'ADMIN') {
-        router.push('/admin');
-      } else {
-        router.push('/workspace');
-      }
-    }, 450);
   };
 
   return (
@@ -224,67 +174,16 @@ export default function SignInPage() {
           </div>
         </div>
 
-        {/* Hackathon Judge / Demo Credentials Card */}
-        <div className="bg-slate-100/80 dark:bg-[#070b14]/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-3.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>JUDGES &amp; HACKATHON TEST CREDENTIALS</span>
-            </div>
-            <span className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-300 font-mono font-semibold px-2 py-0.5 rounded-full border border-amber-500/20">
-              Instant 1-Click
-            </span>
+        {/* Production Trust & Security Footer */}
+        <div className="flex items-center justify-center gap-4 text-[11px] text-slate-500 dark:text-slate-500 pt-2">
+          <div className="flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-emerald-500" />
+            <span>256-Bit Escrow Vault</span>
           </div>
-
-          <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-            Click any demo profile to instantly authenticate into their scoped dashboard:
-          </p>
-
-          <div className="space-y-2">
-            {sampleAccounts.map((acc) => {
-              const Icon = acc.icon;
-              return (
-                <div
-                  key={acc.role}
-                  className="bg-white dark:bg-[#0c1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:border-cyan-400/50 transition-colors shadow-xs"
-                >
-                  <div className="flex items-start gap-2.5">
-                    <div
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                        acc.role === 'CREATOR'
-                          ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                          : acc.role === 'EDITOR'
-                          ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                      }`}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <strong className="text-xs text-slate-900 dark:text-white">
-                          {acc.name}
-                        </strong>
-                        <span className="text-[10px] px-1.5 py-0.2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded font-medium">
-                          {acc.role}
-                        </span>
-                      </div>
-                      <div className="font-mono text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                        {acc.email} • pass: <code className="text-slate-800 dark:text-slate-200">{acc.password}</code>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleQuickLogin(acc.role, acc.email, acc.password)}
-                    className="self-end sm:self-center px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-slate-100 hover:bg-cyan-50 dark:bg-slate-800 dark:hover:bg-cyan-950/60 text-slate-700 dark:text-slate-200 hover:text-cyan-700 dark:hover:text-cyan-300 border border-slate-200 dark:border-slate-700 hover:border-cyan-400/40 transition-all flex items-center gap-1 cursor-pointer"
-                  >
-                    <UserCheck className="w-3.5 h-3.5" />
-                    <span>Demo 1-Click</span>
-                  </button>
-                </div>
-              );
-            })}
+          <span>•</span>
+          <div className="flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-cyan-500" />
+            <span>Supabase Cloud Auth</span>
           </div>
         </div>
       </div>

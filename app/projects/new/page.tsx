@@ -17,7 +17,7 @@ import { retroSound } from '@/lib/soundEffects';
 
 export default function NewProjectPage() {
   const router = useRouter();
-  const { createProject, currentUser, isAuthenticated, loginAsDemo } = useEditBridge();
+  const { createProject, currentUser, isAuthenticated } = useEditBridge();
 
   const [title, setTitle] = useState('');
   const [brief, setBrief] = useState('');
@@ -114,17 +114,18 @@ export default function NewProjectPage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <button
-              onClick={() => loginAsDemo('CREATOR')}
-              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs cursor-pointer shadow-md shadow-blue-500/20"
-            >
-              Instant Login as Creator (Marcus)
-            </button>
             <Link
-              href="/signin"
+              href="/signin?redirect=/projects/new"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-blue-500/20"
+            >
+              <span>Sign In to Post Brief</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/signup"
               className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center justify-center"
             >
-              Sign In with Password
+              Create Account
             </Link>
           </div>
         </div>

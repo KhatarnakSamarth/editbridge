@@ -57,7 +57,6 @@ function ProjectWorkspaceContent() {
     activeRole,
     releaseFinalMilestone,
     isAuthenticated,
-    loginAsDemo,
   } = useEditBridge();
 
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('REVIEW');
@@ -87,44 +86,32 @@ function ProjectWorkspaceContent() {
             </p>
           </div>
 
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md mx-auto text-left space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Instant Hackathon 1-Click Access:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-lg mx-auto text-left text-xs">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+              <span className="font-bold text-slate-900 dark:text-white block mb-1">30/70 Escrow</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Upfront deposits held until final master review is approved.</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-              <button
-                onClick={() => loginAsDemo('CREATOR')}
-                className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] transition-all cursor-pointer shadow-xs text-center"
-              >
-                👤 Creator (Marcus)
-              </button>
-              <button
-                onClick={() => loginAsDemo('EDITOR')}
-                className="p-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] transition-all cursor-pointer shadow-xs text-center"
-              >
-                🎬 Editor (Alex)
-              </button>
-              <button
-                onClick={() => loginAsDemo('ADMIN')}
-                className="p-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-[11px] transition-all cursor-pointer shadow-xs text-center"
-              >
-                🛡️ Admin (Elena)
-              </button>
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+              <span className="font-bold text-slate-900 dark:text-white block mb-1">Frame Accurancy</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Pin exact revision notes to video frames and export EDL.</span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+              <span className="font-bold text-slate-900 dark:text-white block mb-1">Role Security</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Verified permissions for creators, editors, and ops arbiters.</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
               href="/signin"
-              className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
+              className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 transition-all"
             >
               <span>Sign In with Password</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/signup"
-              className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 transition-all"
+              className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
             >
               <span>Create Free Account</span>
             </Link>

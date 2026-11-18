@@ -6,10 +6,8 @@ import {
   ShieldAlert,
   Users,
   Scale,
-  Sparkles,
   Database,
   Lock,
-  Unlock,
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
@@ -17,6 +15,7 @@ import {
   TrendingUp,
   DollarSign,
   UserCheck,
+  Shield,
 } from 'lucide-react';
 import { RetroWindow } from '@/components/RetroWindow';
 import { useEditBridge } from '@/lib/store';
@@ -54,7 +53,7 @@ interface LiveUser {
 }
 
 export default function AdminOpsPage() {
-  const { activeRole, currentUser, loginAsDemo, isAuthenticated } = useEditBridge();
+  const { activeRole, currentUser, isAuthenticated } = useEditBridge();
 
   const [metrics, setMetrics] = useState({
     totalUsers: 4,
@@ -168,29 +167,28 @@ export default function AdminOpsPage() {
               Restricted Access: Administrator Required
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              You are currently viewing as <strong className="text-slate-900 dark:text-white">{currentUser.name}</strong> ({activeRole}).
-              The EditBridge Operational Control Panel, GMV settlement ledger, and dispute arbitration desk are strictly restricted to the <code className="text-amber-600 dark:text-amber-400 font-mono">ADMIN</code> role.
+              {isAuthenticated ? (
+                <>
+                  You are currently authenticated as <strong className="text-slate-900 dark:text-white">{currentUser.name}</strong> ({activeRole}).
+                  The EditBridge Operational Control Panel, GMV settlement ledger, and dispute arbitration desk are strictly restricted to verified <code className="text-amber-600 dark:text-amber-400 font-mono">ADMIN</code> personnel.
+                </>
+              ) : (
+                <>
+                  You must be authenticated with an administrator account to view the EditBridge Operational Control Panel and dispute arbitration desk.
+                </>
+              )}
             </p>
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 max-w-md mx-auto text-left space-y-2 text-xs">
-            <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Hackathon Judge Quick Access:</span>
-            </div>
-            <p className="text-slate-600 dark:text-slate-400">
-              Click the button below to instantly authenticate as <strong>Elena Drake (Root Ops Admin)</strong> and test the full arbitration desk.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <button
-              onClick={() => loginAsDemo('ADMIN')}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+            <Link
+              href="/signin?redirect=/admin"
+              onClick={() => retroSound.playClick()}
               className="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95 transition-all"
             >
-              <Unlock className="w-4 h-4" />
-              <span>Authenticate as Root Ops Admin</span>
-            </button>
+              <Shield className="w-4 h-4" />
+              <span>Sign In with Admin Account</span>
+            </Link>
             <Link
               href="/workspace"
               onClick={() => retroSound.playClick()}

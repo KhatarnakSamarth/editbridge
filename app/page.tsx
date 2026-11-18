@@ -88,10 +88,10 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Hackathon instant demo pill */}
+            {/* Production trust pill */}
             <div className="mt-6 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>Preloaded Demo Scenario: &ldquo;The Great AI Bubble of 2026&rdquo; Ready</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Production Infrastructure • 30/70 Escrow Protocol • Supabase Cloud Active</span>
             </div>
           </div>
 
