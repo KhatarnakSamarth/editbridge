@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Users,
   Search,
@@ -17,11 +18,34 @@ import { useEditBridge } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
 
 export default function EditorsDirectoryPage() {
-  const { editors } = useEditBridge();
+  const router = useRouter();
+  const { editors, activeRole, currentUser, isAuthenticated } = useEditBridge();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNiche, setSelectedNiche] = useState('ALL');
   const [selectedSoftware, setSelectedSoftware] = useState('ALL');
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+
+  // If logged-in user is an EDITOR, redirect them directly to their own vault & stats
+  useEffect(() => {
+    if (isAuthenticated && activeRole === 'EDITOR') {
+      const editorId = currentUser?.id || 'user-editor-1';
+      router.replace(`/editors/${editorId}?tab=vault`);
+    }
+  }, [isAuthenticated, activeRole, currentUser, router]);
+
+  if (isAuthenticated && activeRole === 'EDITOR') {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-3 font-sans">
+        <div className="w-10 h-10 rounded-2xl bg-vice-pink/10 border border-vice-pink/20 text-vice-pink flex items-center justify-center mx-auto animate-spin">
+          <Sparkles className="w-5 h-5" />
+        </div>
+        <h2 className="text-sm font-bold text-vice-text">Redirecting to Your Editor Vault...</h2>
+        <p className="text-xs text-vice-muted">
+          Editors are directed directly to their individual performance stats and master delivery vault.
+        </p>
+      </div>
+    );
+  }
 
   const niches = ['ALL', 'Finance & Investing', 'Tech & AI', 'Shorts / Reels / TikTok', 'Documentaries', 'Gaming'];
   const softwares = ['ALL', 'DaVinci Resolve Studio', 'Adobe Premiere Pro', 'CapCut Pro', 'After Effects'];

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   Users,
@@ -38,16 +38,48 @@ import { SocialLinks, EditorStats } from '@/types';
 
 type ActiveTab = 'OVERVIEW' | 'VAULT_DELIVERY';
 
-export default function EditorDetailPage() {
+function EditorDetailPageContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get('tab');
+  const isVaultRequested = tabParam === 'vault' || tabParam === 'vaults';
+
   const { editors, reviews, currentUser, isAuthenticated, activeRole } = useEditBridge();
-  const [activeTab, setActiveTab] = useState<ActiveTab>('VAULT_DELIVERY');
-  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
 
   const editorId = (params?.id as string) || '';
   const editor = editors.find((e) => e.user_id === editorId) || editors[0];
   const editorReviews = reviews.filter((r) => r.reviewee_id === editor.user_id);
+
+  // Determine if viewing own profile
+  const isOwner =
+    isAuthenticated &&
+    (currentUser?.id === editor.user_id ||
+      currentUser?.id === editorId ||
+      currentUser?.id === 'user-editor-1' ||
+      activeRole === 'EDITOR');
+
+  const [activeTab, setActiveTab] = useState<ActiveTab>(
+    isVaultRequested || isOwner ? 'VAULT_DELIVERY' : 'OVERVIEW'
+  );
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
+
+  // Sync tab with URL query parameter
+  useEffect(() => {
+    if (tabParam === 'vault' || tabParam === 'vaults') {
+      setActiveTab('VAULT_DELIVERY');
+    } else if (tabParam === 'overview') {
+      setActiveTab('OVERVIEW');
+    }
+  }, [tabParam]);
+
+  // Live profile info from database if available
+  const [dbEditor, setDbEditor] = useState<{
+    name?: string;
+    avatar?: string;
+    bio?: string;
+    headline?: string;
+  } | null>(null);
 
   // Social handles state
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({
@@ -112,13 +144,6 @@ export default function EditorDetailPage() {
   const [shareCopyText, setShareCopyText] = useState('');
   const [copiedType, setCopiedType] = useState<string | null>(null);
 
-  // Determine if viewing own profile
-  const isOwner =
-    isAuthenticated &&
-    (currentUser?.id === editor.user_id ||
-      currentUser?.id === 'user-editor-1' ||
-      activeRole === 'EDITOR');
-
   // Load live DB data from API
   useEffect(() => {
     if (!editorId) return;
@@ -127,6 +152,12 @@ export default function EditorDetailPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.editor) {
+          setDbEditor({
+            name: data.editor.name,
+            avatar: data.editor.avatar,
+            bio: data.editor.bio,
+            headline: data.editor.headline,
+          });
           if (data.editor.social_links) {
             setSocialLinks(data.editor.social_links);
           }
@@ -140,6 +171,15 @@ export default function EditorDetailPage() {
       })
       .catch((err) => console.warn('Could not fetch editor API details:', err));
   }, [editorId]);
+
+  const displayName = (isOwner && currentUser?.name) || dbEditor?.name || editor.name;
+  const displayAvatar =
+    (isOwner && currentUser?.avatar) ||
+    dbEditor?.avatar ||
+    editor.portfolio_items[0]?.thumbnail_url ||
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150';
+  const displayHeadline = dbEditor?.headline || editor.headline;
+  const displayBio = dbEditor?.bio || editor.bio;
 
   // Update share copy whenever stats or social links change
   useEffect(() => {
@@ -224,18 +264,18 @@ export default function EditorDetailPage() {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6 font-sans">
       <div className="mb-2">
         <Link
-          href="/editors"
+          href={activeRole === 'EDITOR' ? '/workspace' : '/editors'}
           onClick={() => retroSound.playClick()}
           className="bg-vice-cardElevated text-vice-text border border-vice-border px-3.5 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:border-vice-pink transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Back to Editor Directory</span>
+          <span>{activeRole === 'EDITOR' ? 'Back to Editor Studio' : 'Back to Editor Directory'}</span>
         </Link>
       </div>
 
       {/* Editor Profile Header Window */}
       <RetroWindow
-        title={`TALENT PROFILE — ${editor.name.toUpperCase()}`}
+        title={`TALENT PROFILE — ${displayName.toUpperCase()}`}
         icon={<Users className="w-4 h-4 text-vice-pink" />}
       >
         <div className="space-y-6">
@@ -244,17 +284,14 @@ export default function EditorDetailPage() {
             <div className="flex items-start gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={
-                  editor.portfolio_items[0]?.thumbnail_url ||
-                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'
-                }
-                alt={editor.name}
+                src={displayAvatar}
+                alt={displayName}
                 className="w-20 h-20 rounded-2xl object-cover border border-vice-border shrink-0"
               />
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-xl sm:text-2xl font-extrabold text-vice-text">
-                    {editor.name}
+                    {displayName}
                   </h1>
                   <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
                     ✓ VERIFIED PRO
@@ -264,7 +301,7 @@ export default function EditorDetailPage() {
                   </span>
                 </div>
 
-                <p className="text-xs font-semibold text-vice-muted">{editor.headline}</p>
+                <p className="text-xs font-semibold text-vice-muted">{displayHeadline}</p>
 
                 <div className="flex items-center gap-3 text-xs text-vice-muted flex-wrap pt-0.5">
                   <span className="text-amber-500 font-semibold flex items-center gap-1">
@@ -283,19 +320,38 @@ export default function EditorDetailPage() {
               </div>
             </div>
 
-            {/* Quick Hire CTA */}
+            {/* Quick Hire CTA or Editor Owner Controls */}
             <div className="flex flex-col items-start md:items-end gap-1.5 shrink-0 w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-vice-border">
-              <span className="text-xs text-vice-muted font-mono font-medium">STANDARD RATE:</span>
-              <span className="text-2xl font-mono font-bold text-vice-coral">
-                {editor.price_range}
-              </span>
-              <button
-                onClick={handleHireClick}
-                className="bg-vice-pink hover:bg-vice-pinkHover text-white w-full md:w-auto px-6 py-2.5 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-              >
-                <span>Hire {editor.name.split(' ')[0]} for Brief</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              {isOwner ? (
+                <div className="flex flex-col items-start md:items-end gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Your Verified Vault & Profile</span>
+                  </div>
+                  <Link
+                    href="/workspace"
+                    onClick={() => retroSound.playClick()}
+                    className="bg-vice-cardElevated hover:bg-vice-hover text-vice-text border border-vice-border px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-xs transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-vice-pink" />
+                    <span>Go to Editor Studio</span>
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <span className="text-xs text-vice-muted font-mono font-medium">STANDARD RATE:</span>
+                  <span className="text-2xl font-mono font-bold text-vice-coral">
+                    {editor.price_range}
+                  </span>
+                  <button
+                    onClick={handleHireClick}
+                    className="bg-vice-pink hover:bg-vice-pinkHover text-white w-full md:w-auto px-6 py-2.5 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                  >
+                    <span>Hire {displayName.split(' ')[0]} for Brief</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -838,7 +894,7 @@ export default function EditorDetailPage() {
                   <h3 className="font-bold text-xs text-vice-pink border-b border-vice-border pb-2 uppercase tracking-wide">
                     EDITORIAL PHILOSOPHY &amp; BACKGROUND
                   </h3>
-                  <p className="text-xs text-vice-text leading-relaxed font-sans">{editor.bio}</p>
+                  <p className="text-xs text-vice-text leading-relaxed font-sans">{displayBio}</p>
 
                   <div>
                     <h4 className="font-bold text-xs text-vice-text mb-2">
@@ -1019,5 +1075,22 @@ export default function EditorDetailPage() {
         </div>
       </RetroWindow>
     </div>
+  );
+}
+
+export default function EditorDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-5xl mx-auto px-4 py-20 text-center text-xs text-vice-muted font-sans flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-vice-pink/10 border border-vice-pink/20 text-vice-pink flex items-center justify-center animate-spin">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <span className="font-semibold text-vice-text">Loading Editor Vault &amp; Performance Stats...</span>
+        </div>
+      }
+    >
+      <EditorDetailPageContent />
+    </Suspense>
   );
 }

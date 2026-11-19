@@ -48,6 +48,7 @@ export function RetroHeader() {
       return [
         { href: '/', label: 'Overview', icon: Film, requiresAuth: false },
         { href: '/editors', label: 'Explore Editors', icon: Users, requiresAuth: false },
+        { href: '/signin', label: 'Editor Vaults', icon: FileCheck2, requiresAuth: true },
         { href: '/workspace', label: 'Workspace', icon: Sparkles, requiresAuth: true },
         { href: '/projects', label: 'Projects', icon: FolderKanban, requiresAuth: true },
       ];
@@ -62,10 +63,11 @@ export function RetroHeader() {
       ];
     }
     if (activeRole === 'EDITOR') {
+      const editorVaultHref = currentUser?.id ? `/editors/${currentUser.id}?tab=vault` : '/signin';
       return [
         { href: '/workspace', label: 'Editor Studio', icon: Sparkles, requiresAuth: false },
         { href: '/projects', label: 'Assigned Jobs', icon: FolderKanban, requiresAuth: false },
-        { href: '/workspace?tab=files', label: 'Vault & Master Delivery', icon: FileCheck2, requiresAuth: false },
+        { href: editorVaultHref, label: 'Editor Vaults', icon: FileCheck2, requiresAuth: false },
       ];
     }
     // ADMIN role
@@ -73,9 +75,9 @@ export function RetroHeader() {
       { href: '/admin', label: 'Operational Control (Admin Ops)', icon: ShieldAlert, requiresAuth: false },
       { href: '/workspace', label: 'Workspace Inspector', icon: Sparkles, requiresAuth: false },
       { href: '/projects', label: 'All Projects', icon: FolderKanban, requiresAuth: false },
-      { href: '/editors', label: 'Vetting Queue', icon: Users, requiresAuth: false },
+      { href: '/editors', label: 'Editor Directory & Vetting', icon: Users, requiresAuth: false },
     ];
-  }, [isAuthenticated, activeRole]);
+  }, [isAuthenticated, activeRole, currentUser]);
 
   return (
     <header className="sticky top-0 z-50 h-16 bg-vice-bg/95 border-b border-vice-border backdrop-blur-md select-none transition-colors shadow-xs">
@@ -109,7 +111,8 @@ export function RetroHeader() {
         {/* Middle: Desktop Navigation links (Stable, No Layout Shift) */}
         <nav className="hidden md:flex items-center gap-1 overflow-x-auto">
           {navLinks.map((item) => {
-            const isActive = pathname === item.href;
+            const basePath = item.href.split('?')[0];
+            const isActive = pathname === item.href || (basePath !== '/' && pathname === basePath);
             const Icon = item.icon;
             return (
               <Link
@@ -249,6 +252,17 @@ export function RetroHeader() {
                       <span>{activeRole === 'ADMIN' ? 'Operational Control' : 'Active Workspace'}</span>
                     </Link>
 
+                    {activeRole === 'EDITOR' && (
+                      <Link
+                        href={currentUser?.id ? `/editors/${currentUser.id}?tab=vault` : '/signin'}
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="w-full px-3 py-2 rounded-xl text-vice-text hover:bg-vice-hover flex items-center gap-2 font-medium transition-colors"
+                      >
+                        <FileCheck2 className="w-3.5 h-3.5 text-vice-coral" />
+                        <span>My Vault & Stats</span>
+                      </Link>
+                    )}
+
                     <Link
                       href="/signin"
                       onClick={() => {
@@ -311,7 +325,8 @@ export function RetroHeader() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-vice-border bg-vice-surface p-3 space-y-2 shadow-xl">
           {navLinks.map((item) => {
-            const isActive = pathname === item.href;
+            const basePath = item.href.split('?')[0];
+            const isActive = pathname === item.href || (basePath !== '/' && pathname === basePath);
             const Icon = item.icon;
             return (
               <Link
