@@ -41,9 +41,9 @@ interface EditBridgeContextType {
 
   // Projects
   projects: Project[];
-  activeProjectId: string;
+  activeProjectId: string | null;
   activeProject: Project | undefined;
-  setActiveProjectId: (id: string) => void;
+  setActiveProjectId: (id: string | null) => void;
   updateProjectStatus: (projectId: string, newStatus: ProjectStatus) => void;
   createProject: (newProject: Omit<Project, 'id' | 'created_at' | 'updated_at' | 'revisions_used'>) => string;
   setProjectActiveDraftUrl: (projectId: string, url: string) => void;
@@ -141,11 +141,11 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [customUser, setCustomUser] = useState<User | null>(null);
 
-  const [activeProjectId, setActiveProjectId] = useState<string>('proj-demo-1');
-  const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
-  const [revisionComments, setRevisionComments] = useState<RevisionComment[]>(INITIAL_REVISION_COMMENTS);
-  const [files, setFiles] = useState<ProjectFile[]>(INITIAL_FILES);
-  const [messages, setMessages] = useState<ProjectMessage[]>(INITIAL_MESSAGES);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [revisionComments, setRevisionComments] = useState<RevisionComment[]>([]);
+  const [files, setFiles] = useState<ProjectFile[]>([]);
+  const [messages, setMessages] = useState<ProjectMessage[]>([]);
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [themeMode, setThemeMode] = useState<'DARK' | 'LIGHT'>('DARK');
@@ -167,25 +167,10 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.projects && Array.isArray(parsed.projects)) {
-          const sanitizedProjects = parsed.projects.map((p: Project) => ({
-            ...p,
-            active_draft_url: isValidVideoUrl(p.active_draft_url) ? p.active_draft_url : undefined,
-            current_draft_url: isValidVideoUrl(p.current_draft_url) ? p.current_draft_url : undefined,
-            final_master_url: isValidVideoUrl(p.final_master_url) ? p.final_master_url : undefined,
-          }));
-          setProjects(sanitizedProjects);
-        }
-        if (parsed.revisionComments) setRevisionComments(parsed.revisionComments);
-        if (parsed.files && Array.isArray(parsed.files)) {
-          const sanitizedFiles = parsed.files.filter((f: ProjectFile) => isValidVideoUrl(f.url));
-          setFiles(sanitizedFiles);
-        }
-        if (parsed.messages) setMessages(parsed.messages);
-        if (parsed.reviews) setReviews(parsed.reviews);
-        if (parsed.activeRole) setActiveRole(parsed.activeRole);
+        const isAuth = Boolean(parsed.isAuthenticated);
         if (parsed.isAuthenticated !== undefined) setIsAuthenticated(parsed.isAuthenticated);
         if (parsed.customUser) setCustomUser(parsed.customUser);
+        if (parsed.activeRole) setActiveRole(parsed.activeRole);
         if (parsed.themeMode === 'DARK' || parsed.themeMode === 'LIGHT') {
           setThemeMode(parsed.themeMode);
         }
@@ -193,6 +178,49 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
           setSoundEnabled(parsed.soundEnabled);
           retroSound.enabled = parsed.soundEnabled;
         }
+
+        if (isAuth) {
+          // If authenticated, NEVER restore mock projects like 'proj-demo-1' or 'proj-1'
+          if (parsed.projects && Array.isArray(parsed.projects)) {
+            const realProjects = parsed.projects.filter(
+              (p: Project) =>
+                !p.id.startsWith('mock-') &&
+                p.id !== 'proj-demo-1' &&
+                p.id !== 'proj-demo-2' &&
+                p.id !== 'proj-demo-3' &&
+                p.id !== 'proj-demo-4' &&
+                p.id !== 'proj-1'
+            );
+            if (realProjects.length > 0) {
+              setProjects(realProjects);
+              if (parsed.activeProjectId && realProjects.some((p: Project) => p.id === parsed.activeProjectId)) {
+                setActiveProjectId(parsed.activeProjectId);
+              } else {
+                setActiveProjectId(realProjects[0].id);
+              }
+            } else {
+              setProjects([]);
+              setActiveProjectId(null);
+            }
+          } else {
+            setProjects([]);
+            setActiveProjectId(null);
+          }
+        } else {
+          // Unauthenticated visitor
+          if (parsed.projects && Array.isArray(parsed.projects) && parsed.projects.length > 0) {
+            setProjects(parsed.projects);
+            setActiveProjectId(parsed.activeProjectId || parsed.projects[0]?.id || null);
+          }
+        }
+
+        if (parsed.revisionComments) setRevisionComments(parsed.revisionComments);
+        if (parsed.files && Array.isArray(parsed.files)) {
+          const sanitizedFiles = parsed.files.filter((f: ProjectFile) => isValidVideoUrl(f.url));
+          setFiles(sanitizedFiles);
+        }
+        if (parsed.messages) setMessages(parsed.messages);
+        if (parsed.reviews) setReviews(parsed.reviews);
       }
     } catch {
       // ignore
@@ -218,24 +246,30 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     fetch('/api/projects')
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const sanitized = res.data.map((p: Project) => ({
-            ...p,
-            active_draft_url: isValidVideoUrl(p.active_draft_url) ? p.active_draft_url : undefined,
-            current_draft_url: isValidVideoUrl(p.current_draft_url) ? p.current_draft_url : undefined,
-            final_master_url: isValidVideoUrl(p.final_master_url) ? p.final_master_url : undefined,
-          }));
-          setProjects(sanitized);
-          setActiveProjectId((prev) => {
-            if (prev && sanitized.some((p: Project) => p.id === prev)) {
-              return prev;
-            }
-            return sanitized[0].id;
-          });
+        if (res.success && Array.isArray(res.data)) {
+          if (res.data.length > 0) {
+            const sanitized = res.data.map((p: Project) => ({
+              ...p,
+              active_draft_url: isValidVideoUrl(p.active_draft_url) ? p.active_draft_url : undefined,
+              current_draft_url: isValidVideoUrl(p.current_draft_url) ? p.current_draft_url : undefined,
+              final_master_url: isValidVideoUrl(p.final_master_url) ? p.final_master_url : undefined,
+            }));
+            setProjects(sanitized);
+            setActiveProjectId((prev) => {
+              if (prev && sanitized.some((p: Project) => p.id === prev)) {
+                return prev;
+              }
+              return sanitized[0].id;
+            });
+          } else {
+            // DB returned empty list of projects: activeProjectId MUST be null
+            setProjects([]);
+            setActiveProjectId(null);
+          }
         }
       })
       .catch((err) => console.warn('Could not sync projects from DB:', err));
-  }, []);
+  }, [isAuthenticated]);
 
   // Sync project, files, revisions & messages whenever activeProjectId changes
   useEffect(() => {
@@ -449,13 +483,15 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
   }, []);
 
-  // Active Project
+  // Active Project: NEVER fall back to mock data or projects[0]
   const activeProject = useMemo(() => {
-    return projects.find((p) => p.id === activeProjectId) || projects[0];
+    if (!activeProjectId) return undefined;
+    return projects.find((p) => p.id === activeProjectId);
   }, [projects, activeProjectId]);
 
   // Active Project Comments
   const activeProjectComments = useMemo(() => {
+    if (!activeProjectId) return [];
     return revisionComments
       .filter((c) => c.project_id === activeProjectId)
       .sort((a, b) => a.timestamp_seconds - b.timestamp_seconds);
@@ -463,11 +499,13 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
 
   // Active Project Files
   const activeProjectFiles = useMemo(() => {
+    if (!activeProjectId) return [];
     return files.filter((f) => f.project_id === activeProjectId);
   }, [files, activeProjectId]);
 
   // Active Project Messages
   const activeProjectMessages = useMemo(() => {
+    if (!activeProjectId) return [];
     return messages
       .filter((m) => m.project_id === activeProjectId)
       .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());

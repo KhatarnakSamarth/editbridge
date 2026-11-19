@@ -31,6 +31,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verify project exists in database before proceeding with storage upload or file record creation
+    const existingProject = await prisma.project.findUnique({
+      where: { id: projectId },
+    });
+
+    if (!existingProject) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Project not found in database: ${projectId}`,
+          projectId,
+        },
+        { status: 404 }
+      );
+    }
+
     // Verify session
     const cookieHeader = request.headers.get('cookie') || '';
     const sessionMatch = cookieHeader.match(/editbridge_session=([^;]+)/);

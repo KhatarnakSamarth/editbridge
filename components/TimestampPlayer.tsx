@@ -341,7 +341,21 @@ export function TimestampPlayer({
   // Upload Video directly from Timeline Player to Supabase Storage & PostgreSQL
   const handlePlayerVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !activeProject) return;
+    if (!file) return;
+
+    // Strict validation: NEVER allow upload with missing or mock project ID
+    const targetProjectId = activeProject?.id;
+    if (
+      !targetProjectId ||
+      targetProjectId === 'proj-1' ||
+      targetProjectId.startsWith('mock-') ||
+      targetProjectId.startsWith('temp-')
+    ) {
+      console.warn('Player upload blocked: activeProject.id is missing or mock:', targetProjectId);
+      alert('Cannot upload video: No project is currently active or selected. Please create or select a project first.');
+      if (e.target) e.target.value = '';
+      return;
+    }
 
     setIsUploadingVideo(true);
     retroSound.playDing();
@@ -349,7 +363,7 @@ export function TimestampPlayer({
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('projectId', activeProject.id);
+      formData.append('projectId', targetProjectId);
       formData.append('fileType', 'DRAFT_VIDEO');
       formData.append('version', 'Draft Cut');
       formData.append('uploaderId', currentUser?.id || 'user-creator-1');
@@ -485,10 +499,16 @@ export function TimestampPlayer({
             {/* Upload Video Button: Directly persists to Supabase Storage & PostgreSQL */}
             <button
               type="button"
-              disabled={isUploadingVideo}
-              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingVideo || !activeProject?.id}
+              onClick={() => {
+                if (!activeProject?.id) {
+                  alert('Please select or create a project first before uploading video.');
+                  return;
+                }
+                fileInputRef.current?.click();
+              }}
               className="px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 bg-vice-gradient hover:opacity-95 text-white shadow-xs transition-all shrink-0 cursor-pointer active:scale-95 disabled:opacity-50"
-              title="Upload video to Supabase Storage and sync with PostgreSQL"
+              title={activeProject?.id ? 'Upload video to Supabase Storage and sync with PostgreSQL' : 'Select or create a project first'}
             >
               {isUploadingVideo ? (
                 <>
@@ -548,8 +568,14 @@ export function TimestampPlayer({
 
               <button
                 type="button"
-                disabled={isUploadingVideo}
-                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingVideo || !activeProject?.id}
+                onClick={() => {
+                  if (!activeProject?.id) {
+                    alert('Please select or create a project first before uploading video.');
+                    return;
+                  }
+                  fileInputRef.current?.click();
+                }}
                 className="bg-vice-gradient hover:opacity-95 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
               >
                 {isUploadingVideo ? (

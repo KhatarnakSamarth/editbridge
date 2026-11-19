@@ -103,14 +103,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify project exists
+    // Verify project exists in database before creating file record
     const existingProject = await prisma.project.findUnique({
       where: { id: project_id },
     });
 
     if (!existingProject) {
       return NextResponse.json(
-        { success: false, error: 'Project not found' },
+        {
+          success: false,
+          error: `Project not found in database: ${project_id}`,
+          projectId: project_id,
+        },
         { status: 404 }
       );
     }
