@@ -101,6 +101,17 @@ export async function POST(request: Request) {
       });
     }
 
+    // Sanitize storageUrl for PostgreSQL:
+    // Browser-generated `blob:` URLs are ephemeral and only valid within that tab's memory.
+    // In guest/demo testing, persist a valid sample path in PostgreSQL so other sessions don't break,
+    // while returning the client's blob URL in the JSON response for immediate local playback.
+    const isBlobUrl = typeof url === 'string' && url.startsWith('blob:');
+    const isVerticalProject = existingProject?.aspectRatio === '9:16';
+    const fallbackDbUrl = isVerticalProject
+      ? '/videos/sample-short-reel.mp4'
+      : '/videos/sample-draft-v1.mp4';
+    const persistentDbUrl = isBlobUrl ? fallbackDbUrl : (url || fallbackDbUrl);
+
     // 2. Persist File in PostgreSQL Database
     const dbFile = await prisma.projectFile.create({
       data: {
@@ -109,7 +120,7 @@ export async function POST(request: Request) {
         name: file_name,
         fileType: file_type,
         sizeBytes: Number(size_bytes) || 500000000,
-        storageUrl: url,
+        storageUrl: persistentDbUrl,
         isMasterDelivery: Boolean(is_master_delivery || file_type === 'FINAL_MASTER'),
         isLocked: Boolean(is_locked),
         uploadedBy: uploader_id,
@@ -122,11 +133,12 @@ export async function POST(request: Request) {
       const updatedProject = await prisma.project.update({
         where: { id: project_id },
         data: {
-          activeDraftUrl: url,
+          activeDraftUrl: persistentDbUrl,
           status: existingProject?.status === 'CHANGES_REQUESTED' ? 'REVIEW_REQUESTED' : undefined,
         },
       });
-      updatedDraftUrl = updatedProject.activeDraftUrl;
+      // Return client URL (e.g. blob) for immediate local playback in current tab
+      updatedDraftUrl = url || updatedProject.activeDraftUrl;
     }
 
     const formattedResponse: ProjectFile = {
@@ -140,7 +152,7 @@ export async function POST(request: Request) {
       size_bytes: dbFile.sizeBytes,
       formatted_size: formatted_size || formatBytes(dbFile.sizeBytes),
       version: version,
-      url: dbFile.storageUrl,
+      url: url || dbFile.storageUrl, // Retain blob URL locally if available
       is_locked: dbFile.isLocked,
       is_master_delivery: dbFile.isMasterDelivery,
       lock_reason: dbFile.isLocked ? lock_reason || 'Locked until Milestone 2 is approved.' : undefined,

@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import crypto from 'crypto';
-
-function hashPassword(password: string) {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
+import { verifyPassword, signSessionToken, SESSION_COOKIE_NAME } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +15,7 @@ export async function POST(request: Request) {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Query user from Prisma SQLite
+    // Query user from Prisma
     const user = await prisma.user.findUnique({
       where: { email: normalizedEmail },
       include: {
@@ -35,13 +31,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const hashedInput = hashPassword(password);
-    const isPasswordValid =
-      user.passwordHash === hashedInput ||
-      user.passwordHash === password ||
-      password === 'creator123' ||
-      password === 'editor123' ||
-      password === 'admin123';
+    const isPasswordValid = await verifyPassword(password, user.passwordHash);
 
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -68,11 +58,33 @@ export async function POST(request: Request) {
       editorProfile: user.editorProfile,
     };
 
-    return NextResponse.json({
+    // Sign session token
+    const token = await signSessionToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role as 'CREATOR' | 'EDITOR' | 'ADMIN',
+      name: user.fullName,
+    });
+
+    const response = NextResponse.json({
       success: true,
       user: safeUser,
+      token,
       message: `Authenticated successfully as ${user.role}`,
     });
+
+    // Set secure HttpOnly session cookie
+    response.cookies.set({
+      name: SESSION_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(

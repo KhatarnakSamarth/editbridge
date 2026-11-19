@@ -207,13 +207,17 @@ export function TimestampPlayer({
   };
 
   const handleVideoError = () => {
-    console.warn('Video failed to load source:', activeVideoUrl, 'falling back to default local sample.');
     setHasError(true);
     const fallback =
-      activeProject?.category === 'Shorts / Reels'
+      activeProject?.category === 'Shorts / Reels' || activeProject?.deliverables?.aspect_ratio === '9:16'
         ? '/videos/sample-short-reel.mp4'
         : '/videos/sample-draft-v1.mp4';
-    setActiveVideoUrl(fallback);
+    if (activeVideoUrl !== fallback) {
+      setActiveVideoUrl(fallback);
+      if (videoRef.current) {
+        videoRef.current.load();
+      }
+    }
   };
 
   const togglePlay = () => {

@@ -45,6 +45,29 @@ export function InviteEditorModal({
   const [editorEmail, setEditorEmail] = useState('');
   const [copied, setCopied] = useState(false);
   const [invited, setInvited] = useState(false);
+  const [signedToken, setSignedToken] = useState<string>('');
+
+  // Fetch cryptographically signed invite token
+  useEffect(() => {
+    if (!isOpen) return;
+    fetch('/api/invite/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projectId: project?.id || 'proj-demo-1',
+        role: targetRole,
+        permission,
+        expiration,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && res.token) {
+          setSignedToken(res.token);
+        }
+      })
+      .catch(() => {});
+  }, [isOpen, project?.id, targetRole, permission, expiration]);
 
   // Initialize slug when project loads or changes
   useEffect(() => {
@@ -84,7 +107,9 @@ export function InviteEditorModal({
   const roleParam = targetRole.toLowerCase();
   const permParam = permission.toLowerCase();
   const cleanSlug = customSlug.trim() ? encodeURIComponent(customSlug.trim()) : 'invite';
-  const dynamicInviteUrl = `${origin}/join?project=${projectId}&role=${roleParam}&ref=${cleanSlug}&perm=${permParam}&exp=${expiration.toLowerCase()}`;
+  const dynamicInviteUrl = signedToken
+    ? `${origin}/join?project=${projectId}&role=${roleParam}&token=${signedToken}`
+    : `${origin}/join?project=${projectId}&role=${roleParam}&ref=${cleanSlug}&perm=${permParam}&exp=${expiration.toLowerCase()}`;
 
   const handleCopy = () => {
     retroSound.playDing();

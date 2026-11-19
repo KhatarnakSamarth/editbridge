@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import confetti from 'canvas-confetti';
 import {
   User,
@@ -159,6 +159,20 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
+  }, []);
+
+  // Check active server-side session cookie on mount
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && res.user && res.authenticated) {
+          setCustomUser(res.user);
+          setActiveRole(res.user.role);
+          setIsAuthenticated(true);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Two-way Database Sync: Load live projects from PostgreSQL
@@ -360,11 +374,12 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     retroSound.playClick();
     setIsAuthenticated(false);
     setCustomUser(null);
-  };
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  }, []);
 
   // Active Project
   const activeProject = useMemo(() => {
@@ -762,49 +777,70 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const contextValue = useMemo<EditBridgeContextType>(
+    () => ({
+      currentUser,
+      activeRole,
+      isAuthenticated,
+      switchRole,
+      login,
+      loginAsDemo,
+      logout,
+      projects,
+      activeProjectId,
+      activeProject,
+      setActiveProjectId,
+      updateProjectStatus,
+      createProject,
+      setProjectActiveDraftUrl,
+      updateProjectBrief,
+      revisionComments,
+      activeProjectComments,
+      addRevisionComment,
+      updateCommentStatus,
+      files,
+      activeProjectFiles,
+      addProjectFile,
+      unlockMasterFile,
+      messages,
+      activeProjectMessages,
+      sendMessage,
+      fundUpfrontMilestone,
+      releaseFinalMilestone,
+      reviews,
+      submitReview,
+      editors: INITIAL_EDITORS,
+      soundEnabled,
+      toggleSound,
+      themeMode,
+      toggleThemeMode,
+      resetDemoData,
+      notifications,
+      markNotificationRead,
+    }),
+    [
+      currentUser,
+      activeRole,
+      isAuthenticated,
+      projects,
+      activeProjectId,
+      activeProject,
+      revisionComments,
+      activeProjectComments,
+      files,
+      activeProjectFiles,
+      messages,
+      activeProjectMessages,
+      reviews,
+      soundEnabled,
+      themeMode,
+      notifications,
+      logout,
+    ]
+  );
+
   return (
-    <EditBridgeContext.Provider
-      value={{
-        currentUser,
-        activeRole,
-        isAuthenticated,
-        switchRole,
-        login,
-        loginAsDemo,
-        logout,
-        projects,
-        activeProjectId,
-        activeProject,
-        setActiveProjectId,
-        updateProjectStatus,
-        createProject,
-        setProjectActiveDraftUrl,
-        updateProjectBrief,
-        revisionComments,
-        activeProjectComments,
-        addRevisionComment,
-        updateCommentStatus,
-        files,
-        activeProjectFiles,
-        addProjectFile,
-        unlockMasterFile,
-        messages,
-        activeProjectMessages,
-        sendMessage,
-        fundUpfrontMilestone,
-        releaseFinalMilestone,
-        reviews,
-        submitReview,
-        editors: INITIAL_EDITORS,
-        soundEnabled,
-        toggleSound,
-        themeMode,
-        toggleThemeMode,
-        resetDemoData,
-        notifications,
-        markNotificationRead,
-      }}
-    >
+    <EditBridgeContext.Provider value={contextValue}>
       {children}
     </EditBridgeContext.Provider>
   );

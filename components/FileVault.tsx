@@ -105,7 +105,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
       }
     } else {
       if (newFileType === 'FINAL_MASTER') {
-        fileUrl = '/videos/sample-final-master.mp4';
+        fileUrl = '/videos/sample-draft-v1.mp4';
       }
     }
 

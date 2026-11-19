@@ -115,7 +115,7 @@ export async function GET(
         },
         active_draft_url: dbProject.activeDraftUrl || fallbackDraft,
         current_draft_url: dbProject.activeDraftUrl || fallbackDraft,
-        final_master_url: '/videos/sample-final-master.mp4',
+        final_master_url: '/videos/sample-draft-v1.mp4',
         watermark_active: dbProject.watermarkActive,
         revisions: dbProject.revisions.map((r) => ({
           id: r.id,
@@ -161,7 +161,7 @@ export async function GET(
 
       return NextResponse.json({
         success: true,
-        source: 'prisma-sqlite',
+        source: 'prisma-postgresql',
         data: formatted,
       });
     }
@@ -225,7 +225,7 @@ export async function PATCH(
 
       return NextResponse.json({
         success: true,
-        source: 'prisma-sqlite',
+        source: 'prisma-postgresql',
         message: 'Project updated successfully in SQLite',
         data: updated,
       });

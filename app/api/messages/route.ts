@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
       return NextResponse.json({
         success: true,
-        source: 'prisma-sqlite',
+        source: 'prisma-postgresql',
         data: mapped,
       });
     }
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         success: true,
-        source: 'prisma-sqlite',
+        source: 'prisma-postgresql',
         data: {
           id: dbMsg.id,
           project_id: dbMsg.projectId,

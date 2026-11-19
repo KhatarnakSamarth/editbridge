@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import crypto from 'crypto';
-
-function hashPassword(password: string) {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
+import { hashPassword, signSessionToken, SESSION_COOKIE_NAME } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -43,7 +39,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordHash = hashPassword(password);
+    const passwordHash = await hashPassword(password);
     const validRole = ['CREATOR', 'EDITOR', 'ADMIN'].includes(role) ? role : 'CREATOR';
 
     // Create user and profile
@@ -104,11 +100,32 @@ export async function POST(request: Request) {
       editorProfile: newUser.editorProfile,
     };
 
-    return NextResponse.json({
+    // Sign session token
+    const token = await signSessionToken({
+      userId: newUser.id,
+      email: newUser.email,
+      role: newUser.role as 'CREATOR' | 'EDITOR' | 'ADMIN',
+      name: newUser.fullName,
+    });
+
+    const response = NextResponse.json({
       success: true,
       user: safeUser,
+      token,
       message: `Account created successfully as ${validRole}`,
     });
+
+    response.cookies.set({
+      name: SESSION_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (error) {
     console.error('Signup error:', error);
     return NextResponse.json(

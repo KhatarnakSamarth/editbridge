@@ -115,7 +115,7 @@ export async function GET(request: Request) {
           },
           active_draft_url: p.activeDraftUrl || fallbackDraft,
           current_draft_url: p.activeDraftUrl || fallbackDraft,
-          final_master_url: '/videos/sample-final-master.mp4',
+          final_master_url: '/videos/sample-draft-v1.mp4',
           watermark_active: p.watermarkActive,
           created_at: p.createdAt.toISOString(),
           updated_at: p.updatedAt.toISOString(),
@@ -124,7 +124,7 @@ export async function GET(request: Request) {
 
       return NextResponse.json({
         success: true,
-        source: 'prisma-sqlite',
+        source: 'prisma-postgresql',
         data: formatted,
       });
     }

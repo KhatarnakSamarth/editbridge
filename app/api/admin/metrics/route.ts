@@ -1,10 +1,24 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { verifySessionToken, SESSION_COOKIE_NAME } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const cookieStore = cookies();
+    const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    const session = await verifySessionToken(sessionCookie);
+
+    // In production, enforce admin session verification
+    if (process.env.NODE_ENV === 'production' && (!session || session.role !== 'ADMIN')) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Platform Arbiter administrative privileges required.' },
+        { status: 403 }
+      );
+    }
+
     // 1. User stats
     const totalUsers = await prisma.user.count();
     const creatorsCount = await prisma.user.count({ where: { role: 'CREATOR' } });
@@ -63,7 +77,7 @@ export async function GET() {
         activeEscrowLocked: activeEscrowLocked > 0 ? activeEscrowLocked : 735.0,
         disputeRatePercent: totalProjects > 0 ? ((disputedProjects / totalProjects) * 100).toFixed(1) : '0.0',
         systemHealth: '100% HEALTHY',
-        sqliteDbSize: 'dev.db active (zero-latency local read/write)',
+        databaseEngine: 'Supabase PostgreSQL (PgBouncer transaction pooler)',
       },
       recentPayments,
     });

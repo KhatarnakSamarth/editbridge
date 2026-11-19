@@ -211,7 +211,7 @@ export const INITIAL_EDITORS: EditorProfile[] = [
         id: 'port-5',
         title: 'The Silent Race For The Arctic Deep',
         client: 'Terra Cognita',
-        video_url: '/videos/sample-final-master.mp4',
+        video_url: '/videos/sample-draft-v1.mp4',
         thumbnail_url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80',
         duration: '22:40',
         views: '610K views',
@@ -280,7 +280,7 @@ export const INITIAL_PROJECTS: Project[] = [
     created_at: '2026-11-16T12:00:00Z',
     updated_at: '2026-11-17T18:30:00Z',
     active_draft_url: '/videos/sample-draft-v1.mp4',
-    final_master_url: '/videos/sample-final-master.mp4',
+    final_master_url: '/videos/sample-draft-v1.mp4',
   },
   {
     id: 'proj-demo-2',
@@ -436,7 +436,7 @@ export const INITIAL_PROJECTS: Project[] = [
     ],
     created_at: '2026-10-27T10:00:00Z',
     updated_at: '2026-11-04T18:00:00Z',
-    final_master_url: '/videos/sample-final-master.mp4',
+    final_master_url: '/videos/sample-draft-v1.mp4',
   },
 ];
 
@@ -539,7 +539,7 @@ export const INITIAL_FILES: ProjectFile[] = [
     size_bytes: 8400000000,
     formatted_size: '8.40 GB',
     version: 'Master v1',
-    url: '/videos/sample-final-master.mp4',
+    url: '/videos/sample-draft-v1.mp4',
     is_locked: true,
     lock_reason: 'Locked until Milestone 2 (70% - $420.00) is released by Client.',
     created_at: '2026-11-17T18:00:00Z',
