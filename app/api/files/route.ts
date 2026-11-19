@@ -24,7 +24,15 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    const mapped: ProjectFile[] = dbFiles.map((f) => ({
+    const cleanDbFiles = dbFiles.filter(
+      (f) =>
+        f.storageUrl &&
+        !f.storageUrl.startsWith('/videos/sample-') &&
+        !f.storageUrl.startsWith('blob:') &&
+        !f.storageUrl.includes('sample-')
+    );
+
+    const mapped: ProjectFile[] = cleanDbFiles.map((f) => ({
       id: f.id,
       project_id: f.projectId,
       uploader_id: f.uploadedBy,
@@ -122,9 +130,16 @@ export async function POST(request: Request) {
       },
     });
 
-    // If DRAFT_VIDEO, update project's activeDraftUrl in database
+    // Always update project's activeDraftUrl on ANY video upload
+    const ext = file_name.split('.').pop()?.toLowerCase() || '';
+    const isVideo =
+      file_type === 'DRAFT_VIDEO' ||
+      file_type === 'FINAL_MASTER' ||
+      file_type === 'RAW_FOOTAGE' ||
+      ['mp4', 'mov', 'webm', 'mkv', 'm4v', 'avi'].includes(ext);
+
     let updatedDraftUrl = existingProject.activeDraftUrl;
-    if (file_type === 'DRAFT_VIDEO') {
+    if (isVideo) {
       const updatedProject = await prisma.project.update({
         where: { id: project_id },
         data: {
@@ -134,10 +149,10 @@ export async function POST(request: Request) {
               ? 'REVIEW_REQUESTED'
               : existingProject.status === 'DRAFT'
               ? 'EDITING'
-              : undefined,
+              : existingProject.status,
         },
       });
-      updatedDraftUrl = updatedProject.activeDraftUrl;
+      updatedDraftUrl = updatedProject.activeDraftUrl || url;
     }
 
     const formattedResponse: ProjectFile = {
@@ -164,8 +179,9 @@ export async function POST(request: Request) {
       success: true,
       source: 'prisma-postgresql',
       data: formattedResponse,
+      file: formattedResponse,
       activeDraftUrl: updatedDraftUrl,
-      message: 'Video stored persistently and synced with timeline',
+      message: 'File record successfully saved to database and synced with timeline',
     });
   } catch (error) {
     console.error('Files POST error:', error);

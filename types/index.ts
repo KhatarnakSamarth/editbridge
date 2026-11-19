@@ -167,6 +167,7 @@ export interface Project {
   created_at: string;
   updated_at: string;
   active_draft_url?: string;
+  current_draft_url?: string;
   final_master_url?: string;
 }
 

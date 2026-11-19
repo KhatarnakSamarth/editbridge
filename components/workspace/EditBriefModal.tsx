@@ -179,7 +179,7 @@ export function EditBriefModal({
                 rows={2}
                 value={briefFootageLinksText}
                 onChange={(e) => setBriefFootageLinksText(e.target.value)}
-                placeholder="https://drive.google.com/drive/folders/sample-raw-footage&#10;https://storage.editbridge.network/raw/a-cam.mp4"
+                placeholder="https://drive.google.com/drive/folders/raw-footage&#10;https://storage.editbridge.network/raw/a-cam.mp4"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
               />
             </div>
@@ -196,7 +196,7 @@ export function EditBriefModal({
                 rows={2}
                 value={briefReferencesText}
                 onChange={(e) => setBriefReferencesText(e.target.value)}
-                placeholder="https://youtube.com/watch?v=sample-vox-explainer&#10;https://youtube.com/watch?v=sample-visual-pacing"
+                placeholder="https://youtube.com/watch?v=vox-explainer-masterclass&#10;https://youtube.com/watch?v=visual-pacing-guide"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
               />
             </div>

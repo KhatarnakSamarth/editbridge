@@ -2,13 +2,40 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { INITIAL_PROJECTS } from '@/lib/mockData';
 
+function isValidDraftUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    !trimmed ||
+    trimmed === '#' ||
+    trimmed.startsWith('blob:') ||
+    trimmed.startsWith('/videos/sample-') ||
+    trimmed.includes('sample-draft-') ||
+    trimmed.includes('sample-final-') ||
+    trimmed.includes('sample-short-')
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(0)} KB`;
+  const mb = kb / 1024;
+  if (mb < 1024) return `${mb.toFixed(1)} MB`;
+  const gb = mb / 1024;
+  return `${gb.toFixed(2)} GB`;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get('role');
     const userId = searchParams.get('userId');
 
-    // Query live SQLite database
+    // Query live PostgreSQL database
     const dbProjects = await prisma.project.findMany({
       where: {
         ...(role === 'CREATOR' && userId ? { creatorId: userId } : {}),
@@ -59,7 +86,9 @@ export async function GET(request: Request) {
               ];
 
         const isShorts = p.aspectRatio === '9:16';
-        const masterFile = p.files?.find((f) => f.fileType === 'FINAL_MASTER');
+        const cleanFiles = (p.files || []).filter((f) => isValidDraftUrl(f.storageUrl));
+        const masterFile = cleanFiles.find((f) => f.fileType === 'FINAL_MASTER');
+        const activeDraft = isValidDraftUrl(p.activeDraftUrl) ? p.activeDraftUrl : null;
 
         return {
           id: p.id,
@@ -94,8 +123,8 @@ export async function GET(request: Request) {
             color_grading: true,
           },
           references: [
-            'https://youtube.com/watch?v=sample-visual-pacing',
-            'https://youtube.com/watch?v=sample-vox-explainer',
+            'https://youtube.com/watch?v=visual-pacing-guide',
+            'https://youtube.com/watch?v=explainer-masterclass',
           ],
           raw_footage_links: [
             'https://storage.editbridge.network/raw/marcus-cam-a-4k.mp4',
@@ -111,9 +140,25 @@ export async function GET(request: Request) {
             final_released: ms.some((m) => m.percentage === 70 && m.status === 'RELEASED'),
             platform_fee_percent: 5,
           },
-          active_draft_url: p.activeDraftUrl || null,
-          current_draft_url: p.activeDraftUrl || null,
+          active_draft_url: activeDraft,
+          current_draft_url: activeDraft,
           final_master_url: masterFile?.storageUrl || null,
+          files: cleanFiles.map((f) => ({
+            id: f.id,
+            project_id: f.projectId,
+            uploader_id: f.uploadedBy,
+            uploader_name: 'Project Member',
+            file_name: f.name,
+            storage_key: `uploads/${f.name}`,
+            file_type: f.fileType,
+            size_bytes: f.sizeBytes,
+            formatted_size: formatBytes(f.sizeBytes),
+            version: f.isMasterDelivery ? 'Master Delivery' : 'Draft Cut',
+            url: f.storageUrl,
+            is_locked: f.isLocked,
+            is_master_delivery: f.isMasterDelivery,
+            created_at: f.createdAt.toISOString(),
+          })),
           watermark_active: p.watermarkActive,
           created_at: p.createdAt.toISOString(),
           updated_at: p.updatedAt.toISOString(),

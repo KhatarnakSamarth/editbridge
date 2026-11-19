@@ -26,10 +26,10 @@ export default function NewProjectPage() {
   const [deadline, setDeadline] = useState('2026-12-05');
   const [revisionLimit, setRevisionLimit] = useState(2);
   const [references, setReferences] = useState(
-    'https://youtube.com/watch?v=sample-vox-explainer'
+    'https://youtube.com/watch?v=visual-pacing-guide'
   );
   const [rawFootageLinks, setRawFootageLinks] = useState(
-    'https://drive.google.com/drive/folders/sample-raw-footage-4k'
+    'https://drive.google.com/drive/folders/footage-archive-4k'
   );
 
   // Deliverables specs
@@ -91,8 +91,7 @@ export default function NewProjectPage() {
           status: 'PENDING',
         },
       ],
-      active_draft_url:
-        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      active_draft_url: undefined,
     });
 
     router.push('/workspace');

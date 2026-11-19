@@ -251,8 +251,8 @@ export const INITIAL_PROJECTS: Project[] = [
       color_grading: true,
     },
     references: [
-      'https://youtube.com/watch?v=sample-bloomberg-investigation',
-      'https://youtube.com/watch?v=sample-vox-explainer-pacing',
+      'https://youtube.com/watch?v=bloomberg-investigation',
+      'https://youtube.com/watch?v=vox-explainer-pacing',
     ],
     raw_footage_links: [
       'https://storage.editbridge.network/raw/marcus-cam-a-4k.mp4',

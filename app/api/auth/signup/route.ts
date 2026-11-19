@@ -71,7 +71,7 @@ export async function POST(request: Request) {
                   hourlyRate: Number(hourlyRate) || 45.0,
                   niches: niches || 'YouTube Long-form, Tech, Storytelling',
                   primarySoftware: primarySoftware || 'DaVinci Resolve & Premiere Pro',
-                  portfolioUrls: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                  portfolioUrls: 'https://storage.editbridge.io/portfolio/editor-showreel.mp4',
                   totalEarnings: 0.0,
                   rating: 5.0,
                   verifiedBadge: false,

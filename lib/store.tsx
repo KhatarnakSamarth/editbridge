@@ -74,9 +74,10 @@ interface EditBridgeContextType {
   // Files
   files: ProjectFile[];
   activeProjectFiles: ProjectFile[];
-  addProjectFile: (file: Omit<ProjectFile, 'id' | 'created_at'>) => void;
+  addProjectFile: (file: Omit<ProjectFile, 'id' | 'created_at'> & { id?: string; created_at?: string }) => void;
   deleteProjectFile: (fileId: string) => Promise<boolean>;
   unlockMasterFile: (projectId: string) => void;
+  refreshActiveProject: () => Promise<void>;
 
   // Messages / Chat
   messages: ProjectMessage[];
@@ -110,6 +111,31 @@ const EditBridgeContext = createContext<EditBridgeContextType | null>(null);
 
 const STORAGE_KEY = 'editbridge_state_v3';
 
+/**
+ * Validates video URLs to prevent broken 404s and playback failures.
+ * Rejects legacy '/videos/sample-...', 'blob:', empty strings, or strings containing 'sample-'.
+ */
+export function isValidVideoUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    !trimmed ||
+    trimmed === '#' ||
+    trimmed.startsWith('blob:') ||
+    trimmed.startsWith('/videos/sample-') ||
+    trimmed.includes('sample-draft-') ||
+    trimmed.includes('sample-final-') ||
+    trimmed.includes('sample-short-')
+  ) {
+    return false;
+  }
+  return (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    (trimmed.startsWith('/') && !trimmed.startsWith('/videos/'))
+  );
+}
+
 export function EditBridgeProvider({ children }: { children: ReactNode }) {
   const [activeRole, setActiveRole] = useState<UserRole>('CREATOR');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -135,15 +161,26 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     },
   ]);
 
-  // Load from LocalStorage if available
+  // Load from LocalStorage if available (with strict legacy sample video purging)
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.projects) setProjects(parsed.projects);
+        if (parsed.projects && Array.isArray(parsed.projects)) {
+          const sanitizedProjects = parsed.projects.map((p: Project) => ({
+            ...p,
+            active_draft_url: isValidVideoUrl(p.active_draft_url) ? p.active_draft_url : undefined,
+            current_draft_url: isValidVideoUrl(p.current_draft_url) ? p.current_draft_url : undefined,
+            final_master_url: isValidVideoUrl(p.final_master_url) ? p.final_master_url : undefined,
+          }));
+          setProjects(sanitizedProjects);
+        }
         if (parsed.revisionComments) setRevisionComments(parsed.revisionComments);
-        if (parsed.files) setFiles(parsed.files);
+        if (parsed.files && Array.isArray(parsed.files)) {
+          const sanitizedFiles = parsed.files.filter((f: ProjectFile) => isValidVideoUrl(f.url));
+          setFiles(sanitizedFiles);
+        }
         if (parsed.messages) setMessages(parsed.messages);
         if (parsed.reviews) setReviews(parsed.reviews);
         if (parsed.activeRole) setActiveRole(parsed.activeRole);
@@ -182,12 +219,18 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          setProjects(res.data);
+          const sanitized = res.data.map((p: Project) => ({
+            ...p,
+            active_draft_url: isValidVideoUrl(p.active_draft_url) ? p.active_draft_url : undefined,
+            current_draft_url: isValidVideoUrl(p.current_draft_url) ? p.current_draft_url : undefined,
+            final_master_url: isValidVideoUrl(p.final_master_url) ? p.final_master_url : undefined,
+          }));
+          setProjects(sanitized);
           setActiveProjectId((prev) => {
-            if (prev && res.data.some((p: Project) => p.id === prev)) {
+            if (prev && sanitized.some((p: Project) => p.id === prev)) {
               return prev;
             }
-            return res.data[0].id;
+            return sanitized[0].id;
           });
         }
       })
@@ -202,8 +245,14 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
+          const sanitizedProject = {
+            ...res.data,
+            active_draft_url: isValidVideoUrl(res.data.active_draft_url) ? res.data.active_draft_url : undefined,
+            current_draft_url: isValidVideoUrl(res.data.current_draft_url) ? res.data.current_draft_url : undefined,
+            final_master_url: isValidVideoUrl(res.data.final_master_url) ? res.data.final_master_url : undefined,
+          };
           setProjects((prev) =>
-            prev.map((p) => (p.id === activeProjectId ? { ...p, ...res.data } : p))
+            prev.map((p) => (p.id === activeProjectId ? { ...p, ...sanitizedProject } : p))
           );
         }
       })
@@ -213,9 +262,10 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data)) {
+          const cleanFiles = res.data.filter((f: ProjectFile) => isValidVideoUrl(f.url));
           setFiles((prev) => {
             const otherFiles = prev.filter((f) => f.project_id !== activeProjectId);
-            return [...res.data, ...otherFiles];
+            return [...cleanFiles, ...otherFiles];
           });
         }
       })
@@ -563,28 +613,95 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     }).catch(() => {});
   };
 
-  // Add Project File (Persists to PostgreSQL Database & Updates activeDraftUrl if video)
-  const addProjectFile = (fileData: Omit<ProjectFile, 'id' | 'created_at'>) => {
+  // Refresh Active Project & Files directly from PostgreSQL Database
+  const refreshActiveProject = useCallback(async () => {
+    if (!activeProjectId) return;
+    try {
+      const [projRes, filesRes] = await Promise.all([
+        fetch(`/api/projects/${activeProjectId}`),
+        fetch(`/api/files?projectId=${activeProjectId}`),
+      ]);
+      const projData = await projRes.json();
+      const filesData = await filesRes.json();
+
+      if (projData.success && projData.data) {
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === activeProjectId
+              ? {
+                  ...p,
+                  ...projData.data,
+                  active_draft_url: isValidVideoUrl(projData.data.active_draft_url)
+                    ? projData.data.active_draft_url
+                    : undefined,
+                  current_draft_url: isValidVideoUrl(projData.data.current_draft_url)
+                    ? projData.data.current_draft_url
+                    : undefined,
+                }
+              : p
+          )
+        );
+      }
+
+      if (filesData.success && Array.isArray(filesData.data)) {
+        const cleanFiles = filesData.data.filter((f: ProjectFile) => isValidVideoUrl(f.url));
+        setFiles((prev) => {
+          const otherFiles = prev.filter((f) => f.project_id !== activeProjectId);
+          return [...cleanFiles, ...otherFiles];
+        });
+      }
+    } catch (err) {
+      console.warn('Failed to refresh active project from DB:', err);
+    }
+  }, [activeProjectId]);
+
+  // Helper to detect if a file is a video
+  const isVideoFile = (fileName: string, fileType?: string): boolean => {
+    if (fileType === 'DRAFT_VIDEO' || fileType === 'FINAL_MASTER') return true;
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    return ['mp4', 'mov', 'webm', 'mkv', 'm4v', 'avi'].includes(ext);
+  };
+
+  // Add Project File (Persists to PostgreSQL Database & Updates activeDraftUrl for ANY video)
+  const addProjectFile = (
+    fileData: Omit<ProjectFile, 'id' | 'created_at'> & { id?: string; created_at?: string }
+  ) => {
     retroSound.playDing();
-    const tempId = `file-${Date.now()}`;
+    const tempId = fileData.id || `file-${Date.now()}`;
     const newFile: ProjectFile = {
       ...fileData,
       id: tempId,
-      created_at: new Date().toISOString(),
+      created_at: fileData.created_at || new Date().toISOString(),
     };
 
-    // Optimistically update local files
-    setFiles((prev) => [newFile, ...prev]);
+    const isVideo = isVideoFile(fileData.file_name, fileData.file_type);
 
-    // If this is a draft video, update the project's active draft URL immediately!
-    if (fileData.file_type === 'DRAFT_VIDEO') {
+    // Optimistically update local files
+    setFiles((prev) => [
+      newFile,
+      ...prev.filter((f) => f.id !== tempId && f.url !== fileData.url),
+    ]);
+
+    // If this is a video with a valid URL, immediately update activeDraftUrl
+    if (isVideo && isValidVideoUrl(fileData.url)) {
       setProjects((prev) =>
         prev.map((p) =>
           p.id === fileData.project_id
-            ? { ...p, active_draft_url: fileData.url, updated_at: new Date().toISOString() }
+            ? {
+                ...p,
+                active_draft_url: fileData.url,
+                current_draft_url: fileData.url,
+                updated_at: new Date().toISOString(),
+              }
             : p
         )
       );
+    }
+
+    // If file was already saved by /api/files/upload, avoid duplicate POST
+    if (fileData.id && !fileData.id.startsWith('temp-')) {
+      refreshActiveProject().catch(() => {});
+      return;
     }
 
     // Persist to Database API
@@ -597,15 +714,18 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       .then((res) => {
         if (res.success && res.data) {
           setFiles((prev) => prev.map((f) => (f.id === tempId ? res.data : f)));
-          if (res.activeDraftUrl) {
+          const updatedDraftUrl = res.activeDraftUrl || (isVideo ? fileData.url : undefined);
+          if (updatedDraftUrl && isValidVideoUrl(updatedDraftUrl)) {
             setProjects((prev) =>
               prev.map((p) =>
                 p.id === fileData.project_id
-                  ? { ...p, active_draft_url: res.activeDraftUrl }
+                  ? { ...p, active_draft_url: updatedDraftUrl, current_draft_url: updatedDraftUrl }
                   : p
               )
             );
           }
+          // Immediate database sync
+          refreshActiveProject().catch(() => {});
         }
       })
       .catch((err) => console.error('Failed to save file to DB:', err));
@@ -622,18 +742,20 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       if (data.success) {
         setFiles((prev) => prev.filter((f) => f.id !== fileId));
         if (data.activeDraftUrl !== undefined) {
+          const nextDraftUrl = isValidVideoUrl(data.activeDraftUrl) ? data.activeDraftUrl : undefined;
           setProjects((prev) =>
             prev.map((p) =>
               p.id === activeProjectId
                 ? {
                     ...p,
-                    active_draft_url: data.activeDraftUrl || undefined,
-                    current_draft_url: data.activeDraftUrl || undefined,
+                    active_draft_url: nextDraftUrl,
+                    current_draft_url: nextDraftUrl,
                   }
                 : p
             )
           );
         }
+        refreshActiveProject().catch(() => {});
         return true;
       }
       return false;
@@ -646,10 +768,11 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
   // Set Project Active Draft URL (persists in DB)
   const setProjectActiveDraftUrl = (projectId: string, url: string) => {
     retroSound.playDing();
+    const cleanUrl = isValidVideoUrl(url) ? url : undefined;
     setProjects((prev) =>
       prev.map((p) =>
         p.id === projectId
-          ? { ...p, active_draft_url: url, updated_at: new Date().toISOString() }
+          ? { ...p, active_draft_url: cleanUrl, current_draft_url: cleanUrl, updated_at: new Date().toISOString() }
           : p
       )
     );
@@ -657,7 +780,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     fetch(`/api/projects/${projectId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ active_draft_url: url }),
+      body: JSON.stringify({ active_draft_url: cleanUrl || null }),
     }).catch((err) => console.error('Failed to update activeDraftUrl in DB:', err));
   };
 
@@ -853,6 +976,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       addProjectFile,
       deleteProjectFile,
       unlockMasterFile,
+      refreshActiveProject,
       messages,
       activeProjectMessages,
       sendMessage,
@@ -887,6 +1011,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       themeMode,
       notifications,
       logout,
+      refreshActiveProject,
     ]
   );
 

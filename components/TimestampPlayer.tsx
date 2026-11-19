@@ -22,7 +22,7 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
-import { useEditBridge } from '@/lib/store';
+import { useEditBridge, isValidVideoUrl } from '@/lib/store';
 import { CommentCategory, ProjectFile } from '@/types';
 import { retroSound } from '@/lib/soundEffects';
 
@@ -43,6 +43,13 @@ export interface ProjectVideoCut {
   fileSize?: string;
   isCustom?: boolean;
   isLocked?: boolean;
+}
+
+function isVideoFile(fileName?: string, url?: string, fileType?: string): boolean {
+  if (fileType === 'DRAFT_VIDEO' || fileType === 'FINAL_MASTER') return true;
+  const target = (fileName || url || '').toLowerCase();
+  const ext = target.split('.').pop()?.split('?')[0] || '';
+  return ['mp4', 'mov', 'webm', 'mkv', 'm4v', 'avi'].includes(ext);
 }
 
 const CATEGORIES: { label: string; value: CommentCategory; color: string; ringColor: string }[] = [
@@ -73,7 +80,7 @@ export function TimestampPlayer({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Derive Project-Specific Video Cuts: ONLY genuine videos belonging to THIS active project!
+  // Derive Project-Specific Video Cuts: ALL genuine uploaded videos belonging to THIS active project
   const projectCuts = useMemo<ProjectVideoCut[]>(() => {
     if (!activeProject) return [];
 
@@ -84,32 +91,25 @@ export function TimestampPlayer({
     const aspect = isVertical ? '9/16' : '16/9';
 
     // 1. Primary active draft video of THIS project (saved in DB on Project table)
-    if (activeProject.active_draft_url && !activeProject.active_draft_url.startsWith('blob:')) {
+    if (isValidVideoUrl(activeProject.active_draft_url)) {
       cuts.push({
         id: `primary-draft-${activeProject.id}`,
         label: `${activeProject.title.length > 20 ? activeProject.title.slice(0, 18) + '...' : activeProject.title} (Draft)`,
         tag: isVertical ? 'Vertical 9:16' : 'Active Draft',
-        url: activeProject.active_draft_url,
+        url: activeProject.active_draft_url!,
         aspect,
       });
     }
 
-    // 2. Video files stored in PostgreSQL database for THIS specific project
-    const videoFiles = activeProjectFiles.filter(
-      (f) =>
-        f.file_type === 'DRAFT_VIDEO' ||
-        f.file_type === 'FINAL_MASTER' ||
-        (f.file_type === 'RAW_FOOTAGE' &&
-          f.url &&
-          (f.url.endsWith('.mp4') || f.url.endsWith('.mov') || f.url.endsWith('.webm')))
+    // 2. All valid uploaded video files for this project (sorted most recent first)
+    const sortedFiles = [...activeProjectFiles].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-    videoFiles.forEach((file) => {
-      // Don't duplicate if URL is already in cuts or is invalid
+    sortedFiles.forEach((file) => {
       if (
-        file.url &&
-        file.url !== '#' &&
-        !file.url.startsWith('blob:') &&
+        isValidVideoUrl(file.url) &&
+        isVideoFile(file.file_name, file.url, file.file_type) &&
         !cuts.some((c) => c.url === file.url)
       ) {
         cuts.push({
@@ -125,12 +125,17 @@ export function TimestampPlayer({
       }
     });
 
-    // NOTE: Zero fallback to sample videos! If no videos are uploaded, projectCuts remains empty.
     return cuts;
   }, [activeProject, activeProjectFiles]);
 
-  // Active cut & player state
-  const defaultCutUrl = initialVideoUrl || activeProject?.active_draft_url || projectCuts[0]?.url || '';
+  // Determine default target video URL
+  const defaultCutUrl = useMemo(() => {
+    if (isValidVideoUrl(initialVideoUrl)) return initialVideoUrl!;
+    if (isValidVideoUrl(activeProject?.active_draft_url)) return activeProject!.active_draft_url!;
+    if (projectCuts.length > 0 && isValidVideoUrl(projectCuts[0].url)) return projectCuts[0].url;
+    return '';
+  }, [initialVideoUrl, activeProject?.active_draft_url, projectCuts]);
+
   const [activeVideoUrl, setActiveVideoUrl] = useState<string>(defaultCutUrl);
   const [selectedCutId, setSelectedCutId] = useState<string>(projectCuts[0]?.id || '');
   const [activeFileName, setActiveFileName] = useState<string | null>(null);
@@ -146,14 +151,27 @@ export function TimestampPlayer({
   const [isUploadingVideo, setIsUploadingVideo] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
 
-  // When activeProject or project cuts change: switch cleanly to project's draft or reset
+  // When activeProject or project cuts change: switch cleanly to project's draft or most recent cut
   useEffect(() => {
-    if (!activeProject) return;
+    if (!activeProject) {
+      setActiveVideoUrl('');
+      setSelectedCutId('');
+      setActiveFileName(null);
+      setHasError(false);
+      return;
+    }
 
-    const projectTargetUrl = activeProject.active_draft_url || projectCuts[0]?.url || '';
-    setActiveVideoUrl(projectTargetUrl);
-    setSelectedCutId(projectCuts[0]?.id || '');
-    setActiveFileName(null);
+    const targetUrl = isValidVideoUrl(activeProject.active_draft_url)
+      ? activeProject.active_draft_url!
+      : projectCuts[0]?.url && isValidVideoUrl(projectCuts[0].url)
+      ? projectCuts[0].url
+      : '';
+
+    const matchingCut = projectCuts.find((c) => c.url === targetUrl) || projectCuts[0];
+
+    setActiveVideoUrl(targetUrl);
+    setSelectedCutId(matchingCut?.id || '');
+    setActiveFileName(matchingCut?.fileName || null);
     setCurrentTime(0);
     setIsPlaying(false);
     setDuration(0);
@@ -161,11 +179,22 @@ export function TimestampPlayer({
 
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      if (projectTargetUrl) {
+      if (targetUrl) {
         videoRef.current.load();
       }
     }
   }, [activeProject?.id, activeProject?.active_draft_url, projectCuts]);
+
+  // When activeVideoUrl changes: reload video element cleanly and clear error state
+  useEffect(() => {
+    if (videoRef.current) {
+      setHasError(false);
+      videoRef.current.currentTime = 0;
+      if (activeVideoUrl && isValidVideoUrl(activeVideoUrl)) {
+        videoRef.current.load();
+      }
+    }
+  }, [activeVideoUrl]);
 
   // Sync external seek requests (e.g. clicking on a comment from checklist)
   useEffect(() => {
@@ -336,17 +365,20 @@ export function TimestampPlayer({
         throw new Error(data.error || 'Video upload failed');
       }
 
-      // Add to store (which updates activeDraftUrl and activeProjectFiles)
+      // Add to store (which updates activeDraftUrl, activeProjectFiles, and triggers DB sync)
       addProjectFile(data.data);
-      setActiveVideoUrl(data.data.url);
-      setActiveFileName(file.name);
-      setSelectedCutId(data.data.id);
-      setCurrentTime(0);
-      setIsPlaying(false);
+      if (data.data.url && isValidVideoUrl(data.data.url)) {
+        setActiveVideoUrl(data.data.url);
+        setActiveFileName(file.name);
+        setSelectedCutId(data.data.id);
+        setCurrentTime(0);
+        setIsPlaying(false);
+        setHasError(false);
 
-      if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.load();
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+          videoRef.current.load();
+        }
       }
 
       retroSound.playDing();
@@ -392,7 +424,8 @@ export function TimestampPlayer({
     activeProject?.category === 'Shorts / Reels' ||
     activeProject?.deliverables?.aspect_ratio === '9:16';
 
-  const hasNoVideo = !activeVideoUrl || activeVideoUrl === '' || projectCuts.length === 0;
+  const hasNoVideo =
+    !activeVideoUrl || !isValidVideoUrl(activeVideoUrl) || projectCuts.length === 0;
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-full">

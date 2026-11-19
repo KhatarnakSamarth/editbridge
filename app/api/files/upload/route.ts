@@ -85,9 +85,17 @@ export async function POST(request: Request) {
       },
     });
 
-    // Update activeDraftUrl if DRAFT_VIDEO
+    // Always update Project.activeDraftUrl on ANY video upload
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    const isVideo =
+      fileType === 'DRAFT_VIDEO' ||
+      fileType === 'FINAL_MASTER' ||
+      fileType === 'RAW_FOOTAGE' ||
+      (file.type && file.type.startsWith('video/')) ||
+      ['mp4', 'mov', 'webm', 'mkv', 'm4v', 'avi'].includes(ext);
+
     let updatedDraftUrl = publicUrl;
-    if (fileType === 'DRAFT_VIDEO') {
+    if (isVideo) {
       const updatedProject = await prisma.project.update({
         where: { id: projectId },
         data: {
@@ -118,6 +126,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       data: mapped,
+      file: mapped,
       activeDraftUrl: updatedDraftUrl,
       message: 'Video successfully uploaded to Supabase Storage and saved to database',
     });

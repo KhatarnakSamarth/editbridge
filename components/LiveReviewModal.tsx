@@ -10,7 +10,7 @@ import {
   X,
   PhoneOff,
 } from 'lucide-react';
-import { useEditBridge } from '@/lib/store';
+import { useEditBridge, isValidVideoUrl } from '@/lib/store';
 import { retroSound } from '@/lib/soundEffects';
 import { Portal } from '@/components/Portal';
 
@@ -84,7 +84,7 @@ export function LiveReviewModal({ isOpen, onClose }: LiveReviewModalProps) {
 
               {/* Screen Content Preview */}
               <div className="flex-1 relative flex items-center justify-center bg-black overflow-hidden min-h-[200px]">
-                {activeProject.active_draft_url ? (
+                {activeProject.active_draft_url && isValidVideoUrl(activeProject.active_draft_url) ? (
                   <video
                     src={activeProject.active_draft_url}
                     autoPlay

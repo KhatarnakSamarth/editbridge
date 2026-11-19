@@ -43,6 +43,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
     activeProjectFiles,
     addProjectFile,
     deleteProjectFile,
+    refreshActiveProject,
     activeRole,
     currentUser,
   } = useEditBridge();
@@ -196,6 +197,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
 
         setUploadProgress(100);
         addProjectFile(serverData.data);
+        await refreshActiveProject();
       } else {
         // Direct upload succeeded, register file record in PostgreSQL
         setUploadProgress(95);
@@ -217,6 +219,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               : undefined,
         });
         setUploadProgress(100);
+        await refreshActiveProject();
       }
 
       retroSound.playDing();
