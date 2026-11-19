@@ -2,6 +2,24 @@ export type UserRole = 'CREATOR' | 'EDITOR' | 'ADMIN';
 
 export type AccountStatus = 'ACTIVE' | 'PENDING_VERIFICATION' | 'SUSPENDED';
 
+export interface SocialLinks {
+  twitterHandle?: string;
+  instagramHandle?: string;
+  youtubeUrl?: string;
+  linkedinUrl?: string;
+  portfolioUrl?: string;
+}
+
+export interface EditorStats {
+  mastersDelivered: number;
+  milestonesReleasedCount: number;
+  milestonesReleasedAmount: number;
+  clientRating: number;
+  reviewsCount: number;
+  revisionResolutionRate: number;
+  completedProjectsCount: number;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -12,6 +30,7 @@ export interface User {
   created_at: string;
   account_status: AccountStatus;
   badge?: string;
+  social_links?: SocialLinks;
 }
 
 export interface CreatorProfile {
@@ -54,6 +73,8 @@ export interface EditorProfile {
   rating: number;
   reviews_count: number;
   location: string;
+  social_links?: SocialLinks;
+  stats?: EditorStats;
 }
 
 export type ProjectStatus =

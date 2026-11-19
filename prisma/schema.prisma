@@ -20,6 +20,7 @@ model User {
   fullName      String
   role          String    @default("CREATOR") // CREATOR, EDITOR, ADMIN
   avatarUrl     String?
+  socialLinks   Json?     // Storing { twitterHandle?: string, instagramHandle?: string, youtubeUrl?: string, linkedinUrl?: string, portfolioUrl?: string }
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
