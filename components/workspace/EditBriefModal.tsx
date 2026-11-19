@@ -85,18 +85,18 @@ export function EditBriefModal({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
-        <div className="bg-white dark:bg-[#0c1222] border border-cyan-500/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col p-6 space-y-5">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
+        <div className="bg-[#170B29] border border-pink-500/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col p-6 space-y-5">
+          <div className="flex items-center justify-between pb-4 border-b border-pink-500/20">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-cyan-400 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-pink-500/10 border border-pink-500/20 text-vice-pink flex items-center justify-center">
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                <h3 className="font-extrabold text-base text-vice-text">
                   Edit / Add Creative Brief
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-vice-muted">
                   Directives, story arc, deliverables specs, and raw assets for {project.title}
                 </p>
               </div>
@@ -104,7 +104,7 @@ export function EditBriefModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+              className="p-2 rounded-xl text-vice-muted hover:text-vice-text hover:bg-[#211038] cursor-pointer transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -113,7 +113,7 @@ export function EditBriefModal({
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             {/* Brief Narrative */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-900 dark:text-slate-200 block">
+              <label className="font-bold text-vice-text block">
                 Story Arc &amp; Creative Directive
               </label>
               <textarea
@@ -121,7 +121,7 @@ export function EditBriefModal({
                 value={briefFormText}
                 onChange={(e) => setBriefFormText(e.target.value)}
                 placeholder="Describe the storyline, hook, pacing, tone of voice, visual energy, motion graphics style, and core call to action..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-cyan-500 font-sans leading-relaxed"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text placeholder:text-vice-dim focus:outline-hidden focus:border-vice-pink font-sans leading-relaxed"
                 required
               />
             </div>
@@ -129,11 +129,11 @@ export function EditBriefModal({
             {/* Technical Specs Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 dark:text-slate-300 block">Aspect Ratio</label>
+                <label className="font-bold text-vice-text block">Aspect Ratio</label>
                 <select
                   value={briefAspectRatio}
                   onChange={(e) => setBriefAspectRatio(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:border-cyan-500"
+                  className="w-full px-3 py-2 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text focus:border-vice-pink"
                 >
                   <option value="16:9">16:9 (Landscape YouTube)</option>
                   <option value="9:16">9:16 (Vertical Shorts/Reels)</option>
@@ -141,23 +141,23 @@ export function EditBriefModal({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 dark:text-slate-300 block">Target Duration (min)</label>
+                <label className="font-bold text-vice-text block">Target Duration (min)</label>
                 <input
                   type="number"
                   min={1}
                   max={120}
                   value={briefTargetDuration}
                   onChange={(e) => setBriefTargetDuration(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:border-cyan-500 font-mono"
+                  className="w-full px-3 py-2 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text focus:border-vice-pink font-mono"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 dark:text-slate-300 block">Master Resolution</label>
+                <label className="font-bold text-vice-text block">Master Resolution</label>
                 <select
                   value={briefResolution}
                   onChange={(e) => setBriefResolution(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 focus:border-cyan-500"
+                  className="w-full px-3 py-2 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text focus:border-vice-pink"
                 >
                   <option value="4K (3840x2160)">4K (3840x2160)</option>
                   <option value="1080p (1920x1080)">1080p (1920x1080)</option>
@@ -169,10 +169,10 @@ export function EditBriefModal({
 
             {/* Raw Footage Links */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-900 dark:text-slate-200 block">
+              <label className="font-bold text-vice-text block">
                 Raw Footage Cloud Links (Google Drive, Dropbox, S3)
               </label>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] text-vice-muted">
                 Enter one cloud URL per line.
               </p>
               <textarea
@@ -180,16 +180,16 @@ export function EditBriefModal({
                 value={briefFootageLinksText}
                 onChange={(e) => setBriefFootageLinksText(e.target.value)}
                 placeholder="https://drive.google.com/drive/folders/sample-raw-footage&#10;https://storage.editbridge.network/raw/a-cam.mp4"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 font-mono text-[11px] focus:outline-hidden focus:border-cyan-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
               />
             </div>
 
             {/* Style References */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-900 dark:text-slate-200 block">
+              <label className="font-bold text-vice-text block">
                 Style References &amp; Visual Inspiration Links
               </label>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] text-vice-muted">
                 YouTube or Vimeo links representing desired pacing or graphics (one per line).
               </p>
               <textarea
@@ -197,25 +197,25 @@ export function EditBriefModal({
                 value={briefReferencesText}
                 onChange={(e) => setBriefReferencesText(e.target.value)}
                 placeholder="https://youtube.com/watch?v=sample-vox-explainer&#10;https://youtube.com/watch?v=sample-visual-pacing"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 font-mono text-[11px] focus:outline-hidden focus:border-cyan-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
               />
             </div>
 
             {/* Action Footer */}
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+            <div className="pt-3 border-t border-pink-500/20 flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors"
+                className="px-4 py-2 rounded-xl border border-pink-500/20 hover:bg-[#211038] text-vice-muted hover:text-vice-text font-semibold cursor-pointer transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                className="px-5 py-2 rounded-xl bg-vice-gradient hover:opacity-95 text-white font-bold flex items-center gap-2 shadow-md shadow-pink-500/25 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-4 h-4 text-white" />
                 <span>{isSaving ? 'Saving to Database...' : 'Save & Sync Brief'}</span>
               </button>
             </div>

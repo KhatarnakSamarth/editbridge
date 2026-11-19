@@ -24,27 +24,27 @@ export function ClientDirectivesDrawer({
   onOpenBriefEditor,
 }: ClientDirectivesDrawerProps) {
   return (
-    <div className="glass-panel bg-white/90 dark:bg-[#0e1526]/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm transition-all font-sans">
+    <div className="glass-panel bg-[#170B29]/90 border border-pink-500/25 rounded-2xl p-4 sm:p-5 shadow-sm transition-all font-sans">
       <div
         className="flex items-center justify-between gap-3 cursor-pointer select-none"
         onClick={onToggle}
       >
         <div className="flex items-center gap-2.5 flex-wrap">
-          <div className="w-8 h-8 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-800 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
+          <div className="w-8 h-8 rounded-xl bg-pink-500/10 border border-pink-500/30 text-vice-pink flex items-center justify-center font-bold">
             <BookOpen className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-bold text-xs text-slate-900 dark:text-slate-100">
+              <span className="font-bold text-xs text-vice-text">
                 {activeRole === 'EDITOR'
                   ? 'CLIENT CREATIVE BRIEF & STYLE GUIDELINES'
                   : 'PROJECT CREATIVE DIRECTIVES & SPECS'}
               </span>
-              <span className="text-[10px] bg-cyan-100 dark:bg-cyan-900/60 text-cyan-800 dark:text-cyan-300 px-2 py-0.5 rounded-full font-semibold">
+              <span className="text-[10px] bg-pink-500/15 text-vice-pink border border-pink-500/30 px-2 py-0.5 rounded-full font-semibold">
                 {creatorProfile?.channel_name || project.creator_channel || 'Channel Brief'}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-vice-muted">
               Client expectations, pacing rules, and target deliverables for this video cut
             </p>
           </div>
@@ -57,7 +57,7 @@ export function ClientDirectivesDrawer({
               e.stopPropagation();
               onOpenBriefEditor();
             }}
-            className="text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-[11px] font-semibold text-vice-pink hover:text-vice-coral flex items-center gap-1 cursor-pointer"
           >
             <Edit3 className="w-3 h-3" />
             <span>Edit Brief</span>
@@ -68,13 +68,13 @@ export function ClientDirectivesDrawer({
               e.stopPropagation();
               onOpenBriefTab();
             }}
-            className="text-[11px] font-semibold text-blue-600 dark:text-cyan-400 hover:underline hidden sm:inline cursor-pointer"
+            className="text-[11px] font-semibold text-vice-coral hover:underline hidden sm:inline cursor-pointer"
           >
             Full Brief →
           </button>
           <button
             type="button"
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+            className="p-1 rounded-lg text-vice-muted hover:text-vice-text cursor-pointer"
             title={isOpen ? 'Collapse rules' : 'Expand rules'}
           >
             {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -83,16 +83,16 @@ export function ClientDirectivesDrawer({
       </div>
 
       {isOpen && (
-        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-3.5 animate-in fade-in duration-200">
+        <div className="mt-4 pt-4 border-t border-pink-500/20 space-y-3.5 animate-in fade-in duration-200">
           {/* Creator Pacing & Editing Rules Box */}
-          <div className="p-3.5 bg-gradient-to-r from-amber-500/10 via-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl">
+          <div className="p-3.5 bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-orange-500/15 border border-pink-500/30 rounded-xl">
             <div className="flex items-start gap-2.5">
-              <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <Sparkles className="w-4 h-4 text-vice-gold shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <span className="text-xs font-bold text-slate-900 dark:text-white">
+                <span className="text-xs font-bold text-vice-text">
                   Client Pacing &amp; Aesthetic Directives from {project.creator_name}:
                 </span>
-                <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-sans">
+                <p className="text-xs text-vice-text leading-relaxed font-sans">
                   &ldquo;{creatorProfile?.requirements || 'Fast-paced documentary style, sophisticated kinetic typography, sound effects for every chart pop.'}&rdquo;
                 </p>
               </div>
@@ -101,25 +101,25 @@ export function ClientDirectivesDrawer({
 
           {/* Summary Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[11px]">
-            <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase font-mono">Channel Niche</span>
-              <strong className="text-slate-800 dark:text-slate-200">{creatorProfile?.niche || 'Finance & Tech'}</strong>
+            <div className="p-2.5 bg-[#0D0618] border border-pink-500/20 rounded-xl">
+              <span className="text-vice-dim block text-[10px] uppercase font-mono">Channel Niche</span>
+              <strong className="text-vice-text">{creatorProfile?.niche || 'Finance & Tech'}</strong>
             </div>
-            <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase font-mono">Target Format</span>
-              <strong className="text-slate-800 dark:text-slate-200">
+            <div className="p-2.5 bg-[#0D0618] border border-pink-500/20 rounded-xl">
+              <span className="text-vice-dim block text-[10px] uppercase font-mono">Target Format</span>
+              <strong className="text-vice-text">
                 {project.deliverables?.aspect_ratio || '16:9'} • {project.deliverables?.target_duration_minutes || 10}m
               </strong>
             </div>
-            <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase font-mono">Master Delivery</span>
-              <strong className="text-slate-800 dark:text-slate-200">
+            <div className="p-2.5 bg-[#0D0618] border border-pink-500/20 rounded-xl">
+              <span className="text-vice-dim block text-[10px] uppercase font-mono">Master Delivery</span>
+              <strong className="text-vice-text">
                 {project.deliverables?.resolution || '4K (3840x2160)'}
               </strong>
             </div>
-            <div className="p-2.5 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase font-mono">Revision Scope</span>
-              <strong className="text-slate-800 dark:text-slate-200">
+            <div className="p-2.5 bg-[#0D0618] border border-pink-500/20 rounded-xl">
+              <span className="text-vice-dim block text-[10px] uppercase font-mono">Revision Scope</span>
+              <strong className="text-vice-text">
                 {project.revisions_used ?? 0} of {project.revision_limit ?? 2} Rounds Used
               </strong>
             </div>

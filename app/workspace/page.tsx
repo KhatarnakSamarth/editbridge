@@ -78,9 +78,9 @@ function ProjectWorkspaceContent() {
 
   if (!activeProject) {
     return (
-      <div className="max-w-4xl mx-auto p-10 text-center glass-panel mt-12 bg-white dark:bg-[#0e1526] rounded-2xl border border-slate-200 dark:border-slate-800 font-sans">
-        <p className="text-slate-600 dark:text-slate-300 text-sm">No project currently selected.</p>
-        <Link href="/projects" className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 mt-4 inline-block font-semibold rounded-xl text-xs transition-all shadow-sm">
+      <div className="max-w-4xl mx-auto p-10 text-center glass-panel mt-12 bg-[#170B29] rounded-2xl border border-pink-500/25 font-sans">
+        <p className="text-vice-muted text-sm">No project currently selected.</p>
+        <Link href="/projects" className="bg-vice-gradient hover:opacity-95 text-white px-5 py-2.5 mt-4 inline-block font-semibold rounded-xl text-xs transition-all shadow-md shadow-pink-500/20">
           View Projects Directory
         </Link>
       </div>
@@ -106,28 +106,28 @@ function ProjectWorkspaceContent() {
     switch (status) {
       case 'REVIEW_REQUESTED':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 font-semibold flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-pink-500/15 text-vice-pink border border-pink-500/30 font-semibold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-vice-pink animate-pulse"></span>
             Review Requested (Draft v1)
           </span>
         );
       case 'CHANGES_REQUESTED':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 font-semibold flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/15 text-vice-gold border border-amber-500/30 font-semibold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-vice-gold"></span>
             Changes Requested
           </span>
         );
       case 'COMPLETED':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30 font-semibold flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 font-semibold flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-vice-mint" />
             Project Completed &amp; Escrow Released
           </span>
         );
       default:
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-[#211038] text-vice-muted border border-pink-500/20 font-semibold">
             {status}
           </span>
         );
@@ -137,18 +137,18 @@ function ProjectWorkspaceContent() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16 font-sans">
       {/* Top Project Selector & State Banner */}
-      <div className="glass-panel p-5 sm:p-6 bg-white/90 dark:bg-[#0e1526]/90 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl dark:shadow-2xl dark:shadow-cyan-950/10 transition-colors">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-slate-100 dark:border-slate-800/80">
+      <div className="glass-panel p-5 sm:p-6 bg-[#170B29]/90 border border-pink-500/25 rounded-2xl shadow-xl shadow-pink-950/20 transition-colors">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-pink-500/20">
           {/* Project Details */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-[11px] font-mono bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 px-2.5 py-0.5 rounded-full border border-cyan-300 dark:border-cyan-500/30 font-semibold uppercase">
+              <span className="text-[11px] font-mono bg-pink-500/15 text-vice-pink px-2.5 py-0.5 rounded-full border border-pink-500/30 font-semibold uppercase">
                 {activeProject.category}
               </span>
               {getStatusBadge(activeProject.status)}
 
               {/* Project Switcher Selector */}
-              <div className="inline-flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <div className="inline-flex items-center gap-2 text-xs text-vice-muted">
                 <span className="hidden sm:inline font-medium">Switch Project:</span>
                 <select
                   value={activeProject.id}
@@ -156,7 +156,7 @@ function ProjectWorkspaceContent() {
                     retroSound.playClick();
                     setActiveProjectId(e.target.value);
                   }}
-                  className="px-3 py-1 text-xs font-semibold bg-slate-50 dark:bg-[#070b14] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
+                  className="px-3 py-1 text-xs font-semibold bg-[#0D0618] text-vice-text border border-pink-500/30 rounded-xl focus:border-vice-pink focus:outline-hidden"
                 >
                   {projects.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -167,18 +167,18 @@ function ProjectWorkspaceContent() {
               </div>
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-vice-text">
               {activeProject.title}
             </h1>
 
-            <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-300 flex-wrap">
-              <span>Client: <strong className="text-slate-900 dark:text-white">{activeProject.creator_name}</strong></span>
+            <div className="flex items-center gap-3 text-xs text-vice-muted flex-wrap">
+              <span>Client: <strong className="text-vice-text">{activeProject.creator_name}</strong></span>
               <span>•</span>
-              <span>Editor: <strong className="text-slate-900 dark:text-white">{activeProject.editor_name || 'Unassigned'}</strong></span>
+              <span>Editor: <strong className="text-vice-text">{activeProject.editor_name || 'Unassigned'}</strong></span>
               <span>•</span>
-              <span>Budget: <strong className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">${activeProject.budget}.00 USD</strong></span>
+              <span>Budget: <strong className="text-vice-gold font-mono font-bold">${activeProject.budget}.00 USD</strong></span>
               <span>•</span>
-              <span>Deadline: <strong className="text-slate-900 dark:text-white">{activeProject.deadline}</strong></span>
+              <span>Deadline: <strong className="text-vice-text">{activeProject.deadline}</strong></span>
             </div>
           </div>
 
@@ -190,10 +190,10 @@ function ProjectWorkspaceContent() {
                 retroSound.playDing();
                 setIsLiveReviewOpen(true);
               }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+              className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-md shadow-pink-500/25 transition-all active:scale-95 cursor-pointer"
               title="Launch synchronized screen & video review session"
             >
-              <Video className="w-4 h-4 text-cyan-300" />
+              <Video className="w-4 h-4 text-vice-gold" />
               <span>Review Room</span>
             </button>
 
@@ -204,10 +204,10 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsInviteOpen(true);
                 }}
-                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                className="bg-[#211038] hover:bg-[#2c174a] text-vice-text border border-pink-500/20 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
                 title="Invite video editor or collaborator"
               >
-                <UserPlus className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                <UserPlus className="w-4 h-4 text-vice-pink" />
                 <span>Invite Editor</span>
               </button>
             ) : activeRole === 'EDITOR' ? (
@@ -216,10 +216,10 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsInviteOpen(true);
                 }}
-                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                className="bg-[#211038] hover:bg-[#2c174a] text-vice-text border border-pink-500/20 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
                 title="Share collaboration invite link with client or reviewer"
               >
-                <Share2 className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                <Share2 className="w-4 h-4 text-vice-coral" />
                 <span>Share Collab Link</span>
               </button>
             ) : (
@@ -228,10 +228,10 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsInviteOpen(true);
                 }}
-                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                className="bg-[#211038] hover:bg-[#2c174a] text-vice-text border border-pink-500/20 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
                 title="Generate workspace access link"
               >
-                <Link2 className="w-4 h-4 text-purple-500" />
+                <Link2 className="w-4 h-4 text-vice-pink" />
                 <span>Workspace Link</span>
               </button>
             )}
@@ -243,9 +243,9 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsReviewModalOpen(true);
                 }}
-                className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:opacity-95 text-slate-950 font-bold px-4 py-2 text-xs rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer"
               >
-                <Award className="w-4 h-4 text-white" />
+                <Award className="w-4 h-4 text-slate-950" />
                 <span>Rate Project</span>
               </button>
             ) : null}
@@ -256,9 +256,9 @@ function ProjectWorkspaceContent() {
                 onClick={() => {
                   releaseFinalMilestone(activeProject.id);
                 }}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                className="bg-gradient-to-r from-vice-pink via-vice-coral to-vice-gold hover:opacity-95 text-white px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-pink-500/20 active:scale-95 transition-all cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-slate-950" />
+                <Sparkles className="w-4 h-4 text-white" />
                 <span>Release 70%</span>
               </button>
             ) : null}
@@ -280,10 +280,10 @@ function ProjectWorkspaceContent() {
                   key={step.status}
                   className={`flex-1 px-2.5 py-1.5 text-center rounded-xl text-xs transition-all ${
                     isCurrent
-                      ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/25 border border-blue-400'
+                      ? 'bg-vice-gradient text-white font-bold shadow-md shadow-pink-500/25 border border-pink-400'
                       : isPast
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 font-semibold'
-                      : 'bg-slate-50 dark:bg-slate-800/40 text-slate-400 border border-slate-200 dark:border-slate-800'
+                      ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-500/40 font-semibold'
+                      : 'bg-[#211038]/60 text-vice-dim border border-pink-500/15'
                   }`}
                 >
                   <span className="truncate block">{step.label}</span>
@@ -295,13 +295,13 @@ function ProjectWorkspaceContent() {
       </div>
 
       {/* Tabs Navigation Bar */}
-      <div className="flex items-center gap-2 p-1.5 bg-slate-200/70 dark:bg-[#070b14]/90 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-x-auto shadow-inner">
+      <div className="flex items-center gap-2 p-1.5 bg-[#170B29]/90 border border-pink-500/20 rounded-2xl overflow-x-auto shadow-inner">
         <button
           onClick={() => handleTabChange('REVIEW')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'REVIEW'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
+              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
           }`}
         >
           <Film className="w-4 h-4" />
@@ -312,8 +312,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('FILES')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'FILES'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
+              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
           }`}
         >
           <FolderOpen className="w-4 h-4" />
@@ -324,8 +324,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('CHAT')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'CHAT'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
+              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
@@ -336,8 +336,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('MILESTONES')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'MILESTONES'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
+              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
           }`}
         >
           <CreditCard className="w-4 h-4" />
@@ -348,8 +348,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('BRIEF')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'BRIEF'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
+              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -378,7 +378,7 @@ function ProjectWorkspaceContent() {
               <div className="lg:col-span-7">
                 <RetroWindow
                   title={`VIDEO REVIEW MONITOR — ${activeProject.title.toUpperCase()}`}
-                  icon={<Film className="w-4 h-4 text-cyan-500" />}
+                  icon={<Film className="w-4 h-4 text-vice-pink" />}
                 >
                   <TimestampPlayer
                     externalSeekSeconds={seekSeconds}
@@ -392,7 +392,7 @@ function ProjectWorkspaceContent() {
               <div className="lg:col-span-5">
                 <RetroWindow
                   title="FRAME REVISION CHECKLIST"
-                  icon={<CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                  icon={<CheckCircle2 className="w-4 h-4 text-vice-mint" />}
                   bodyClassName="p-4 sm:p-5 overflow-visible"
                 >
                   <RevisionChecklist onSeekToTimestamp={handleSeekFromChecklist} />
@@ -406,7 +406,7 @@ function ProjectWorkspaceContent() {
         {activeTab === 'FILES' && (
           <RetroWindow
             title="SECURE ASSET & MASTER DELIVERY VAULT"
-            icon={<FolderOpen className="w-4 h-4 text-amber-500" />}
+            icon={<FolderOpen className="w-4 h-4 text-vice-gold" />}
             bodyClassName="p-4 sm:p-5 overflow-visible"
           >
             <FileVault onRequestReleaseMilestone={() => releaseFinalMilestone(activeProject.id)} />
@@ -417,7 +417,7 @@ function ProjectWorkspaceContent() {
         {activeTab === 'CHAT' && (
           <RetroWindow
             title="DIRECT PROJECT COMMS & NOTIFICATIONS"
-            icon={<MessageSquare className="w-4 h-4 text-cyan-500" />}
+            icon={<MessageSquare className="w-4 h-4 text-vice-pink" />}
             bodyClassName="p-4 sm:p-5 overflow-visible flex flex-col h-[600px]"
           >
             <ProjectChat />
@@ -428,7 +428,7 @@ function ProjectWorkspaceContent() {
         {activeTab === 'MILESTONES' && (
           <RetroWindow
             title="30/70 ESCROW CONTRACT LEDGER & PAYOUTS"
-            icon={<CreditCard className="w-4 h-4 text-emerald-500" />}
+            icon={<CreditCard className="w-4 h-4 text-vice-mint" />}
             bodyClassName="p-4 sm:p-5 overflow-visible"
           >
             <MilestoneCard />

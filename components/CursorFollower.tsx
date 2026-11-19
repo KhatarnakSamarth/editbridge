@@ -39,11 +39,11 @@ export function CursorFollower() {
     return null;
   }
 
-  // Smooth ambient glow gradient optimized for dark and light themes
+  // Smooth ambient glow gradient optimized for GTA VI Vice City Sunset theme
   const glowGradient =
     themeMode === 'DARK'
-      ? 'radial-gradient(circle, rgba(6, 182, 212, 0.16) 0%, rgba(59, 130, 246, 0.08) 35%, transparent 70%)'
-      : 'radial-gradient(circle, rgba(2, 132, 199, 0.12) 0%, rgba(99, 102, 241, 0.05) 35%, transparent 70%)';
+      ? 'radial-gradient(circle, rgba(255, 46, 147, 0.14) 0%, rgba(255, 123, 84, 0.07) 35%, transparent 70%)'
+      : 'radial-gradient(circle, rgba(255, 46, 147, 0.12) 0%, rgba(255, 209, 102, 0.05) 35%, transparent 70%)';
 
   return (
     <div

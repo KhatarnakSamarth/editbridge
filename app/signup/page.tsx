@@ -88,23 +88,23 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-lg w-full mx-auto space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/20 mb-2">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-vice-gradient text-white shadow-lg shadow-pink-500/25 mb-2">
             <UserPlus className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Join <span className="text-cyan-600 dark:text-cyan-400">EditBridge</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-vice-text">
+            Join <span className="bg-vice-gradient bg-clip-text text-transparent">EditBridge</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
+          <p className="text-xs sm:text-sm text-vice-muted max-w-sm mx-auto">
             Choose your role to get started with verified milestones and escrow-protected video workflows.
           </p>
         </div>
 
         {/* Role Selection Segmented Pill */}
-        <div className="bg-slate-100 dark:bg-slate-900/90 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-1">
+        <div className="bg-[#211038] p-1 rounded-2xl border border-pink-500/20 grid grid-cols-2 gap-1">
           <button
             type="button"
             onClick={() => {
@@ -113,8 +113,8 @@ export default function SignUpPage() {
             }}
             className={`py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               role === 'CREATOR'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-vice-gradient text-white shadow-sm'
+                : 'text-vice-muted hover:text-vice-text'
             }`}
           >
             <Film className="w-4 h-4" />
@@ -129,8 +129,8 @@ export default function SignUpPage() {
             }}
             className={`py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               role === 'EDITOR'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-gradient-to-r from-vice-coral to-vice-gold text-slate-950 shadow-sm'
+                : 'text-vice-muted hover:text-vice-text'
             }`}
           >
             <Scissors className="w-4 h-4" />
@@ -139,13 +139,13 @@ export default function SignUpPage() {
         </div>
 
         {/* Form Container */}
-        <div className="bg-white dark:bg-[#0c1222] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-900/5 dark:shadow-none space-y-5 transition-colors">
+        <div className="bg-[#170B29] border border-pink-500/30 rounded-3xl p-6 sm:p-8 shadow-xl shadow-pink-950/20 space-y-5 transition-colors">
           {errorMessage && (
             <div
               role="alert"
-              className="p-3.5 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/70 rounded-2xl text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2.5"
+              className="p-3.5 bg-rose-950/50 border border-rose-800/70 rounded-2xl text-xs text-rose-300 flex items-start gap-2.5"
             >
-              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -153,16 +153,16 @@ export default function SignUpPage() {
           {successMessage && (
             <div
               role="status"
-              className="p-3.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/70 rounded-2xl text-xs text-emerald-700 dark:text-emerald-300 flex items-start gap-2.5"
+              className="p-3.5 bg-emerald-950/50 border border-emerald-800/70 rounded-2xl text-xs text-emerald-300 flex items-start gap-2.5"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-vice-mint shrink-0 mt-0.5" />
               <span>{successMessage}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-vice-text mb-1.5">
                 Full Name
               </label>
               <input
@@ -171,40 +171,40 @@ export default function SignUpPage() {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Jordan Brooks"
                 required
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 text-slate-900 dark:text-white transition-all placeholder:text-slate-400"
+                className="w-full px-3.5 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl focus:outline-hidden focus:border-vice-pink focus:ring-2 focus:ring-pink-500/20 text-vice-text transition-all placeholder:text-vice-dim"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-vice-text mb-1.5">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Mail className="w-4 h-4 text-vice-dim absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. jordan@channel.com"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 text-slate-900 dark:text-white transition-all placeholder:text-slate-400"
+                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl focus:outline-hidden focus:border-vice-pink focus:ring-2 focus:ring-pink-500/20 text-vice-text transition-all placeholder:text-vice-dim"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-vice-text mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <KeyRound className="w-4 h-4 text-vice-dim absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 text-slate-900 dark:text-white transition-all placeholder:text-slate-400"
+                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl focus:outline-hidden focus:border-vice-pink focus:ring-2 focus:ring-pink-500/20 text-vice-text transition-all placeholder:text-vice-dim"
                 />
               </div>
             </div>
@@ -213,7 +213,7 @@ export default function SignUpPage() {
             {role === 'CREATOR' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-vice-text mb-1.5">
                     Channel / Show Name
                   </label>
                   <input
@@ -221,17 +221,17 @@ export default function SignUpPage() {
                     value={channelName}
                     onChange={(e) => setChannelName(e.target.value)}
                     placeholder="e.g. Tech Horizon"
-                    className="w-full px-3.5 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white"
+                    className="w-full px-3.5 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl text-vice-text"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-vice-text mb-1.5">
                     Primary Platform
                   </label>
                   <select
                     value={platform}
                     onChange={(e) => setPlatform(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white"
+                    className="w-full px-3.5 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl text-vice-text"
                   >
                     <option value="YouTube">YouTube</option>
                     <option value="TikTok">TikTok / Reels</option>
@@ -242,7 +242,7 @@ export default function SignUpPage() {
             ) : (
               <div className="space-y-3 pt-1">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-vice-text mb-1.5">
                     Editor Headline / Bio
                   </label>
                   <input
@@ -250,18 +250,18 @@ export default function SignUpPage() {
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     placeholder="e.g. Documentary Storyteller & Sound Foley Specialist"
-                    className="w-full px-3.5 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white"
+                    className="w-full px-3.5 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl text-vice-text"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-semibold text-vice-text mb-1.5">
                       Primary Software
                     </label>
                     <select
                       value={primarySoftware}
                       onChange={(e) => setPrimarySoftware(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white"
+                      className="w-full px-3.5 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl text-vice-text"
                     >
                       <option value="DaVinci Resolve Studio">DaVinci Resolve Studio</option>
                       <option value="Adobe Premiere Pro">Adobe Premiere Pro</option>
@@ -270,7 +270,7 @@ export default function SignUpPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-semibold text-vice-text mb-1.5">
                       Hourly Rate ($ USD)
                     </label>
                     <input
@@ -278,7 +278,7 @@ export default function SignUpPage() {
                       value={hourlyRate}
                       onChange={(e) => setHourlyRate(e.target.value)}
                       placeholder="60"
-                      className="w-full px-3.5 py-2.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white"
+                      className="w-full px-3.5 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl text-vice-text"
                     />
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 hover:shadow-cyan-500/30 active:scale-[0.99] transition-all disabled:opacity-60 cursor-pointer"
+              className="w-full bg-vice-gradient hover:opacity-95 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-pink-500/25 hover:shadow-pink-500/40 active:scale-[0.99] transition-all disabled:opacity-60 cursor-pointer"
             >
               {isLoading ? (
                 <span>Creating Account in Database...</span>
@@ -301,12 +301,12 @@ export default function SignUpPage() {
             </button>
           </form>
 
-          <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80">
+          <div className="pt-2 text-center text-xs text-vice-muted border-t border-pink-500/20">
             Already have an account?{' '}
             <Link
               href="/signin"
               onClick={() => retroSound.playClick()}
-              className="font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
+              className="font-semibold text-vice-pink hover:text-vice-coral hover:underline"
             >
               Sign In with Demo Credentials
             </Link>

@@ -33,22 +33,22 @@ export function RetroWindow({
 }: RetroWindowProps) {
   return (
     <div
-      className={`glass-panel flex flex-col overflow-hidden text-slate-900 dark:text-slate-100 bg-white/90 dark:bg-[#0e1526]/90 border border-slate-200 dark:border-slate-800/90 rounded-2xl shadow-xl dark:shadow-2xl dark:shadow-cyan-950/20 transition-all ${className}`}
+      className={`glass-panel flex flex-col overflow-hidden text-[#FFF5F9] bg-[#170B29]/95 border border-[rgba(255,46,147,0.24)] rounded-2xl shadow-2xl shadow-black/60 transition-all ${className}`}
     >
-      {/* Titlebar */}
+      {/* Vice Sunset Window Titlebar */}
       <div
-        className={`px-4 py-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-[#090e1a]/80 backdrop-blur-md ${headerClassName}`}
+        className={`px-4 py-3 flex items-center justify-between border-b border-[rgba(255,46,147,0.2)] bg-[#211038]/85 backdrop-blur-md ${headerClassName}`}
       >
         <div className="flex items-center gap-2.5 overflow-hidden truncate">
-          {/* Subtle OS-style dots */}
+          {/* Vice City Sunset Glow OS dots */}
           <div className="flex items-center gap-1.5 mr-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF2E93] inline-block shadow-sm shadow-[#FF2E93]/60"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF7B54] inline-block shadow-sm shadow-[#FF7B54]/60"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FFD166] inline-block shadow-sm shadow-[#FFD166]/60"></span>
           </div>
 
-          {icon && <span className="flex-shrink-0 text-cyan-600 dark:text-cyan-400">{icon}</span>}
-          <span className="truncate text-xs md:text-sm font-semibold tracking-wide text-slate-800 dark:text-slate-200">
+          {icon && <span className="flex-shrink-0 text-[#FF2E93]">{icon}</span>}
+          <span className="truncate text-xs md:text-sm font-bold tracking-wide text-[#FFF5F9]">
             {title}
           </span>
         </div>
@@ -61,7 +61,7 @@ export function RetroWindow({
               onMinimize?.();
             }}
             aria-label="Minimize"
-            className="w-6 h-6 rounded-md bg-slate-200/70 dark:bg-slate-800/70 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold flex items-center justify-center transition-colors"
+            className="w-6 h-6 rounded-md bg-[#170B29] hover:bg-[#2D154B] text-[#C8A8C9] hover:text-white border border-[rgba(255,46,147,0.2)] text-[10px] font-bold flex items-center justify-center transition-colors cursor-pointer"
           >
             <Minus className="w-3 h-3" />
           </button>
@@ -71,7 +71,7 @@ export function RetroWindow({
               onMaximize?.();
             }}
             aria-label="Maximize"
-            className="w-6 h-6 rounded-md bg-slate-200/70 dark:bg-slate-800/70 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold flex items-center justify-center transition-colors"
+            className="w-6 h-6 rounded-md bg-[#170B29] hover:bg-[#2D154B] text-[#C8A8C9] hover:text-white border border-[rgba(255,46,147,0.2)] text-[10px] font-bold flex items-center justify-center transition-colors cursor-pointer"
           >
             <Square className="w-2.5 h-2.5" />
           </button>
@@ -81,7 +81,7 @@ export function RetroWindow({
               onClose?.();
             }}
             aria-label="Close"
-            className="w-6 h-6 rounded-md bg-slate-200/70 dark:bg-slate-800/70 hover:bg-rose-600 hover:text-white text-slate-600 dark:text-slate-300 text-[10px] font-bold flex items-center justify-center transition-colors"
+            className="w-6 h-6 rounded-md bg-[#170B29] hover:bg-[#FF2E93] hover:text-[#0D0618] text-[#C8A8C9] border border-[rgba(255,46,147,0.2)] text-[10px] font-bold flex items-center justify-center transition-colors cursor-pointer"
           >
             <X className="w-3 h-3" />
           </button>
@@ -99,11 +99,12 @@ export function RetroWindow({
 
       {/* Optional window status bar */}
       {statusText && (
-        <div className="px-4 py-2 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#070b14]/60 text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between">
-          <div className="truncate flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
-            <span>{statusText}</span>
-          </div>
+        <div className="px-4 py-2 border-t border-[rgba(255,46,147,0.18)] bg-[#0D0618]/70 text-[11px] font-mono text-[#C8A8C9] flex items-center justify-between">
+          <span className="truncate">{statusText}</span>
+          <span className="flex items-center gap-1.5 text-[10px] text-[#00F5A0] shrink-0 font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5A0] animate-pulse"></span>
+            SYNCED
+          </span>
         </div>
       )}
     </div>

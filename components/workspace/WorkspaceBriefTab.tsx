@@ -19,25 +19,25 @@ export function WorkspaceBriefTab({
   return (
     <RetroWindow
       title="PROJECT SPECIFICATION & CREATOR BRIEF"
-      icon={<FileText className="w-4 h-4 text-blue-500" />}
+      icon={<FileText className="w-4 h-4 text-vice-pink" />}
       bodyClassName="p-4 sm:p-5 overflow-visible font-sans"
     >
-      <div className="p-6 bg-white dark:bg-[#070b14] rounded-2xl text-xs space-y-6 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800">
+      <div className="p-6 bg-[#170B29] rounded-2xl text-xs space-y-6 text-vice-text border border-pink-500/25">
         {/* Brief Controls & Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-pink-500/20">
           <div>
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-blue-500" />
+            <h3 className="font-extrabold text-sm text-vice-text flex items-center gap-2">
+              <FileText className="w-4 h-4 text-vice-pink" />
               <span>Creative Brief &amp; Deliverables Blueprint</span>
             </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] text-vice-muted mt-0.5">
               Production specifications, narrative directives, reference cuts, and raw cloud footage repositories.
             </p>
           </div>
           <button
             type="button"
             onClick={onOpenBriefEditor}
-            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer shrink-0 active:scale-95 self-start sm:self-auto"
+            className="px-4 py-2 bg-vice-gradient hover:opacity-95 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-pink-500/25 transition-all cursor-pointer shrink-0 active:scale-95 self-start sm:self-auto"
           >
             <Edit3 className="w-3.5 h-3.5" />
             <span>{project.brief ? 'Edit / Update Creative Brief' : 'Add Creative Brief'}</span>
@@ -45,7 +45,7 @@ export function WorkspaceBriefTab({
         </div>
 
         {/* Creator Profile & Channel Details */}
-        <div className="p-4 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-4 bg-[#211038] rounded-xl border border-pink-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <img
               src={
@@ -53,20 +53,20 @@ export function WorkspaceBriefTab({
                 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
               }
               alt={project.creator_name || 'Creator'}
-              className="w-12 h-12 rounded-full object-cover border-2 border-cyan-500/40 shrink-0"
+              className="w-12 h-12 rounded-full object-cover border-2 border-pink-500/50 shrink-0"
             />
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+              <h3 className="font-extrabold text-sm text-vice-text">
                 {project.creator_name || 'Content Creator'}
               </h3>
-              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
-                <span className="font-semibold text-slate-700 dark:text-slate-300">
+              <div className="flex items-center gap-2 text-xs text-vice-muted mt-0.5 flex-wrap">
+                <span className="font-semibold text-vice-text">
                   {creatorProfile?.channel_name || project.creator_channel || 'Channel'}
                 </span>
                 <span>•</span>
                 <span>{creatorProfile?.subscribers || '480,000'} Subscribers</span>
                 <span>•</span>
-                <span className="text-cyan-600 dark:text-cyan-400 font-medium">
+                <span className="text-vice-pink font-medium">
                   {creatorProfile?.niche || 'Finance & Tech'}
                 </span>
               </div>
@@ -78,46 +78,46 @@ export function WorkspaceBriefTab({
               href={creatorProfile.channel_url}
               target="_blank"
               rel="noreferrer"
-              className="px-3.5 py-1.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 rounded-xl font-bold flex items-center gap-1.5 text-xs hover:bg-rose-100 self-start sm:self-auto shrink-0 transition-colors"
+              className="px-3.5 py-1.5 bg-rose-950/40 text-rose-300 border border-rose-800/60 rounded-xl font-bold flex items-center gap-1.5 text-xs hover:bg-rose-900/50 self-start sm:self-auto shrink-0 transition-colors"
             >
-              <Youtube className="w-3.5 h-3.5" />
+              <Youtube className="w-3.5 h-3.5 text-rose-400" />
               <span>View Channel</span>
             </a>
           )}
         </div>
 
         {/* Creator's Editing Guidelines & Rules */}
-        <div className="p-4 bg-gradient-to-r from-amber-500/10 via-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl space-y-2">
+        <div className="p-4 bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-orange-500/15 border border-pink-500/30 rounded-xl space-y-2">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-            <h4 className="font-bold text-xs uppercase tracking-wide text-slate-900 dark:text-white">
+            <Sparkles className="w-4 h-4 text-vice-gold shrink-0" />
+            <h4 className="font-bold text-xs uppercase tracking-wide text-vice-text">
               Client Pacing &amp; Aesthetic Directives (Editor Rules):
             </h4>
           </div>
-          <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-sans pl-6">
+          <p className="text-xs text-vice-text leading-relaxed font-sans pl-6">
             &ldquo;{creatorProfile?.requirements || 'Fast-paced documentary style, sophisticated kinetic typography, sound effects for every chart pop.'}&rdquo;
           </p>
-          <div className="pl-6 pt-1 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+          <div className="pl-6 pt-1 text-[11px] text-vice-dim font-mono">
             Cadence: {creatorProfile?.publishing_frequency || '1 Long-form weekly + 3 Shorts'}
           </div>
         </div>
 
         {/* Narrative Goal */}
-        <div className="border-b border-slate-100 dark:border-slate-800/80 pb-4">
+        <div className="border-b border-pink-500/20 pb-4">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300">
+            <h4 className="font-bold text-xs uppercase text-vice-text">
               Project Narrative Brief &amp; Story Arc:
             </h4>
             <button
               type="button"
               onClick={onOpenBriefEditor}
-              className="text-[11px] text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-[11px] text-vice-pink hover:text-vice-coral flex items-center gap-1 cursor-pointer"
             >
               <Edit3 className="w-3 h-3" />
               <span>Edit</span>
             </button>
           </div>
-          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans whitespace-pre-wrap">
+          <p className="text-xs text-vice-muted leading-relaxed font-sans whitespace-pre-wrap">
             {project.brief ||
               'No detailed brief narrative provided yet. Click "Edit / Update Creative Brief" above to set narrative directives.'}
           </p>
@@ -125,43 +125,43 @@ export function WorkspaceBriefTab({
 
         {/* Deliverables specs */}
         <div>
-          <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-3">
+          <h4 className="font-bold text-xs uppercase text-vice-text mb-3">
             Agreed Technical Deliverables:
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-            <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Aspect Ratio:</span>
-              <strong className="text-slate-900 dark:text-white text-xs">
+            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
+              <span className="text-vice-dim block text-[11px]">Aspect Ratio:</span>
+              <strong className="text-vice-text text-xs">
                 {project.deliverables?.aspect_ratio || '16:9'}
               </strong>
             </div>
-            <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Target Duration:</span>
-              <strong className="text-slate-900 dark:text-white text-xs">
+            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
+              <span className="text-vice-dim block text-[11px]">Target Duration:</span>
+              <strong className="text-vice-text text-xs">
                 {project.deliverables?.target_duration_minutes || 10} minutes
               </strong>
             </div>
-            <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Master Resolution:</span>
-              <strong className="text-slate-900 dark:text-white text-xs">
+            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
+              <span className="text-vice-dim block text-[11px]">Master Resolution:</span>
+              <strong className="text-vice-text text-xs">
                 {project.deliverables?.resolution || '4K (3840x2160)'}
               </strong>
             </div>
-            <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Captions:</span>
-              <strong className="text-slate-900 dark:text-white text-xs">
+            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
+              <span className="text-vice-dim block text-[11px]">Captions:</span>
+              <strong className="text-vice-text text-xs">
                 {project.deliverables?.captions_included ? 'Included (SRT + Burned)' : 'No'}
               </strong>
             </div>
-            <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Sound Design:</span>
-              <strong className="text-slate-900 dark:text-white text-xs">
+            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
+              <span className="text-vice-dim block text-[11px]">Sound Design:</span>
+              <strong className="text-vice-text text-xs">
                 {project.deliverables?.sound_design ? 'Full Foley & Riser Mix' : 'Basic'}
               </strong>
             </div>
-            <div className="p-3.5 bg-slate-50 dark:bg-[#0e1526] rounded-xl border border-slate-200 dark:border-slate-800">
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Color Grading:</span>
-              <strong className="text-slate-900 dark:text-white text-xs">
+            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
+              <span className="text-vice-dim block text-[11px]">Color Grading:</span>
+              <strong className="text-vice-text text-xs">
                 {project.deliverables?.color_grading ? 'Custom Film Emulation' : 'Standard'}
               </strong>
             </div>
@@ -171,13 +171,13 @@ export function WorkspaceBriefTab({
         {/* Raw Footage Links */}
         {project.raw_footage_links && project.raw_footage_links.length > 0 && (
           <div>
-            <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
+            <h4 className="font-bold text-xs uppercase text-vice-text mb-2">
               Raw Footage Cloud Links:
             </h4>
-            <ul className="list-disc pl-5 space-y-1.5 text-blue-600 dark:text-cyan-400 font-mono text-[11px]">
+            <ul className="list-disc pl-5 space-y-1.5 text-vice-pink font-mono text-[11px]">
               {project.raw_footage_links.map((link, idx) => (
                 <li key={idx}>
-                  <a href={link} target="_blank" rel="noreferrer" className="underline hover:text-cyan-500">
+                  <a href={link} target="_blank" rel="noreferrer" className="underline hover:text-vice-coral">
                     {link}
                   </a>
                 </li>
@@ -188,30 +188,30 @@ export function WorkspaceBriefTab({
 
         {/* References */}
         <div>
-          <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
+          <h4 className="font-bold text-xs uppercase text-vice-text mb-2">
             Style References &amp; Visual Inspiration:
           </h4>
-          <ul className="list-disc pl-5 space-y-1.5 text-blue-600 dark:text-cyan-400">
+          <ul className="list-disc pl-5 space-y-1.5 text-vice-pink">
             {project.references && project.references.length > 0 ? (
               project.references.map((ref, idx) => (
                 <li key={idx}>
-                  <a href={ref} target="_blank" rel="noreferrer" className="underline hover:text-cyan-500">
+                  <a href={ref} target="_blank" rel="noreferrer" className="underline hover:text-vice-coral">
                     {ref}
                   </a>
                 </li>
               ))
             ) : (
-              <li className="text-slate-500 list-none italic">None specified</li>
+              <li className="text-vice-dim list-none italic">None specified</li>
             )}
           </ul>
         </div>
 
         {/* Revision Policy */}
         <div>
-          <h4 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 mb-2">
+          <h4 className="font-bold text-xs uppercase text-vice-text mb-2">
             Revision Policy Scope &amp; Escrow Boundary:
           </h4>
-          <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-xl text-amber-900 dark:text-amber-200 text-xs leading-relaxed">
+          <div className="p-4 bg-[#211038] border border-vice-gold/30 rounded-xl text-vice-gold text-xs leading-relaxed">
             Included Revisions: <strong>{project.revision_limit ?? 2} rounds</strong> (Currently{' '}
             <strong>{project.revisions_used ?? 0}</strong> used). Changes must be documented through
             timestamp pins on the review player. Additional revisions beyond scope require written mutual

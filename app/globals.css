@@ -3,48 +3,49 @@
 @tailwind utilities;
 
 /* ========================================================
-   EDITBRIDGE NEON DESIGN SYSTEM (DARK & LIGHT MODES)
+   EDITBRIDGE GTA VI / VICE CITY SUNSET SYSTEM
    ======================================================== */
 
 :root {
-  --bg-canvas: #070b14;
-  --bg-surface: #0e1526;
-  --bg-surface-elevated: #131c33;
-  --border-subtle: #1e293b;
-  --border-neon: rgba(0, 245, 255, 0.3);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-cyan: #00f5ff;
-  --accent-purple: #a855f7;
-  --accent-blue: #3b82f6;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-  --primary-accent: #00f5ff;
+  --bg-canvas: #0D0618;
+  --bg-surface: #170B29;
+  --bg-surface-elevated: #211038;
+  --border-subtle: rgba(255, 46, 147, 0.22);
+  --border-neon: rgba(255, 46, 147, 0.55);
+  --text-primary: #FFF5F9;
+  --text-secondary: #C8A8C9;
+  --text-muted: #8E6B93;
+  --accent-pink: #FF2E93;
+  --accent-coral: #FF7B54;
+  --accent-gold: #FFD166;
+  --accent-mint: #00F5A0;
+  --primary-accent: #FF2E93;
 }
 
 html.light,
 body.light {
-  --bg-canvas: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #f1f5f9;
-  --border-subtle: #e2e8f0;
-  --border-neon: rgba(2, 132, 199, 0.3);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --accent-cyan: #0284c7;
-  --accent-purple: #7c3aed;
-  --accent-blue: #2563eb;
-  --accent-emerald: #059669;
-  --accent-amber: #d97706;
-  --accent-rose: #e11d48;
-  --primary-accent: #0284c7;
+  --bg-canvas: #130924;
+  --bg-surface: #1C0E33;
+  --bg-surface-elevated: #271444;
+  --border-subtle: rgba(255, 46, 147, 0.28);
+  --border-neon: rgba(255, 123, 84, 0.6);
+  --text-primary: #FFF5F9;
+  --text-secondary: #D4B4D5;
+  --text-muted: #9D76A2;
+  --accent-pink: #FF2E93;
+  --accent-coral: #FF7B54;
+  --accent-gold: #FFD166;
+  --accent-mint: #00F5A0;
+  --primary-accent: #FF2E93;
 }
 
 body {
   background-color: var(--bg-canvas);
+  background-image: 
+    radial-gradient(ellipse at 15% -5%, rgba(255, 46, 147, 0.15) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 0%, rgba(255, 123, 84, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 95%, rgba(255, 46, 147, 0.08) 0%, transparent 55%);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
@@ -54,46 +55,84 @@ body {
 }
 
 /* ========================================================
-   NEON & GLASS UTILITIES
+   SELECTION & ACCESSIBILITY
    ======================================================== */
 
+::selection {
+  background-color: #FF2E93;
+  color: #FFF5F9;
+}
+
+*:focus-visible {
+  outline: 2px solid #FF2E93 !important;
+  outline-offset: 2px !important;
+}
+
+/* ========================================================
+   VICE SUNSET & GLASS UTILITIES
+   ======================================================== */
+
+.glass-panel {
+  background-color: rgba(23, 11, 41, 0.88);
+  border: 1px solid rgba(255, 46, 147, 0.24);
+  border-radius: 1rem;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px 0 rgba(13, 6, 24, 0.65);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 123, 84, 0.45);
+}
+
+.text-vice-gradient {
+  background: linear-gradient(135deg, #FF2E93 0%, #FF7B54 55%, #FFD166 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-vice-gradient {
+  background: linear-gradient(135deg, #FF2E93 0%, #FF7B54 55%, #FFD166 100%);
+}
+
+.bg-vice-gradient-h {
+  background: linear-gradient(90deg, #FF2E93 0%, #FF7B54 50%, #FFD166 100%);
+}
+
 .neon-border {
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 46, 147, 0.25);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .neon-border:hover {
-  border-color: rgba(0, 245, 255, 0.5);
-  box-shadow: 0 0 15px rgba(0, 245, 255, 0.15);
+  border-color: rgba(255, 46, 147, 0.6);
+  box-shadow: 0 0 16px rgba(255, 46, 147, 0.35);
 }
 
-html.light .neon-border:hover {
-  border-color: rgba(2, 132, 199, 0.5);
-  box-shadow: 0 0 12px rgba(2, 132, 199, 0.12);
+.neon-glow-pink {
+  box-shadow: 0 0 16px rgba(255, 46, 147, 0.45), 0 0 32px rgba(255, 46, 147, 0.2);
 }
 
+.neon-glow-coral {
+  box-shadow: 0 0 16px rgba(255, 123, 84, 0.45), 0 0 32px rgba(255, 123, 84, 0.2);
+}
+
+.neon-glow-gold {
+  box-shadow: 0 0 16px rgba(255, 209, 102, 0.45), 0 0 32px rgba(255, 209, 102, 0.2);
+}
+
+/* Backward compatibility aliases */
 .neon-glow-cyan {
-  box-shadow: 0 0 16px rgba(0, 245, 255, 0.35), 0 0 32px rgba(0, 245, 255, 0.15);
+  box-shadow: 0 0 16px rgba(255, 46, 147, 0.45), 0 0 32px rgba(255, 46, 147, 0.2);
 }
-
 .neon-glow-purple {
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35), 0 0 32px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 16px rgba(217, 70, 239, 0.45), 0 0 32px rgba(217, 70, 239, 0.2);
 }
-
 .neon-glow-emerald {
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35), 0 0 32px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 16px rgba(0, 245, 160, 0.45), 0 0 32px rgba(0, 245, 160, 0.2);
 }
-
 .neon-glow-blue {
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.35), 0 0 32px rgba(59, 130, 246, 0.15);
-}
-
-.glass-panel {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 1rem;
-  backdrop-filter: blur(12px);
-  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 0 16px rgba(255, 123, 84, 0.45), 0 0 32px rgba(255, 123, 84, 0.2);
 }
 
 /* 3D Perspective Transformations */
@@ -110,45 +149,29 @@ html.light .neon-border:hover {
   backface-visibility: hidden;
 }
 
-/* 3D Matrix / Cyber Grid */
+/* 3D Sunset Grid */
 .bg-grid-cyber {
-  background-size: 40px 40px;
+  background-size: 36px 36px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-}
-html.light .bg-grid-cyber {
-  background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 46, 147, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 123, 84, 0.05) 1px, transparent 1px);
 }
 
-/* Accessibility Focus Ring */
-*:focus-visible {
-  outline: 2px solid var(--primary-accent) !important;
-  outline-offset: 2px !important;
-}
-
-/* Custom Sleek Scrollbars */
+/* Custom Vice Sunset Scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-canvas);
+  background: #0D0618;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--border-subtle);
+  background: linear-gradient(180deg, #FF2E93 0%, #FF7B54 100%);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--primary-accent);
-}
-
-/* Smooth Video Timeline Scrubber */
-.video-timeline-glow {
-  box-shadow: 0 0 10px rgba(0, 245, 255, 0.6);
+  background: linear-gradient(180deg, #FF52A8 0%, #FF9478 100%);
 }
