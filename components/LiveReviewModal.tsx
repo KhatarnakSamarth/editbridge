@@ -84,14 +84,21 @@ export function LiveReviewModal({ isOpen, onClose }: LiveReviewModalProps) {
 
               {/* Screen Content Preview */}
               <div className="flex-1 relative flex items-center justify-center bg-neutral-950 overflow-hidden min-h-[200px]">
-                <video
-                  src={activeProject.active_draft_url || '/videos/sample-draft-v1.mp4'}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-contain"
-                />
+                {activeProject.active_draft_url ? (
+                  <video
+                    src={activeProject.active_draft_url}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-slate-500 gap-2 p-6 text-center">
+                    <Video className="w-8 h-8 text-slate-600" />
+                    <span className="text-xs font-mono">No active video draft uploaded yet.</span>
+                  </div>
+                )}
 
                 {/* Watermark badge */}
                 <div className="absolute bottom-2.5 left-2.5 bg-black/80 backdrop-blur-xs px-2 py-1 text-[10px] font-mono text-emerald-400 border border-emerald-500/40 rounded">

@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { INITIAL_REVISION_COMMENTS } from '@/lib/mockData';
 import { RevisionComment, CommentCategory, UserRole } from '@/types';
-
-let runtimeComments: RevisionComment[] = [...INITIAL_REVISION_COMMENTS];
 
 function formatTimestamp(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -22,44 +19,32 @@ export async function GET(request: Request) {
       orderBy: { timeSeconds: 'asc' },
     });
 
-    if (dbRevisions && dbRevisions.length > 0) {
-      const mapped = dbRevisions.map((r) => ({
-        id: r.id,
-        project_id: r.projectId,
-        video_version: `Round ${r.roundNumber}`,
-        timestamp_seconds: r.timeSeconds,
-        formatted_time: formatTimestamp(r.timeSeconds),
-        comment: r.comment,
-        category: (r.category as CommentCategory) || 'GENERAL',
-        status: (r.status as 'PENDING' | 'IN_PROGRESS' | 'RESOLVED') || 'PENDING',
-        created_by_name: r.author.fullName,
-        created_by_role: (r.author.role as UserRole) || 'CREATOR',
-        created_at: r.createdAt.toISOString(),
-        resolved_at: r.resolvedAt?.toISOString(),
-      }));
-
-      return NextResponse.json({
-        success: true,
-        source: 'prisma-postgresql',
-        data: mapped,
-      });
-    }
-
-    const filtered = projectId
-      ? runtimeComments.filter((c) => c.project_id === projectId)
-      : runtimeComments;
+    const mapped = dbRevisions.map((r) => ({
+      id: r.id,
+      project_id: r.projectId,
+      video_version: `Round ${r.roundNumber}`,
+      timestamp_seconds: r.timeSeconds,
+      formatted_time: formatTimestamp(r.timeSeconds),
+      comment: r.comment,
+      category: (r.category as CommentCategory) || 'GENERAL',
+      status: (r.status as 'PENDING' | 'IN_PROGRESS' | 'RESOLVED') || 'PENDING',
+      created_by_name: r.author.fullName,
+      created_by_role: (r.author.role as UserRole) || 'CREATOR',
+      created_at: r.createdAt.toISOString(),
+      resolved_at: r.resolvedAt?.toISOString(),
+    }));
 
     return NextResponse.json({
       success: true,
-      source: 'runtime-fallback',
-      data: filtered,
+      source: 'prisma-postgresql',
+      data: mapped,
     });
   } catch (error) {
     console.error('Revisions GET error:', error);
     return NextResponse.json({
       success: true,
-      source: 'memory-fallback',
-      data: runtimeComments,
+      source: 'error-empty-fallback',
+      data: [],
     });
   }
 }
@@ -124,29 +109,12 @@ export async function POST(request: Request) {
         source: 'prisma-postgresql',
         data: formatted,
       });
-    } catch {
-      // In-memory fallback if authorId/projectId not matched in DB
-      const newComment: RevisionComment = {
-        id: `rev-${Date.now()}`,
-        project_id,
-        video_version: video_version || 'Draft v1',
-        timestamp_seconds: seconds,
-        formatted_time: formatTimestamp(seconds),
-        comment: String(comment),
-        category: (category as CommentCategory) || 'GENERAL',
-        status: 'PENDING',
-        created_by_name: created_by_name || 'Marcus Sterling',
-        created_by_role: (created_by_role as UserRole) || 'CREATOR',
-        created_at: new Date().toISOString(),
-      };
-
-      runtimeComments.push(newComment);
-
-      return NextResponse.json({
-        success: true,
-        source: 'memory-fallback',
-        data: newComment,
-      });
+    } catch (dbErr) {
+      console.error('Failed to create revision in DB:', dbErr);
+      return NextResponse.json(
+        { success: false, error: 'Failed to persist revision in database' },
+        { status: 500 }
+      );
     }
   } catch (error) {
     return NextResponse.json(
@@ -161,40 +129,19 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { id, status } = body;
 
-    try {
-      const updated = await prisma.revision.update({
-        where: { id },
-        data: {
-          status,
-          resolvedAt: status === 'RESOLVED' ? new Date() : null,
-        },
-      });
+    const updated = await prisma.revision.update({
+      where: { id },
+      data: {
+        status,
+        resolvedAt: status === 'RESOLVED' ? new Date() : null,
+      },
+    });
 
-      return NextResponse.json({
-        success: true,
-        source: 'prisma-postgresql',
-        data: updated,
-      });
-    } catch {
-      const index = runtimeComments.findIndex((c) => c.id === id);
-      if (index !== -1) {
-        runtimeComments[index] = {
-          ...runtimeComments[index],
-          status,
-          resolved_at: status === 'RESOLVED' ? new Date().toISOString() : undefined,
-        };
-        return NextResponse.json({
-          success: true,
-          source: 'memory-fallback',
-          data: runtimeComments[index],
-        });
-      }
-
-      return NextResponse.json(
-        { success: false, error: 'Revision not found' },
-        { status: 404 }
-      );
-    }
+    return NextResponse.json({
+      success: true,
+      source: 'prisma-postgresql',
+      data: updated,
+    });
   } catch (error) {
     return NextResponse.json(
       { success: false, error: 'Failed to update revision' },

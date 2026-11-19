@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Play,
   Pause,
@@ -19,6 +19,8 @@ import {
   FolderPlus,
   FileVideo,
   Lock,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { CommentCategory, ProjectFile } from '@/types';
@@ -65,12 +67,13 @@ export function TimestampPlayer({
     addRevisionComment,
     addProjectFile,
     currentUser,
+    activeRole,
   } = useEditBridge();
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Derive Project-Specific Video Cuts: ONLY videos belonging to THIS active project!
+  // Derive Project-Specific Video Cuts: ONLY genuine videos belonging to THIS active project!
   const projectCuts = useMemo<ProjectVideoCut[]>(() => {
     if (!activeProject) return [];
 
@@ -81,7 +84,7 @@ export function TimestampPlayer({
     const aspect = isVertical ? '9/16' : '16/9';
 
     // 1. Primary active draft video of THIS project (saved in DB on Project table)
-    if (activeProject.active_draft_url) {
+    if (activeProject.active_draft_url && !activeProject.active_draft_url.startsWith('blob:')) {
       cuts.push({
         id: `primary-draft-${activeProject.id}`,
         label: `${activeProject.title.length > 20 ? activeProject.title.slice(0, 18) + '...' : activeProject.title} (Draft)`,
@@ -96,12 +99,19 @@ export function TimestampPlayer({
       (f) =>
         f.file_type === 'DRAFT_VIDEO' ||
         f.file_type === 'FINAL_MASTER' ||
-        (f.file_type === 'RAW_FOOTAGE' && f.url && (f.url.endsWith('.mp4') || f.url.startsWith('blob:')))
+        (f.file_type === 'RAW_FOOTAGE' &&
+          f.url &&
+          (f.url.endsWith('.mp4') || f.url.endsWith('.mov') || f.url.endsWith('.webm')))
     );
 
     videoFiles.forEach((file) => {
-      // Don't duplicate if URL is already in cuts
-      if (file.url && file.url !== '#' && !cuts.some((c) => c.url === file.url)) {
+      // Don't duplicate if URL is already in cuts or is invalid
+      if (
+        file.url &&
+        file.url !== '#' &&
+        !file.url.startsWith('blob:') &&
+        !cuts.some((c) => c.url === file.url)
+      ) {
         cuts.push({
           id: file.id,
           label: file.file_name,
@@ -115,83 +125,90 @@ export function TimestampPlayer({
       }
     });
 
-    // 3. Project fallback if no draft URL is set yet
-    if (cuts.length === 0) {
-      const fallbackUrl = isVertical ? '/videos/sample-short-reel.mp4' : '/videos/sample-draft-v1.mp4';
-      cuts.push({
-        id: `default-${activeProject.id}`,
-        label: `${activeProject.title.length > 20 ? activeProject.title.slice(0, 18) + '...' : activeProject.title} (Cut 1)`,
-        tag: isVertical ? 'Vertical 9:16' : 'Project Cut',
-        url: fallbackUrl,
-        aspect,
-      });
-    }
-
+    // NOTE: Zero fallback to sample videos! If no videos are uploaded, projectCuts remains empty.
     return cuts;
   }, [activeProject, activeProjectFiles]);
 
-  // Active cut state initialized to active project's draft
-  const defaultCutUrl = initialVideoUrl || activeProject?.active_draft_url || projectCuts[0]?.url || '/videos/sample-draft-v1.mp4';
+  // Active cut & player state
+  const defaultCutUrl = initialVideoUrl || activeProject?.active_draft_url || projectCuts[0]?.url || '';
   const [activeVideoUrl, setActiveVideoUrl] = useState<string>(defaultCutUrl);
-  const [selectedCutId, setSelectedCutId] = useState<string>(projectCuts[0]?.id || 'active-draft');
+  const [selectedCutId, setSelectedCutId] = useState<string>(projectCuts[0]?.id || '');
   const [activeFileName, setActiveFileName] = useState<string | null>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(52);
+  const [duration, setDuration] = useState<number>(0);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [playbackRate, setPlaybackRate] = useState<number>(1);
   const [activeCategory, setActiveCategory] = useState<CommentCategory>('B_ROLL');
   const [commentText, setCommentText] = useState<string>('');
+  const [isScrubbing, setIsScrubbing] = useState<boolean>(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
 
-  // When activeProject changes: switch immediately to THAT project's draft and cuts
+  // When activeProject or project cuts change: switch cleanly to project's draft or reset
   useEffect(() => {
     if (!activeProject) return;
 
-    const projectTargetUrl = activeProject.active_draft_url || projectCuts[0]?.url || '/videos/sample-draft-v1.mp4';
+    const projectTargetUrl = activeProject.active_draft_url || projectCuts[0]?.url || '';
     setActiveVideoUrl(projectTargetUrl);
-    setSelectedCutId(projectCuts[0]?.id || `draft-${activeProject.id}`);
+    setSelectedCutId(projectCuts[0]?.id || '');
     setActiveFileName(null);
     setCurrentTime(0);
     setIsPlaying(false);
+    setDuration(0);
+    setHasError(false);
 
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.load();
+      if (projectTargetUrl) {
+        videoRef.current.load();
+      }
     }
-  }, [activeProject?.id]);
+  }, [activeProject?.id, activeProject?.active_draft_url, projectCuts]);
 
-  // Sync external seek requests (e.g. clicking on a comment from the list)
+  // Sync external seek requests (e.g. clicking on a comment from checklist)
   useEffect(() => {
     if (externalSeekSeconds !== undefined && externalSeekSeconds !== null && videoRef.current) {
       videoRef.current.currentTime = externalSeekSeconds;
       setCurrentTime(externalSeekSeconds);
-      if (!isPlaying) {
-        videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(() => {});
       }
     }
-  }, [externalSeekSeconds, isPlaying]);
+  }, [externalSeekSeconds]);
 
-  // Spacebar play/pause listener
+  // Spacebar play/pause listener (guarded against inputs, textareas, modals)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code !== 'Space') return;
+
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+      if (!target) return;
+
+      const tagName = target.tagName;
+      if (
+        tagName === 'INPUT' ||
+        tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' ||
+        target.isContentEditable ||
+        target.closest('[role="dialog"]') ||
+        target.closest('.modal-content')
+      ) {
         return;
       }
-      if (e.code === 'Space') {
-        e.preventDefault();
-        togglePlay();
-      }
+
+      e.preventDefault();
+      togglePlay();
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying]);
+  }, []);
 
-  // Video event handlers
+  // Video event handlers: strict event-driven state sync
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
+    if (videoRef.current && !isScrubbing) {
       setCurrentTime(videoRef.current.currentTime);
     }
   };
@@ -199,42 +216,39 @@ export function TimestampPlayer({
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       const dur = videoRef.current.duration;
-      if (dur && !isNaN(dur) && isFinite(dur)) {
+      if (dur && !isNaN(dur) && isFinite(dur) && dur > 0) {
         setDuration(dur);
+      } else {
+        setDuration(0);
       }
+      // Re-apply preserved playback rate and mute preferences
+      videoRef.current.playbackRate = playbackRate;
+      videoRef.current.muted = isMuted;
       setHasError(false);
     }
   };
 
   const handleVideoError = () => {
     setHasError(true);
-    const fallback =
-      activeProject?.category === 'Shorts / Reels' || activeProject?.deliverables?.aspect_ratio === '9:16'
-        ? '/videos/sample-short-reel.mp4'
-        : '/videos/sample-draft-v1.mp4';
-    if (activeVideoUrl !== fallback) {
-      setActiveVideoUrl(fallback);
-      if (videoRef.current) {
-        videoRef.current.load();
-      }
-    }
+    setIsPlaying(false);
   };
 
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     retroSound.playClick();
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
+    if (!videoRef.current || !activeVideoUrl) return;
+
+    if (videoRef.current.paused || videoRef.current.ended) {
+      videoRef.current.play().catch(() => {});
     } else {
-      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      videoRef.current.pause();
     }
-  };
+  }, [activeVideoUrl]);
 
   const seekTo = (seconds: number) => {
     retroSound.playClick();
     if (!videoRef.current) return;
-    const clamped = Math.max(0, Math.min(duration, seconds));
+    const effectiveDur = duration > 0 ? duration : videoRef.current.duration || 0;
+    const clamped = Math.max(0, Math.min(effectiveDur, seconds));
     videoRef.current.currentTime = clamped;
     setCurrentTime(clamped);
     onSelectTimestamp?.(clamped);
@@ -243,7 +257,8 @@ export function TimestampPlayer({
   const seekRelative = (delta: number) => {
     retroSound.playClick();
     if (!videoRef.current) return;
-    const newTime = Math.max(0, Math.min(duration, videoRef.current.currentTime + delta));
+    const effectiveDur = duration > 0 ? duration : videoRef.current.duration || 0;
+    const newTime = Math.max(0, Math.min(effectiveDur, videoRef.current.currentTime + delta));
     videoRef.current.currentTime = newTime;
     setCurrentTime(newTime);
     onSelectTimestamp?.(newTime);
@@ -255,9 +270,9 @@ export function TimestampPlayer({
 
   const handleScrubberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
-    if (videoRef.current) {
+    setCurrentTime(val);
+    if (!isScrubbing && videoRef.current) {
       videoRef.current.currentTime = val;
-      setCurrentTime(val);
       onSelectTimestamp?.(val);
     }
   };
@@ -273,8 +288,9 @@ export function TimestampPlayer({
   const toggleMute = () => {
     retroSound.playClick();
     if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
+    const nextMute = !isMuted;
+    videoRef.current.muted = nextMute;
+    setIsMuted(nextMute);
   };
 
   const switchSampleCut = (cut: ProjectVideoCut) => {
@@ -284,66 +300,80 @@ export function TimestampPlayer({
     setActiveFileName(cut.fileName || null);
     setIsPlaying(false);
     setCurrentTime(0);
+    setDuration(0);
+    setHasError(false);
+
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.load();
     }
   };
 
-  // Upload Local Video: Persists to PostgreSQL Database & Displays on Timeline!
-  const handleLocalVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload Video directly from Timeline Player to Supabase Storage & PostgreSQL
+  const handlePlayerVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !activeProject) return;
 
+    setIsUploadingVideo(true);
     retroSound.playDing();
-    const objectUrl = URL.createObjectURL(file);
-    const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
 
-    // 1. Immediately switch player to the newly uploaded video
-    setActiveVideoUrl(objectUrl);
-    setActiveFileName(file.name);
-    setSelectedCutId(`local-${file.name}`);
-    setIsPlaying(false);
-    setCurrentTime(0);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('projectId', activeProject.id);
+      formData.append('fileType', 'DRAFT_VIDEO');
+      formData.append('version', 'Draft Cut');
+      formData.append('uploaderId', currentUser?.id || 'user-creator-1');
+      formData.append('uploaderName', currentUser?.name || 'Creator');
 
-    // 2. Persist to PostgreSQL Database via addProjectFile (POSTs to /api/files & updates activeDraftUrl in DB)
-    addProjectFile({
-      project_id: activeProject.id,
-      uploader_id: currentUser?.id || 'user-editor-1',
-      uploader_name: currentUser?.name || 'Project Editor',
-      file_name: file.name,
-      storage_key: `uploads/${file.name}`,
-      file_type: 'DRAFT_VIDEO',
-      size_bytes: file.size,
-      formatted_size: `${sizeMb} MB`,
-      version: 'Uploaded Draft',
-      url: objectUrl,
-      is_locked: false,
-    });
+      const res = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.load();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Video upload failed');
+      }
+
+      // Add to store (which updates activeDraftUrl and activeProjectFiles)
+      addProjectFile(data.data);
+      setActiveVideoUrl(data.data.url);
+      setActiveFileName(file.name);
+      setSelectedCutId(data.data.id);
+      setCurrentTime(0);
+      setIsPlaying(false);
+
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.load();
+      }
+
+      retroSound.playDing();
+    } catch (err: any) {
+      console.error('Player upload error:', err);
+      alert(err?.message || 'Failed to upload video to cloud storage.');
+    } finally {
+      setIsUploadingVideo(false);
+      e.target.value = '';
     }
-
-    e.target.value = '';
   };
 
   const formatTime = (secs: number) => {
-    if (isNaN(secs) || !isFinite(secs)) return '00:00';
+    if (isNaN(secs) || !isFinite(secs) || secs < 0) return '00:00';
     const mins = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
     return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  // Submit comment
+  // Submit comment tied to project ID
   const handleAddComment = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!commentText.trim() || !activeProject) return;
 
     const versionName = activeFileName
       ? `Cut (${activeFileName.slice(0, 15)})`
-      : 'Draft v1';
+      : 'Draft Cut';
 
     addRevisionComment({
       projectId: activeProject.id,
@@ -357,18 +387,12 @@ export function TimestampPlayer({
     retroSound.playDing();
   };
 
-  // Dynamic jump timepoints
-  const DEMO_TIMESTAMPS = [
-    { sec: 15, label: '00:15 - Hook Title' },
-    { sec: 43, label: '00:43 - Replace B-Roll' },
-    { sec: 81, label: '01:21 - Audio Level' },
-    { sec: 165, label: '02:45 - Punch Zoom' },
-  ];
-
   const isCurrentCutVertical =
     selectedCutId.includes('short') ||
     activeProject?.category === 'Shorts / Reels' ||
     activeProject?.deliverables?.aspect_ratio === '9:16';
+
+  const hasNoVideo = !activeVideoUrl || activeVideoUrl === '' || projectCuts.length === 0;
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-full">
@@ -421,19 +445,29 @@ export function TimestampPlayer({
               ref={fileInputRef}
               type="file"
               accept="video/mp4,video/webm,video/quicktime,video/m4v,video/*"
-              onChange={handleLocalVideoUpload}
+              onChange={handlePlayerVideoUpload}
               className="hidden"
             />
 
-            {/* Upload Video Button: Directly persists to Database */}
+            {/* Upload Video Button: Directly persists to Supabase Storage & PostgreSQL */}
             <button
               type="button"
+              disabled={isUploadingVideo}
               onClick={() => fileInputRef.current?.click()}
-              className="px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-xs transition-all shrink-0 cursor-pointer active:scale-95"
-              title="Upload your video file to database and review on timeline"
+              className="px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-xs transition-all shrink-0 cursor-pointer active:scale-95 disabled:opacity-50"
+              title="Upload video to Supabase Storage and sync with PostgreSQL"
             >
-              <Upload className="w-3.5 h-3.5" />
-              <span>+ Upload Video to DB</span>
+              {isUploadingVideo ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Uploading...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>+ Upload Video</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -445,7 +479,9 @@ export function TimestampPlayer({
         <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="bg-black/80 backdrop-blur-md text-cyan-400 font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-cyan-500/40 font-semibold shadow-xs">
-              {activeFileName
+              {hasNoVideo
+                ? 'TIMELINE IDLE'
+                : activeFileName
                 ? `PROJECT FILE: ${activeFileName.length > 25 ? activeFileName.slice(0, 23) + '...' : activeFileName}`
                 : isCurrentCutVertical
                 ? 'VERTICAL 9:16 • SYNCED'
@@ -461,32 +497,71 @@ export function TimestampPlayer({
           </span>
         </div>
 
-        {/* Video Element */}
-        <div className="relative w-full flex items-center justify-center bg-black min-h-[240px] sm:min-h-[340px] max-h-[460px]">
-          <video
-            ref={videoRef}
-            src={activeVideoUrl}
-            className={`w-full max-h-[440px] object-contain bg-black cursor-pointer ${
-              isCurrentCutVertical ? 'max-w-[280px] sm:max-w-[320px] aspect-[9/16]' : 'aspect-video'
-            }`}
-            onClick={togglePlay}
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
-            onError={handleVideoError}
-            onEnded={() => setIsPlaying(false)}
-            playsInline
-            preload="auto"
-          />
+        {/* Video Element OR Clean Empty State */}
+        <div className="relative w-full flex items-center justify-center bg-black min-h-[260px] sm:min-h-[360px] max-h-[460px]">
+          {hasNoVideo ? (
+            <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-center space-y-4 max-w-md mx-auto">
+              <div className="w-16 h-16 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-center text-cyan-400 shadow-inner">
+                <FileVideo className="w-8 h-8 opacity-80" />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-sm sm:text-base font-bold text-white">
+                  No video uploaded yet
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Upload a project video from the Files tab or player button to start frame-accurate timeline reviews.
+                </p>
+              </div>
 
-          {/* Center Play Overlay Indicator (When Paused) */}
-          {!isPlaying && (
-            <div
-              onClick={togglePlay}
-              className="absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-cyan-500/90 hover:bg-cyan-400 text-slate-950 flex items-center justify-center shadow-xl shadow-cyan-500/40 cursor-pointer backdrop-blur-xs transition-transform hover:scale-110 active:scale-95 z-10"
-              title="Click or press Space to Play"
-            >
-              <Play className="w-6 h-6 fill-current ml-0.5" />
+              <button
+                type="button"
+                disabled={isUploadingVideo}
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-cyan-500/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+              >
+                {isUploadingVideo ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Uploading Video...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    <span>Upload Video Now</span>
+                  </>
+                )}
+              </button>
             </div>
+          ) : (
+            <>
+              <video
+                ref={videoRef}
+                src={activeVideoUrl}
+                className={`w-full max-h-[440px] object-contain bg-black cursor-pointer ${
+                  isCurrentCutVertical ? 'max-w-[280px] sm:max-w-[320px] aspect-[9/16]' : 'aspect-video'
+                }`}
+                onClick={togglePlay}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+                onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={handleLoadedMetadata}
+                onError={handleVideoError}
+                playsInline
+                preload="metadata"
+              />
+
+              {/* Center Play Overlay Indicator (When Paused) */}
+              {!isPlaying && !hasError && (
+                <div
+                  onClick={togglePlay}
+                  className="absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-cyan-500/90 hover:bg-cyan-400 text-slate-950 flex items-center justify-center shadow-xl shadow-cyan-500/40 cursor-pointer backdrop-blur-xs transition-transform hover:scale-110 active:scale-95 z-10"
+                  title="Click or press Space to Play"
+                >
+                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -535,15 +610,21 @@ export function TimestampPlayer({
               })}
             </div>
 
-            {/* Range Slider */}
+            {/* Range Slider with Anti-fighting Dragging State */}
             <input
               type="range"
               min="0"
-              max={duration || 100}
+              max={duration > 0 ? duration : 100}
               step="0.1"
               value={currentTime}
+              disabled={hasNoVideo}
+              onPointerDown={() => setIsScrubbing(true)}
+              onPointerUp={(e) => {
+                setIsScrubbing(false);
+                seekTo(parseFloat((e.target as HTMLInputElement).value));
+              }}
               onChange={handleScrubberChange}
-              className="w-full h-2 bg-slate-700/80 rounded-lg appearance-none cursor-pointer accent-cyan-400 focus:outline-hidden"
+              className="w-full h-2 bg-slate-700/80 rounded-lg appearance-none cursor-pointer accent-cyan-400 focus:outline-hidden disabled:opacity-30 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -552,24 +633,27 @@ export function TimestampPlayer({
             {/* Left Controls: Play, Skips, Mute, Timecode */}
             <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
               <button
+                disabled={hasNoVideo}
                 onClick={togglePlay}
-                className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-bold transition-all shadow-sm hover:shadow-cyan-400/20 active:scale-95 text-xs cursor-pointer"
+                className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-bold transition-all shadow-sm hover:shadow-cyan-400/20 active:scale-95 text-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
                 <span>{isPlaying ? 'PAUSE' : 'PLAY'}</span>
               </button>
 
               <button
+                disabled={hasNoVideo}
                 onClick={() => seekRelative(-5)}
-                className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
+                className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40"
                 title="Rewind 5s"
               >
                 -5s
               </button>
 
               <button
+                disabled={hasNoVideo}
                 onClick={() => seekRelative(5)}
-                className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
+                className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40"
                 title="Forward 5s"
               >
                 +5s
@@ -577,24 +661,27 @@ export function TimestampPlayer({
 
               {/* Frame-by-frame buttons */}
               <button
+                disabled={hasNoVideo}
                 onClick={() => stepFrame(-0.04)}
-                className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline"
+                className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline disabled:opacity-40"
                 title="Previous frame (0.04s)"
               >
                 -1f
               </button>
 
               <button
+                disabled={hasNoVideo}
                 onClick={() => stepFrame(0.04)}
-                className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline"
+                className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline disabled:opacity-40"
                 title="Next frame (0.04s)"
               >
                 +1f
               </button>
 
               <button
+                disabled={hasNoVideo}
                 onClick={toggleMute}
-                className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 p-1.5 rounded-lg transition-colors cursor-pointer"
+                className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 p-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-40"
                 title={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-500" /> : <Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
@@ -608,11 +695,12 @@ export function TimestampPlayer({
             {/* Right Controls: Playback speed */}
             <div className="flex items-center gap-1.5 text-[11px] self-end sm:self-auto">
               <span className="text-slate-400 hidden sm:inline">SPEED:</span>
-              {[0.75, 1, 1.25, 1.5, 2].map((rate) => (
+              {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
                 <button
                   key={rate}
+                  disabled={hasNoVideo}
                   onClick={() => handleSpeedChange(rate)}
-                  className={`px-2 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                  className={`px-2 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer disabled:opacity-40 ${
                     playbackRate === rate
                       ? 'bg-blue-600 text-white font-bold shadow-xs'
                       : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
@@ -622,25 +710,6 @@ export function TimestampPlayer({
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Quick Jump Frame Pills */}
-          <div className="pt-2 border-t border-slate-800/80 flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] font-mono text-slate-400 mr-1 flex items-center gap-1 shrink-0">
-              <FastForward className="w-3 h-3 text-cyan-400" />
-              <span>JUMP:</span>
-            </span>
-            {DEMO_TIMESTAMPS.map((ts) => (
-              <button
-                key={ts.sec}
-                type="button"
-                onClick={() => seekTo(ts.sec)}
-                className="px-2 py-0.5 bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-md text-[10px] font-mono transition-colors shrink-0 cursor-pointer"
-                title={`Jump playhead to ${ts.label}`}
-              >
-                {ts.label}
-              </button>
-            ))}
           </div>
         </div>
       </div>
@@ -659,7 +728,7 @@ export function TimestampPlayer({
           </div>
 
           <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Pins marker directly to project timeline
+            Pins marker directly to project timeline in PostgreSQL
           </span>
         </div>
 
@@ -712,7 +781,7 @@ export function TimestampPlayer({
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2.5 flex items-center gap-1.5">
           <Sparkles className="w-3 h-3 text-cyan-500 shrink-0" />
-          <span>Showing project-specific cuts from database. Uploading new videos saves to PostgreSQL and synchronizes the active timeline.</span>
+          <span>Real-time cross-client sync: Notes and videos uploaded by Creators are immediately reflected for Editors upon login.</span>
         </p>
       </div>
     </div>

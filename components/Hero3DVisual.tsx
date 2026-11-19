@@ -80,16 +80,22 @@ export function Hero3DVisual({ inBackground = false }: Hero3DVisualProps) {
             </div>
           </div>
 
-          {/* Video Preview Frame with Real Local 4K Sample Video */}
-          <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border border-slate-800/80 shadow-inner">
-            <video
-              src="/videos/sample-draft-v1.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover opacity-90 transition-opacity duration-300"
-            />
+          {/* Video Preview Frame / Interactive Studio Monitor */}
+          <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800/80 shadow-inner flex items-center justify-center">
+            {/* Ambient Animated Studio Grid */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/40 via-slate-950 to-black opacity-90" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:24px_24px]" />
+
+            {/* Simulated Frame Playback Waveform */}
+            <div className="relative z-10 flex items-center gap-1 opacity-60">
+              {[40, 65, 30, 85, 55, 95, 70, 45, 80, 60, 90, 75, 50, 85, 65, 40, 70, 55, 90, 45].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 rounded-full bg-gradient-to-t from-cyan-500 to-blue-400 animate-pulse"
+                  style={{ height: `${h}px`, animationDelay: `${(i * 100) % 1000}ms` }}
+                />
+              ))}
+            </div>
 
             {/* Subtle Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
@@ -102,7 +108,7 @@ export function Hero3DVisual({ inBackground = false }: Hero3DVisualProps) {
             {/* Frame Watermark Overlay */}
             <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
               <span className="px-2.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md text-[10px] font-mono text-cyan-400 border border-cyan-500/40 font-semibold shadow-xs">
-                4K PRORES 422HQ • 23.98 FPS
+                STUDIO WORKSPACE • ESCROW SECURED
               </span>
             </div>
 

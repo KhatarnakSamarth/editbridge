@@ -59,9 +59,7 @@ export async function GET(
             ];
 
       const isShorts = dbProject.aspectRatio === '9:16';
-      const fallbackDraft = isShorts
-        ? '/videos/sample-short-reel.mp4'
-        : '/videos/sample-draft-v1.mp4';
+      const masterFile = dbProject.files?.find((f) => f.fileType === 'FINAL_MASTER');
 
       const formatted = {
         id: dbProject.id,
@@ -113,9 +111,9 @@ export async function GET(
           final_released: ms.some((m) => m.percentage === 70 && m.status === 'RELEASED'),
           platform_fee_percent: 5,
         },
-        active_draft_url: dbProject.activeDraftUrl || fallbackDraft,
-        current_draft_url: dbProject.activeDraftUrl || fallbackDraft,
-        final_master_url: '/videos/sample-draft-v1.mp4',
+        active_draft_url: dbProject.activeDraftUrl || null,
+        current_draft_url: dbProject.activeDraftUrl || null,
+        final_master_url: masterFile?.storageUrl || null,
         watermark_active: dbProject.watermarkActive,
         revisions: dbProject.revisions.map((r) => ({
           id: r.id,

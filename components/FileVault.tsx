@@ -14,6 +14,9 @@ import {
   FileUp,
   CheckCircle2,
   AlertCircle,
+  Trash2,
+  Loader2,
+  Film,
 } from 'lucide-react';
 import { useEditBridge } from '@/lib/store';
 import { ProjectFile } from '@/types';
@@ -24,11 +27,22 @@ interface FileVaultProps {
   onRequestReleaseMilestone?: () => void;
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(0)} KB`;
+  const mb = kb / 1024;
+  if (mb < 1024) return `${mb.toFixed(1)} MB`;
+  const gb = mb / 1024;
+  return `${gb.toFixed(2)} GB`;
+}
+
 export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
   const {
     activeProject,
     activeProjectFiles,
     addProjectFile,
+    deleteProjectFile,
     activeRole,
     currentUser,
   } = useEditBridge();
@@ -38,8 +52,17 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [newFileName, setNewFileName] = useState('');
   const [newFileType, setNewFileType] = useState<ProjectFile['file_type']>('DRAFT_VIDEO');
-  const [newVersion, setNewVersion] = useState('Draft v2');
+  const [newVersion, setNewVersion] = useState('Draft v1');
   const [isDragOver, setIsDragOver] = useState(false);
+
+  // Upload Progress & State
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Delete Confirmation State
+  const [fileToDelete, setFileToDelete] = useState<ProjectFile | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (!activeProject) {
     return <div className="text-xs text-slate-400 font-mono">No active project.</div>;
@@ -49,11 +72,12 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
   const handleProcessSelectedFile = (file: File) => {
     setSelectedFile(file);
     setNewFileName(file.name);
+    setUploadError(null);
 
     const ext = file.name.split('.').pop()?.toLowerCase() || '';
     if (['mp4', 'mov', 'webm', 'mkv', 'm4v', 'avi'].includes(ext)) {
       setNewFileType('DRAFT_VIDEO');
-      setNewVersion('Draft v2 (Local)');
+      setNewVersion('Draft Cut');
     } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
       setNewFileType('RAW_FOOTAGE');
       setNewVersion('Footage Pack');
@@ -84,53 +108,148 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
     }
   };
 
-  const handleSimulateUpload = (e: React.FormEvent) => {
+  // Perform Real Persistent Cloud Upload (Supabase Storage + PostgreSQL)
+  const handlePerformUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newFileName.trim()) return;
-
-    let fileUrl = '/videos/sample-draft-v1.mp4';
-    let formattedSize = '840 MB';
-    let sizeBytes = 840000000;
-
-    if (selectedFile) {
-      fileUrl = URL.createObjectURL(selectedFile);
-      sizeBytes = selectedFile.size;
-      const mb = selectedFile.size / (1024 * 1024);
-      if (mb < 1) {
-        formattedSize = `${(selectedFile.size / 1024).toFixed(0)} KB`;
-      } else if (mb > 1024) {
-        formattedSize = `${(mb / 1024).toFixed(2)} GB`;
-      } else {
-        formattedSize = `${mb.toFixed(1)} MB`;
-      }
-    } else {
-      if (newFileType === 'FINAL_MASTER') {
-        fileUrl = '/videos/sample-draft-v1.mp4';
-      }
+    if (!selectedFile) {
+      setUploadError('Please select a file to upload.');
+      return;
     }
 
-    addProjectFile({
-      project_id: activeProject.id,
-      uploader_id: currentUser?.id || 'user-1',
-      uploader_name: currentUser?.name || 'Authorized Member',
-      file_name: newFileName.trim(),
-      storage_key: `uploads/${newFileName.trim().toLowerCase().replace(/\s+/g, '-')}`,
-      file_type: newFileType,
-      size_bytes: sizeBytes,
-      formatted_size: formattedSize,
-      version: newVersion,
-      url: fileUrl,
-      is_locked: newFileType === 'FINAL_MASTER' && activeProject.status !== 'COMPLETED',
-      lock_reason:
-        newFileType === 'FINAL_MASTER' && activeProject.status !== 'COMPLETED'
-          ? 'Locked until Milestone 2 (70%) is released by client.'
-          : undefined,
-    });
+    setIsUploading(true);
+    setUploadProgress(10);
+    setUploadError(null);
 
-    setSelectedFile(null);
-    setNewFileName('');
-    setShowUploadModal(false);
-    retroSound.playDing();
+    try {
+      // 1. Attempt signed URL direct upload first (avoids Next.js server body limit for large videos)
+      let uploadSuccess = false;
+      let finalPublicUrl = '';
+      let storagePathKey = '';
+
+      try {
+        const urlRes = await fetch('/api/files/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectId: activeProject.id,
+            fileName: selectedFile.name,
+            fileType: newFileType,
+          }),
+        });
+
+        if (urlRes.ok) {
+          const urlData = await urlRes.json();
+          if (urlData.success && urlData.signedUrl) {
+            // Direct PUT to Supabase Storage signed URL
+            await new Promise<void>((resolve, reject) => {
+              const xhr = new XMLHttpRequest();
+              xhr.open('PUT', urlData.signedUrl);
+              xhr.setRequestHeader('Content-Type', selectedFile.type || 'video/mp4');
+
+              xhr.upload.onprogress = (evt) => {
+                if (evt.lengthComputable) {
+                  const percent = Math.round((evt.loaded / evt.total) * 90);
+                  setUploadProgress(Math.max(15, percent));
+                }
+              };
+
+              xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                  uploadSuccess = true;
+                  finalPublicUrl = urlData.publicUrl;
+                  storagePathKey = urlData.path;
+                  resolve();
+                } else {
+                  reject(new Error(`Storage PUT failed with status ${xhr.status}`));
+                }
+              };
+
+              xhr.onerror = () => reject(new Error('Network error during upload'));
+              xhr.send(selectedFile);
+            });
+          }
+        }
+      } catch (directErr) {
+        console.warn('Direct signed upload note, falling back to server upload:', directErr);
+      }
+
+      // 2. Fallback to server-side multipart upload if direct signed upload did not complete
+      if (!uploadSuccess) {
+        setUploadProgress(30);
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('projectId', activeProject.id);
+        formData.append('fileType', newFileType);
+        formData.append('version', newVersion);
+        formData.append('uploaderId', currentUser?.id || 'user-creator-1');
+        formData.append('uploaderName', currentUser?.name || 'Creator');
+
+        const serverRes = await fetch('/api/files/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const serverData = await serverRes.json();
+        if (!serverRes.ok || !serverData.success) {
+          throw new Error(serverData.error || 'Server upload failed');
+        }
+
+        setUploadProgress(100);
+        addProjectFile(serverData.data);
+      } else {
+        // Direct upload succeeded, register file record in PostgreSQL
+        setUploadProgress(95);
+        addProjectFile({
+          project_id: activeProject.id,
+          uploader_id: currentUser?.id || 'user-creator-1',
+          uploader_name: currentUser?.name || 'Creator',
+          file_name: newFileName.trim() || selectedFile.name,
+          storage_key: storagePathKey || `uploads/${selectedFile.name}`,
+          file_type: newFileType,
+          size_bytes: selectedFile.size,
+          formatted_size: formatBytes(selectedFile.size),
+          version: newVersion,
+          url: finalPublicUrl,
+          is_locked: newFileType === 'FINAL_MASTER' && activeProject.status !== 'COMPLETED',
+          lock_reason:
+            newFileType === 'FINAL_MASTER' && activeProject.status !== 'COMPLETED'
+              ? 'Locked until Milestone 2 (70%) is released by client.'
+              : undefined,
+        });
+        setUploadProgress(100);
+      }
+
+      retroSound.playDing();
+      setIsUploading(false);
+      setSelectedFile(null);
+      setNewFileName('');
+      setShowUploadModal(false);
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      setIsUploading(false);
+      setUploadError(err?.message || 'Failed to complete video upload.');
+    }
+  };
+
+  // Perform File Deletion
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete) return;
+    setIsDeleting(true);
+
+    try {
+      const ok = await deleteProjectFile(fileToDelete.id);
+      if (ok) {
+        retroSound.playDing();
+        setFileToDelete(null);
+      } else {
+        alert('Failed to delete file from database. Please try again.');
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('An error occurred while deleting the file.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const getFileIcon = (type: ProjectFile['file_type']) => {
@@ -146,6 +265,8 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
     }
   };
 
+  const canManageFiles = activeRole === 'CREATOR' || activeRole === 'ADMIN';
+
   return (
     <div className="flex flex-col gap-3.5">
       {/* Vault header with upload button */}
@@ -160,116 +281,220 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
           </span>
           <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 px-2 py-0.5 rounded-full font-semibold hidden sm:inline flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>PostgreSQL Sync</span>
+            <span>Supabase Cloud Sync</span>
           </span>
         </div>
 
-        <button
-          onClick={() => {
-            retroSound.playClick();
-            setShowUploadModal(true);
-          }}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
-        >
-          <Upload className="w-3.5 h-3.5" />
-          <span>Upload File / Master</span>
-        </button>
+        {canManageFiles && (
+          <button
+            onClick={() => {
+              retroSound.playClick();
+              setShowUploadModal(true);
+            }}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            <span>Upload Video / Asset</span>
+          </button>
+        )}
       </div>
 
       {/* Files Table / List */}
       <div className="space-y-3">
-        {activeProjectFiles.map((file) => {
-          const isFinalLocked = file.is_locked;
+        {activeProjectFiles.length === 0 ? (
+          <div className="p-8 text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 space-y-3">
+            <Film className="w-8 h-8 text-slate-400 mx-auto" />
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              No files uploaded to this project yet.
+            </p>
+            <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+              Upload raw footage, project drafts, or master exports. Files are securely persisted to Supabase Storage and PostgreSQL.
+            </p>
+            {canManageFiles && (
+              <button
+                type="button"
+                onClick={() => setShowUploadModal(true)}
+                className="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 text-xs font-semibold rounded-xl inline-flex items-center gap-2 shadow-sm transition-all"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>Upload First Video</span>
+              </button>
+            )}
+          </div>
+        ) : (
+          activeProjectFiles.map((file) => {
+            const isFinalLocked = file.is_locked;
 
-          return (
-            <div
-              key={file.id}
-              className={`p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3.5 transition-all ${
-                isFinalLocked
-                  ? 'border-rose-300 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 shadow-xs'
-                  : 'bg-white dark:bg-[#0e1526] border-slate-200 dark:border-slate-800 shadow-sm hover:border-cyan-500/40'
-              }`}
-            >
-              {/* File Info */}
-              <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0 mt-0.5 shadow-xs">
-                  {getFileIcon(file.file_type)}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
-                      {file.file_name}
-                    </span>
-                    <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] px-2 py-0.5 rounded-md font-mono text-slate-700 dark:text-slate-300">
-                      {file.version}
-                    </span>
-                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                      [{file.formatted_size}]
-                    </span>
+            return (
+              <div
+                key={file.id}
+                className={`p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3.5 transition-all ${
+                  isFinalLocked
+                    ? 'border-rose-300 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 shadow-xs'
+                    : 'bg-white dark:bg-[#0e1526] border-slate-200 dark:border-slate-800 shadow-sm hover:border-cyan-500/40'
+                }`}
+              >
+                {/* File Info */}
+                <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0 mt-0.5 shadow-xs">
+                    {getFileIcon(file.file_type)}
                   </div>
 
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
-                    <span>Uploaded by: <strong className="text-slate-700 dark:text-slate-300">{file.uploader_name}</strong></span>
-                    <span>•</span>
-                    <span>Type: {file.file_type}</span>
-                    {file.checksum && (
-                      <span className="text-slate-400 font-mono hidden sm:inline">
-                        • Hash: {file.checksum}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
+                        {file.file_name}
                       </span>
-                    )}
-                  </div>
-
-                  {/* Lock Warning Notice */}
-                  {isFinalLocked && (
-                    <div className="mt-2.5 p-2.5 bg-rose-100/70 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs rounded-xl flex items-center gap-2">
-                      <Lock className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
-                      <span>
-                        <strong>ACCESS PROTECTED:</strong> {file.lock_reason}
+                      <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] px-2 py-0.5 rounded-md font-mono text-slate-700 dark:text-slate-300">
+                        {file.version}
+                      </span>
+                      <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                        [{file.formatted_size}]
                       </span>
                     </div>
+
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                      <span>Uploaded by: <strong className="text-slate-700 dark:text-slate-300">{file.uploader_name}</strong></span>
+                      <span>•</span>
+                      <span>Type: {file.file_type}</span>
+                    </div>
+
+                    {/* Lock Warning Notice */}
+                    {isFinalLocked && (
+                      <div className="mt-2.5 p-2.5 bg-rose-100/70 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs rounded-xl flex items-center gap-2">
+                        <Lock className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+                        <span>
+                          <strong>ACCESS PROTECTED:</strong> {file.lock_reason}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                  {isFinalLocked ? (
+                    activeRole === 'CREATOR' ? (
+                      <button
+                        onClick={() => {
+                          retroSound.playDing();
+                          onRequestReleaseMilestone?.();
+                        }}
+                        className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-amber-500/20 animate-pulse transition-all cursor-pointer"
+                      >
+                        <Unlock className="w-3.5 h-3.5" />
+                        <span>Release Milestone 2 to Unlock</span>
+                      </button>
+                    ) : (
+                      <span className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+                        <Lock className="w-3.5 h-3.5 text-rose-500" />
+                        Awaiting Client Payment
+                      </span>
+                    )
+                  ) : (
+                    <a
+                      href={file.url}
+                      download={file.file_name}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => retroSound.playClick()}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download</span>
+                    </a>
+                  )}
+
+                  {/* Creator Delete Video Button */}
+                  {canManageFiles && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        retroSound.playClick();
+                        setFileToDelete(file);
+                      }}
+                      className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-all border border-transparent hover:border-rose-200 dark:hover:border-rose-800 cursor-pointer"
+                      title="Delete Video"
+                      aria-label="Delete Video"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   )}
                 </div>
               </div>
+            );
+          })
+        )}
+      </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
-                {isFinalLocked ? (
-                  activeRole === 'CREATOR' ? (
-                    <button
-                      onClick={() => {
-                        retroSound.playDing();
-                        onRequestReleaseMilestone?.();
-                      }}
-                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-amber-500/20 animate-pulse transition-all cursor-pointer"
-                    >
-                      <Unlock className="w-3.5 h-3.5" />
-                      <span>Release Milestone 2 to Unlock</span>
-                    </button>
-                  ) : (
-                    <span className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
-                      <Lock className="w-3.5 h-3.5 text-rose-500" />
-                      Awaiting Client Payment
-                    </span>
-                  )
-                ) : (
-                  <a
-                    href={file.url}
-                    download={file.file_name}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => retroSound.playClick()}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download File</span>
-                  </a>
+      {/* Delete Confirmation Modal */}
+      {fileToDelete && (
+        <Portal>
+          <div
+            className="fixed inset-0 z-[110] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !isDeleting) setFileToDelete(null);
+            }}
+          >
+            <div className="glass-panel max-w-md w-full bg-white dark:bg-[#0e1526] border border-rose-300 dark:border-rose-900/60 rounded-2xl shadow-2xl p-6 space-y-4">
+              <div className="flex items-center gap-3 text-rose-600 dark:text-rose-400">
+                <div className="p-2.5 rounded-xl bg-rose-100 dark:bg-rose-950/60">
+                  <Trash2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                    Delete File &amp; Video Asset?
+                  </h3>
+                  <p className="text-xs text-slate-500">This action cannot be undone.</p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1">
+                <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                  {fileToDelete.file_name}
+                </p>
+                <p className="text-[11px] text-slate-500 font-mono">
+                  {fileToDelete.version} • {fileToDelete.formatted_size}
+                </p>
+                {activeProject.active_draft_url === fileToDelete.url && (
+                  <p className="text-amber-600 dark:text-amber-400 font-semibold pt-1">
+                    ⚠️ This file is currently active on the timeline player. Deleting it will switch to the next available video or empty state.
+                  </p>
                 )}
               </div>
+
+              <div className="flex justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={() => setFileToDelete(null)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={handleConfirmDelete}
+                  className="bg-rose-600 hover:bg-rose-500 text-white px-5 py-2 text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Confirm Delete</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </Portal>
+      )}
 
       {/* Upload Modal (Mounted to Document Body via Portal) */}
       {showUploadModal && (
@@ -277,7 +502,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
           <div
             className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
             onClick={(e) => {
-              if (e.target === e.currentTarget) setShowUploadModal(false);
+              if (e.target === e.currentTarget && !isUploading) setShowUploadModal(false);
             }}
           >
             <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-white dark:bg-[#0e1526] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto">
@@ -285,12 +510,13 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#070b14] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
                 <span className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-xs truncate pr-2">
                   <Upload className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
-                  <span>UPLOAD LOCAL FILE OR PROJECT MASTER</span>
+                  <span>UPLOAD VIDEO TO CLOUD STORAGE</span>
                 </span>
                 <button
                   type="button"
+                  disabled={isUploading}
                   onClick={() => setShowUploadModal(false)}
-                  className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+                  className="w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-50"
                   title="Close"
                   aria-label="Close"
                 >
@@ -299,20 +525,29 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               </div>
 
               {/* Form Body */}
-              <form onSubmit={handleSimulateUpload} className="p-6 space-y-4 text-xs text-slate-800 dark:text-slate-200 overflow-y-auto flex-1 min-h-0">
+              <form onSubmit={handlePerformUpload} className="p-6 space-y-4 text-xs text-slate-800 dark:text-slate-200 overflow-y-auto flex-1 min-h-0">
+                {uploadError && (
+                  <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 rounded-xl flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{uploadError}</span>
+                  </div>
+                )}
+
                 {/* Drag and Drop Zone */}
                 <div>
                   <label className="block font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
-                    Select Local Video, Audio, or Archive File:
+                    Select Video or Footage File:
                   </label>
                   <div
                     onDragOver={(e) => {
                       e.preventDefault();
-                      setIsDragOver(true);
+                      if (!isUploading) setIsDragOver(true);
                     }}
                     onDragLeave={() => setIsDragOver(false)}
                     onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!isUploading) fileInputRef.current?.click();
+                    }}
                     className={`border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all ${
                       isDragOver
                         ? 'border-cyan-500 bg-cyan-50/50 dark:bg-cyan-950/30'
@@ -324,6 +559,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                     <input
                       ref={fileInputRef}
                       type="file"
+                      disabled={isUploading}
                       onChange={handleFileChange}
                       className="hidden"
                       accept="video/*,.zip,.mov,.mp4,.webm,.mkv,.pdf,.drp,.prproj"
@@ -336,17 +572,18 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                           {selectedFile.name}
                         </p>
                         <p className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
-                          {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB ready to add • Click to replace
+                          {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB • {selectedFile.type || 'Video'}
                         </p>
+                        <p className="text-[10px] text-slate-500">Click to replace file</p>
                       </div>
                     ) : (
                       <div className="space-y-1.5">
                         <FileUp className="w-8 h-8 text-cyan-600 dark:text-cyan-400 mx-auto" />
                         <p className="font-bold text-slate-800 dark:text-slate-200">
-                          Click to browse or drag &amp; drop your file here
+                          Click to browse or drag &amp; drop video here
                         </p>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                          Accepts .mp4, .mov, .webm, .zip raw footage, or project archives
+                          Supports .mp4, .mov, .webm (uploaded directly to Supabase Storage)
                         </p>
                       </div>
                     )}
@@ -360,10 +597,11 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                   <input
                     type="text"
                     required
+                    disabled={isUploading}
                     value={newFileName}
                     onChange={(e) => setNewFileName(e.target.value)}
-                    placeholder="e.g. AI_Bubble_Final_Export_v2.mov"
-                    className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
+                    placeholder="e.g. AI_Bubble_Final_Export_v1.mp4"
+                    className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden disabled:opacity-50"
                   />
                 </div>
 
@@ -373,13 +611,14 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                       File Category:
                     </label>
                     <select
+                      disabled={isUploading}
                       value={newFileType}
                       onChange={(e) =>
                         setNewFileType(e.target.value as ProjectFile['file_type'])
                       }
-                      className="w-full px-3 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
+                      className="w-full px-3 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden disabled:opacity-50"
                     >
-                      <option value="DRAFT_VIDEO">Draft Video Version</option>
+                      <option value="DRAFT_VIDEO">Draft Video Cut (Timeline Review)</option>
                       <option value="FINAL_MASTER">Final Master Export (Locked until payment)</option>
                       <option value="RAW_FOOTAGE">Raw Footage Package</option>
                       <option value="REFERENCE">Reference / Style Asset</option>
@@ -393,31 +632,61 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                     </label>
                     <input
                       type="text"
+                      disabled={isUploading}
                       value={newVersion}
                       onChange={(e) => setNewVersion(e.target.value)}
-                      placeholder="e.g. Draft v2"
-                      className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden"
+                      placeholder="e.g. Draft Cut 1"
+                      className="w-full px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-700 rounded-xl focus:border-cyan-500 focus:outline-hidden disabled:opacity-50"
                     />
                   </div>
                 </div>
 
-                <div className="p-3 bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-900 dark:text-cyan-200 rounded-xl text-xs leading-relaxed">
-                  🔒 Uploaded files are immediately accessible in the local workspace, and master deliveries are automatically gated under the 30/70 escrow contract until final signoff.
-                </div>
+                {/* Upload Progress Bar */}
+                {isUploading && (
+                  <div className="p-3.5 bg-cyan-50/70 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between font-mono text-[11px]">
+                      <span className="flex items-center gap-1.5 font-bold text-cyan-700 dark:text-cyan-300">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Uploading to Supabase Storage...
+                      </span>
+                      <span className="font-bold text-cyan-600 dark:text-cyan-400">
+                        {uploadProgress}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-cyan-500 to-blue-600 h-full rounded-full transition-all duration-200"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className="pt-2 flex justify-end gap-2.5">
                   <button
                     type="button"
+                    disabled={isUploading}
                     onClick={() => setShowUploadModal(false)}
-                    className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer"
+                    disabled={isUploading || !selectedFile}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   >
-                    Confirm &amp; Add File
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload to Cloud Storage</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>

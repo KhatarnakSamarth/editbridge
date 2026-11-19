@@ -59,9 +59,7 @@ export async function GET(request: Request) {
               ];
 
         const isShorts = p.aspectRatio === '9:16';
-        const fallbackDraft = isShorts
-          ? '/videos/sample-short-reel.mp4'
-          : '/videos/sample-draft-v1.mp4';
+        const masterFile = p.files?.find((f) => f.fileType === 'FINAL_MASTER');
 
         return {
           id: p.id,
@@ -113,9 +111,9 @@ export async function GET(request: Request) {
             final_released: ms.some((m) => m.percentage === 70 && m.status === 'RELEASED'),
             platform_fee_percent: 5,
           },
-          active_draft_url: p.activeDraftUrl || fallbackDraft,
-          current_draft_url: p.activeDraftUrl || fallbackDraft,
-          final_master_url: '/videos/sample-draft-v1.mp4',
+          active_draft_url: p.activeDraftUrl || null,
+          current_draft_url: p.activeDraftUrl || null,
+          final_master_url: masterFile?.storageUrl || null,
           watermark_active: p.watermarkActive,
           created_at: p.createdAt.toISOString(),
           updated_at: p.updatedAt.toISOString(),

@@ -63,7 +63,6 @@ function ProjectWorkspaceContent() {
   const [isLiveReviewOpen, setIsLiveReviewOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [guestPlaygroundMode, setGuestPlaygroundMode] = useState(false);
   const [isRequirementsOpen, setIsRequirementsOpen] = useState(true);
   const [isEditingBrief, setIsEditingBrief] = useState(false);
 
@@ -72,9 +71,9 @@ function ProjectWorkspaceContent() {
     ? INITIAL_CREATORS.find((c) => c.user_id === activeProject.creator_id) || INITIAL_CREATORS[0]
     : INITIAL_CREATORS[0];
 
-  // Authentication Gate: Users must be logged in to access workstation & escrow vaults (unless previewing playground)
-  if (!isAuthenticated && !guestPlaygroundMode) {
-    return <WorkspaceAuthGate onEnterPlayground={() => setGuestPlaygroundMode(true)} />;
+  // Authentication Gate: Users must be authenticated to enter project workspace
+  if (!isAuthenticated) {
+    return <WorkspaceAuthGate />;
   }
 
   if (!activeProject) {
@@ -137,32 +136,6 @@ function ProjectWorkspaceContent() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16 font-sans">
-      {/* Guest Mode Indicator Banner */}
-      {!isAuthenticated && guestPlaygroundMode && (
-        <div className="p-3 bg-gradient-to-r from-cyan-500/15 via-blue-500/10 to-transparent border border-cyan-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-cyan-800 dark:text-cyan-300">
-            <Film className="w-4 h-4 text-cyan-500 shrink-0" />
-            <span>
-              <strong>Guest Playground Mode:</strong> You are testing the interactive frame-accurate video review monitor. Sign in to post live escrow contracts.
-            </span>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/signin"
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-colors"
-            >
-              Sign In for Full Escrow Access →
-            </Link>
-            <button
-              onClick={() => setGuestPlaygroundMode(false)}
-              className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700/80 cursor-pointer"
-            >
-              Exit Demo
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Top Project Selector & State Banner */}
       <div className="glass-panel p-5 sm:p-6 bg-white/90 dark:bg-[#0e1526]/90 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl dark:shadow-2xl dark:shadow-cyan-950/10 transition-colors">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-slate-100 dark:border-slate-800/80">

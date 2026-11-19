@@ -75,6 +75,7 @@ interface EditBridgeContextType {
   files: ProjectFile[];
   activeProjectFiles: ProjectFile[];
   addProjectFile: (file: Omit<ProjectFile, 'id' | 'created_at'>) => void;
+  deleteProjectFile: (fileId: string) => Promise<boolean>;
   unlockMasterFile: (projectId: string) => void;
 
   // Messages / Chat
@@ -182,19 +183,36 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setProjects(res.data);
+          setActiveProjectId((prev) => {
+            if (prev && res.data.some((p: Project) => p.id === prev)) {
+              return prev;
+            }
+            return res.data[0].id;
+          });
         }
       })
       .catch((err) => console.warn('Could not sync projects from DB:', err));
   }, []);
 
-  // Sync files & revisions whenever activeProjectId changes
+  // Sync project, files, revisions & messages whenever activeProjectId changes
   useEffect(() => {
     if (!activeProjectId) return;
+
+    fetch(`/api/projects/${activeProjectId}`)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          setProjects((prev) =>
+            prev.map((p) => (p.id === activeProjectId ? { ...p, ...res.data } : p))
+          );
+        }
+      })
+      .catch(() => {});
 
     fetch(`/api/files?projectId=${activeProjectId}`)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        if (res.success && Array.isArray(res.data)) {
           setFiles((prev) => {
             const otherFiles = prev.filter((f) => f.project_id !== activeProjectId);
             return [...res.data, ...otherFiles];
@@ -206,7 +224,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     fetch(`/api/revisions?projectId=${activeProjectId}`)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        if (res.success && Array.isArray(res.data)) {
           setRevisionComments((prev) => {
             const otherComments = prev.filter((c) => c.project_id !== activeProjectId);
             return [...res.data, ...otherComments];
@@ -218,7 +236,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
     fetch(`/api/messages?projectId=${activeProjectId}`)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        if (res.success && Array.isArray(res.data)) {
           setMessages((prev) => {
             const otherMessages = prev.filter((m) => m.project_id !== activeProjectId);
             return [...res.data, ...otherMessages];
@@ -593,6 +611,38 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       .catch((err) => console.error('Failed to save file to DB:', err));
   };
 
+  // Delete Project File (Persists to PostgreSQL Database & Updates activeDraftUrl if video)
+  const deleteProjectFile = async (fileId: string): Promise<boolean> => {
+    retroSound.playClick();
+    try {
+      const res = await fetch(`/api/files?id=${fileId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFiles((prev) => prev.filter((f) => f.id !== fileId));
+        if (data.activeDraftUrl !== undefined) {
+          setProjects((prev) =>
+            prev.map((p) =>
+              p.id === activeProjectId
+                ? {
+                    ...p,
+                    active_draft_url: data.activeDraftUrl || undefined,
+                    current_draft_url: data.activeDraftUrl || undefined,
+                  }
+                : p
+            )
+          );
+        }
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Failed to delete file from DB:', err);
+      return false;
+    }
+  };
+
   // Set Project Active Draft URL (persists in DB)
   const setProjectActiveDraftUrl = (projectId: string, url: string) => {
     retroSound.playDing();
@@ -801,6 +851,7 @@ export function EditBridgeProvider({ children }: { children: ReactNode }) {
       files,
       activeProjectFiles,
       addProjectFile,
+      deleteProjectFile,
       unlockMasterFile,
       messages,
       activeProjectMessages,

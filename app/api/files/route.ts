@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { ProjectFile } from '@/types';
+import { verifySessionToken } from '@/lib/auth';
+import { deleteFromSupabaseStorage } from '@/lib/supabase';
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -22,11 +24,11 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    const mapped = dbFiles.map((f) => ({
+    const mapped: ProjectFile[] = dbFiles.map((f) => ({
       id: f.id,
       project_id: f.projectId,
       uploader_id: f.uploadedBy,
-      uploader_name: 'Authorized Member',
+      uploader_name: 'Project Member',
       file_name: f.name,
       storage_key: `uploads/${f.name}`,
       file_type: f.fileType as ProjectFile['file_type'],
@@ -36,7 +38,9 @@ export async function GET(request: Request) {
       url: f.storageUrl,
       is_locked: f.isLocked,
       is_master_delivery: f.isMasterDelivery,
-      lock_reason: f.isLocked ? 'Locked until Milestone 2 (70%) is released by client.' : undefined,
+      lock_reason: f.isLocked
+        ? 'Locked until Milestone 2 (70%) is released by client.'
+        : undefined,
       created_at: f.createdAt.toISOString(),
     }));
 
@@ -59,86 +63,81 @@ export async function POST(request: Request) {
     const body = await request.json();
     const {
       project_id,
-      uploader_id = 'user-editor-1',
-      uploader_name = 'Editor',
+      uploader_id = 'user-creator-1',
+      uploader_name = 'Creator',
       file_name,
       storage_key,
       file_type = 'DRAFT_VIDEO',
       size_bytes = 0,
       formatted_size,
-      version = 'Draft v2',
-      url = '/videos/sample-draft-v1.mp4',
+      version = 'Draft v1',
+      url,
       is_locked = false,
       is_master_delivery = false,
       lock_reason,
     } = body;
 
-    if (!project_id || !file_name) {
+    if (!project_id || !file_name || !url) {
       return NextResponse.json(
-        { success: false, error: 'project_id and file_name are required' },
+        { success: false, error: 'project_id, file_name, and persistent url are required' },
         { status: 400 }
       );
     }
 
-    // 1. Verify project exists in DB; if not, upsert a minimal stub to preserve foreign key
+    // Guard: Disallow ephemeral blob URLs in PostgreSQL
+    if (typeof url === 'string' && url.startsWith('blob:')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Ephemeral blob: URLs cannot be saved to the database. Upload video to Supabase Storage first.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Verify project exists
     const existingProject = await prisma.project.findUnique({
       where: { id: project_id },
     });
 
     if (!existingProject) {
-      await prisma.project.create({
-        data: {
-          id: project_id,
-          title: 'Active Project',
-          briefDescription: 'Creator Project Workspace',
-          aspectRatio: '16:9',
-          targetDuration: '10 min',
-          totalBudget: 500,
-          status: 'EDITING',
-          creatorId: 'user-creator-1',
-          activeDraftUrl: file_type === 'DRAFT_VIDEO' ? url : '/videos/sample-draft-v1.mp4',
-        },
-      });
+      return NextResponse.json(
+        { success: false, error: 'Project not found' },
+        { status: 404 }
+      );
     }
 
-    // Sanitize storageUrl for PostgreSQL:
-    // Browser-generated `blob:` URLs are ephemeral and only valid within that tab's memory.
-    // In guest/demo testing, persist a valid sample path in PostgreSQL so other sessions don't break,
-    // while returning the client's blob URL in the JSON response for immediate local playback.
-    const isBlobUrl = typeof url === 'string' && url.startsWith('blob:');
-    const isVerticalProject = existingProject?.aspectRatio === '9:16';
-    const fallbackDbUrl = isVerticalProject
-      ? '/videos/sample-short-reel.mp4'
-      : '/videos/sample-draft-v1.mp4';
-    const persistentDbUrl = isBlobUrl ? fallbackDbUrl : (url || fallbackDbUrl);
-
-    // 2. Persist File in PostgreSQL Database
+    // Persist file record in PostgreSQL
     const dbFile = await prisma.projectFile.create({
       data: {
         id: `file-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         projectId: project_id,
         name: file_name,
         fileType: file_type,
-        sizeBytes: Number(size_bytes) || 500000000,
-        storageUrl: persistentDbUrl,
+        sizeBytes: Number(size_bytes) || 0,
+        storageUrl: url,
         isMasterDelivery: Boolean(is_master_delivery || file_type === 'FINAL_MASTER'),
         isLocked: Boolean(is_locked),
         uploadedBy: uploader_id,
       },
     });
 
-    // 3. If file is DRAFT_VIDEO, automatically update Project's activeDraftUrl in database
-    let updatedDraftUrl = undefined;
+    // If DRAFT_VIDEO, update project's activeDraftUrl in database
+    let updatedDraftUrl = existingProject.activeDraftUrl;
     if (file_type === 'DRAFT_VIDEO') {
       const updatedProject = await prisma.project.update({
         where: { id: project_id },
         data: {
-          activeDraftUrl: persistentDbUrl,
-          status: existingProject?.status === 'CHANGES_REQUESTED' ? 'REVIEW_REQUESTED' : undefined,
+          activeDraftUrl: url,
+          status:
+            existingProject.status === 'CHANGES_REQUESTED'
+              ? 'REVIEW_REQUESTED'
+              : existingProject.status === 'DRAFT'
+              ? 'EDITING'
+              : undefined,
         },
       });
-      // Return client URL (e.g. blob) for immediate local playback in current tab
-      updatedDraftUrl = url || updatedProject.activeDraftUrl;
+      updatedDraftUrl = updatedProject.activeDraftUrl;
     }
 
     const formattedResponse: ProjectFile = {
@@ -152,10 +151,12 @@ export async function POST(request: Request) {
       size_bytes: dbFile.sizeBytes,
       formatted_size: formatted_size || formatBytes(dbFile.sizeBytes),
       version: version,
-      url: url || dbFile.storageUrl, // Retain blob URL locally if available
+      url: dbFile.storageUrl,
       is_locked: dbFile.isLocked,
       is_master_delivery: dbFile.isMasterDelivery,
-      lock_reason: dbFile.isLocked ? lock_reason || 'Locked until Milestone 2 is approved.' : undefined,
+      lock_reason: dbFile.isLocked
+        ? lock_reason || 'Locked until Milestone 2 is approved.'
+        : undefined,
       created_at: dbFile.createdAt.toISOString(),
     };
 
@@ -164,7 +165,7 @@ export async function POST(request: Request) {
       source: 'prisma-postgresql',
       data: formattedResponse,
       activeDraftUrl: updatedDraftUrl,
-      message: 'File stored in database and linked to timeline',
+      message: 'Video stored persistently and synced with timeline',
     });
   } catch (error) {
     console.error('Files POST error:', error);
@@ -181,16 +182,102 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json({ success: false, error: 'id required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'file id is required' },
+        { status: 400 }
+      );
     }
 
+    // 1. Session verification & RBAC check
+    const cookieHeader = request.headers.get('cookie') || '';
+    const sessionMatch = cookieHeader.match(/editbridge_session=([^;]+)/);
+    const sessionToken = sessionMatch ? sessionMatch[1] : null;
+
+    let authenticatedUserId: string | null = request.headers.get('x-user-id');
+    let authenticatedUserRole: string | null = request.headers.get('x-user-role');
+
+    if (!authenticatedUserId && sessionToken) {
+      const payload = await verifySessionToken(sessionToken);
+      if (payload) {
+        authenticatedUserId = payload.userId;
+        authenticatedUserRole = payload.role;
+      }
+    }
+
+    // 2. Fetch File & Project
+    const file = await prisma.projectFile.findUnique({
+      where: { id },
+      include: { project: true },
+    });
+
+    if (!file) {
+      return NextResponse.json(
+        { success: false, error: 'File not found' },
+        { status: 404 }
+      );
+    }
+
+    // RBAC: Verify authenticated user is CREATOR of this project or ADMIN
+    if (authenticatedUserRole && authenticatedUserRole !== 'ADMIN') {
+      if (authenticatedUserRole !== 'CREATOR') {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: Only the Creator can delete project files' },
+          { status: 403 }
+        );
+      }
+      if (authenticatedUserId && file.project.creatorId !== authenticatedUserId) {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: You do not own this project' },
+          { status: 403 }
+        );
+      }
+    }
+
+    // 3. Delete from Supabase Storage if it's hosted there
+    if (file.storageUrl && file.storageUrl.includes('/storage/v1/object/public/')) {
+      try {
+        const parts = file.storageUrl.split('/project-videos/');
+        if (parts.length > 1) {
+          const storagePath = decodeURIComponent(parts[1]);
+          await deleteFromSupabaseStorage(storagePath);
+        }
+      } catch (storageErr) {
+        console.warn('Storage deletion warning:', storageErr);
+      }
+    }
+
+    // 4. Delete ProjectFile record from PostgreSQL
     await prisma.projectFile.delete({
       where: { id },
     });
 
+    // 5. If deleted video was project's activeDraftUrl, update to next available video or null
+    let nextActiveDraftUrl: string | null = null;
+    if (file.project.activeDraftUrl === file.storageUrl) {
+      const nextVideo = await prisma.projectFile.findFirst({
+        where: {
+          projectId: file.projectId,
+          fileType: { in: ['DRAFT_VIDEO', 'FINAL_MASTER'] },
+          NOT: { id: file.id },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      nextActiveDraftUrl = nextVideo ? nextVideo.storageUrl : null;
+
+      await prisma.project.update({
+        where: { id: file.projectId },
+        data: { activeDraftUrl: nextActiveDraftUrl },
+      });
+    } else {
+      nextActiveDraftUrl = file.project.activeDraftUrl;
+    }
+
     return NextResponse.json({
       success: true,
-      message: 'File record deleted from database',
+      message: 'File deleted successfully',
+      deletedFileId: id,
+      activeDraftUrl: nextActiveDraftUrl,
     });
   } catch (error) {
     console.error('Files DELETE error:', error);
