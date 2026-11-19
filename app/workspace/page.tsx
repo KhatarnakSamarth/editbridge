@@ -78,9 +78,9 @@ function ProjectWorkspaceContent() {
 
   if (!activeProject) {
     return (
-      <div className="max-w-4xl mx-auto p-10 text-center glass-panel mt-12 bg-[#170B29] rounded-2xl border border-pink-500/25 font-sans">
+      <div className="max-w-4xl mx-auto p-10 text-center glass-panel mt-12 bg-vice-surface rounded-2xl border border-vice-border font-sans">
         <p className="text-vice-muted text-sm">No project currently selected.</p>
-        <Link href="/projects" className="bg-vice-gradient hover:opacity-95 text-white px-5 py-2.5 mt-4 inline-block font-semibold rounded-xl text-xs transition-all shadow-md shadow-pink-500/20">
+        <Link href="/projects" className="bg-vice-gradient hover:opacity-95 text-white px-5 py-2.5 mt-4 inline-block font-semibold rounded-xl text-xs transition-all shadow-xs">
           View Projects Directory
         </Link>
       </div>
@@ -106,28 +106,28 @@ function ProjectWorkspaceContent() {
     switch (status) {
       case 'REVIEW_REQUESTED':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-pink-500/15 text-vice-pink border border-pink-500/30 font-semibold flex items-center gap-1.5">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-vice-pink/10 text-vice-pink border border-vice-pink/20 font-semibold flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-vice-pink animate-pulse"></span>
             Review Requested (Draft v1)
           </span>
         );
       case 'CHANGES_REQUESTED':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/15 text-vice-gold border border-amber-500/30 font-semibold flex items-center gap-1.5">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-semibold flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-vice-gold"></span>
             Changes Requested
           </span>
         );
       case 'COMPLETED':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 font-semibold flex items-center gap-1.5">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-vice-mint" />
             Project Completed &amp; Escrow Released
           </span>
         );
       default:
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-[#211038] text-vice-muted border border-pink-500/20 font-semibold">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-vice-cardElevated text-vice-muted border border-vice-border font-semibold">
             {status}
           </span>
         );
@@ -137,12 +137,12 @@ function ProjectWorkspaceContent() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16 font-sans">
       {/* Top Project Selector & State Banner */}
-      <div className="glass-panel p-5 sm:p-6 bg-[#170B29]/90 border border-pink-500/25 rounded-2xl shadow-xl shadow-pink-950/20 transition-colors">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-pink-500/20">
+      <div className="glass-panel p-5 sm:p-6 bg-vice-surface border border-vice-border rounded-2xl shadow-xs transition-colors">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-vice-border">
           {/* Project Details */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-[11px] font-mono bg-pink-500/15 text-vice-pink px-2.5 py-0.5 rounded-full border border-pink-500/30 font-semibold uppercase">
+              <span className="text-[11px] font-mono bg-vice-pink/10 text-vice-pink px-2.5 py-0.5 rounded-full border border-vice-pink/20 font-semibold uppercase">
                 {activeProject.category}
               </span>
               {getStatusBadge(activeProject.status)}
@@ -156,7 +156,7 @@ function ProjectWorkspaceContent() {
                     retroSound.playClick();
                     setActiveProjectId(e.target.value);
                   }}
-                  className="px-3 py-1 text-xs font-semibold bg-[#0D0618] text-vice-text border border-pink-500/30 rounded-xl focus:border-vice-pink focus:outline-hidden"
+                  className="px-3 py-1 text-xs font-semibold bg-vice-input text-vice-text border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden"
                 >
                   {projects.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -204,7 +204,7 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsInviteOpen(true);
                 }}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-text border border-pink-500/20 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-text border border-vice-border px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
                 title="Invite video editor or collaborator"
               >
                 <UserPlus className="w-4 h-4 text-vice-pink" />
@@ -216,7 +216,7 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsInviteOpen(true);
                 }}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-text border border-pink-500/20 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-text border border-vice-border px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
                 title="Share collaboration invite link with client or reviewer"
               >
                 <Share2 className="w-4 h-4 text-vice-coral" />
@@ -228,7 +228,7 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsInviteOpen(true);
                 }}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-text border border-pink-500/20 px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-text border border-vice-border px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
                 title="Generate workspace access link"
               >
                 <Link2 className="w-4 h-4 text-vice-pink" />
@@ -243,9 +243,9 @@ function ProjectWorkspaceContent() {
                   retroSound.playClick();
                   setIsReviewModalOpen(true);
                 }}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:opacity-95 text-slate-950 font-bold px-4 py-2 text-xs rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:opacity-95 text-white font-bold px-4 py-2 text-xs rounded-xl flex items-center gap-2 shadow-xs transition-all cursor-pointer"
               >
-                <Award className="w-4 h-4 text-slate-950" />
+                <Award className="w-4 h-4 text-white" />
                 <span>Rate Project</span>
               </button>
             ) : null}
@@ -256,7 +256,7 @@ function ProjectWorkspaceContent() {
                 onClick={() => {
                   releaseFinalMilestone(activeProject.id);
                 }}
-                className="bg-gradient-to-r from-vice-pink via-vice-coral to-vice-gold hover:opacity-95 text-white px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-pink-500/20 active:scale-95 transition-all cursor-pointer"
+                className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-xs active:scale-95 transition-all cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-white" />
                 <span>Release 70%</span>
@@ -280,10 +280,10 @@ function ProjectWorkspaceContent() {
                   key={step.status}
                   className={`flex-1 px-2.5 py-1.5 text-center rounded-xl text-xs transition-all ${
                     isCurrent
-                      ? 'bg-vice-gradient text-white font-bold shadow-md shadow-pink-500/25 border border-pink-400'
+                      ? 'bg-vice-gradient text-white font-bold shadow-xs border border-vice-pink'
                       : isPast
-                      ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-500/40 font-semibold'
-                      : 'bg-[#211038]/60 text-vice-dim border border-pink-500/15'
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold'
+                      : 'bg-vice-cardElevated/60 text-vice-dim border border-vice-border'
                   }`}
                 >
                   <span className="truncate block">{step.label}</span>
@@ -295,13 +295,13 @@ function ProjectWorkspaceContent() {
       </div>
 
       {/* Tabs Navigation Bar */}
-      <div className="flex items-center gap-2 p-1.5 bg-[#170B29]/90 border border-pink-500/20 rounded-2xl overflow-x-auto shadow-inner">
+      <div className="flex items-center gap-2 p-1.5 bg-vice-surface border border-vice-border rounded-2xl overflow-x-auto shadow-xs">
         <button
           onClick={() => handleTabChange('REVIEW')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'REVIEW'
-              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
-              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
+              ? 'bg-vice-gradient text-white shadow-xs font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-vice-hover'
           }`}
         >
           <Film className="w-4 h-4" />
@@ -312,8 +312,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('FILES')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'FILES'
-              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
-              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
+              ? 'bg-vice-gradient text-white shadow-xs font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-vice-hover'
           }`}
         >
           <FolderOpen className="w-4 h-4" />
@@ -324,8 +324,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('CHAT')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'CHAT'
-              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
-              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
+              ? 'bg-vice-gradient text-white shadow-xs font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-vice-hover'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
@@ -336,8 +336,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('MILESTONES')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'MILESTONES'
-              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
-              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
+              ? 'bg-vice-gradient text-white shadow-xs font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-vice-hover'
           }`}
         >
           <CreditCard className="w-4 h-4" />
@@ -348,8 +348,8 @@ function ProjectWorkspaceContent() {
           onClick={() => handleTabChange('BRIEF')}
           className={`px-3.5 sm:px-4 py-2 text-xs rounded-xl font-semibold flex items-center gap-2 transition-all shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'BRIEF'
-              ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
-              : 'text-vice-muted hover:text-vice-text hover:bg-[#211038]'
+              ? 'bg-vice-gradient text-white shadow-xs font-bold'
+              : 'text-vice-muted hover:text-vice-text hover:bg-vice-hover'
           }`}
         >
           <FileText className="w-4 h-4" />

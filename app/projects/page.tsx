@@ -30,17 +30,17 @@ export default function ProjectsDashboardPage() {
   const getStatusBadge = (status: ProjectStatus) => {
     switch (status) {
       case 'REVIEW_REQUESTED':
-        return <span className="bg-pink-500/15 text-vice-pink border border-pink-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px] animate-pulse">● REVIEW REQUESTED</span>;
+        return <span className="bg-vice-pink/10 text-vice-pink border border-vice-pink/20 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● REVIEW REQUESTED</span>;
       case 'CHANGES_REQUESTED':
-        return <span className="bg-amber-500/15 text-vice-gold border border-amber-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● CHANGES REQUESTED</span>;
+        return <span className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● CHANGES REQUESTED</span>;
       case 'FINAL_PAYMENT_PENDING':
-        return <span className="bg-orange-500/15 text-vice-coral border border-orange-500/30 px-2.5 py-0.5 rounded-full font-bold text-[11px] animate-pulse">● FINAL PAYMENT DUE</span>;
+        return <span className="bg-orange-500/10 text-orange-500 border border-orange-500/20 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● FINAL PAYMENT DUE</span>;
       case 'COMPLETED':
-        return <span className="bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-bold text-[11px]">✓ COMPLETED</span>;
+        return <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-bold text-[11px]">✓ COMPLETED</span>;
       case 'EDITING':
-        return <span className="bg-purple-950/60 text-fuchsia-300 border border-purple-500/40 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● IN EDITING</span>;
+        return <span className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-0.5 rounded-full font-bold text-[11px]">● IN EDITING</span>;
       default:
-        return <span className="bg-[#211038] text-vice-muted border border-pink-500/20 px-2.5 py-0.5 rounded-full font-semibold text-[11px]">{status}</span>;
+        return <span className="bg-vice-cardElevated text-vice-muted border border-vice-border px-2.5 py-0.5 rounded-full font-semibold text-[11px]">{status}</span>;
     }
   };
 
@@ -52,7 +52,7 @@ export default function ProjectsDashboardPage() {
       >
         <div className="space-y-6">
           {/* Header Strip with New Project button */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-pink-500/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vice-border">
             <div>
               <h2 className="font-extrabold text-lg text-vice-text">
                 ACTIVE PRODUCTION PROJECTS
@@ -65,7 +65,7 @@ export default function ProjectsDashboardPage() {
             <Link
               href={isAuthenticated ? "/projects/new" : "/signin?redirect=/projects/new"}
               onClick={() => retroSound.playDing()}
-              className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 self-start sm:self-center shadow-md shadow-pink-500/25 transition-all cursor-pointer"
+              className="bg-vice-pink hover:bg-vice-pinkHover text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 self-start sm:self-center shadow-sm transition-all cursor-pointer"
             >
               <FolderPlus className="w-4 h-4" />
               <span>Create New Project Brief</span>
@@ -73,7 +73,7 @@ export default function ProjectsDashboardPage() {
           </div>
 
           {!isAuthenticated && (
-            <div className="p-4 bg-[#211038] border border-pink-500/20 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="p-4 bg-vice-surface border border-vice-border rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2.5 text-vice-muted">
                 <Lock className="w-4 h-4 text-vice-pink shrink-0" />
                 <span>You are browsing as <strong>Guest</strong>. Sign in as Creator or Editor to manage private deliverables and release payments.</span>
@@ -81,7 +81,7 @@ export default function ProjectsDashboardPage() {
               <div className="flex items-center gap-2 shrink-0">
                 <Link
                   href="/signin"
-                  className="px-4 py-1.5 bg-vice-gradient hover:opacity-95 text-white rounded-xl text-xs font-semibold shadow-xs"
+                  className="px-4 py-1.5 bg-vice-pink hover:bg-vice-pinkHover text-white rounded-xl text-xs font-semibold shadow-xs"
                 >
                   Sign In
                 </Link>
@@ -91,7 +91,7 @@ export default function ProjectsDashboardPage() {
 
           {/* Filter Pills */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-vice-dim text-xs flex items-center gap-1 mr-1 font-medium">
+            <span className="text-vice-muted text-xs flex items-center gap-1 mr-1 font-medium">
               <Filter className="w-3.5 h-3.5" /> Filter:
             </span>
             {[
@@ -109,8 +109,8 @@ export default function ProjectsDashboardPage() {
                 }}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   filter === f.id
-                    ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
-                    : 'bg-[#211038] text-vice-muted hover:text-vice-text hover:bg-[#2c174a] border border-pink-500/20'
+                    ? 'bg-vice-pink text-white shadow-sm font-bold'
+                    : 'bg-vice-cardElevated text-vice-muted hover:text-vice-text hover:bg-vice-hover border border-vice-border'
                 }`}
               >
                 {f.label}
@@ -130,19 +130,19 @@ export default function ProjectsDashboardPage() {
                   key={project.id}
                   className={`p-5 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
                     isFeatured
-                      ? 'border-pink-500/60 bg-[#170B29] shadow-lg shadow-pink-950/30'
-                      : 'bg-[#170B29] border-pink-500/20 shadow-xs hover:border-pink-500/40'
+                      ? 'border-vice-pink/60 bg-vice-surface shadow-lg'
+                      : 'bg-vice-surface border-vice-border shadow-xs hover:border-vice-border/80'
                   }`}
                 >
                   {/* Left Column: Title & Meta */}
                   <div className="space-y-2 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] font-mono bg-pink-500/15 text-vice-pink px-2.5 py-0.5 rounded-full border border-pink-500/30 font-semibold uppercase">
+                      <span className="text-[10px] font-mono bg-vice-pink/10 text-vice-pink px-2.5 py-0.5 rounded-full border border-vice-pink/20 font-semibold uppercase">
                         {project.category}
                       </span>
                       {getStatusBadge(project.status)}
                       {isFeatured && (
-                        <span className="bg-amber-950/60 text-vice-gold border border-amber-500/40 px-2.5 py-0.5 text-[10px] rounded-full font-bold">
+                        <span className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2.5 py-0.5 text-[10px] rounded-full font-bold">
                           ★ FEATURED PRODUCTION
                         </span>
                       )}
@@ -156,22 +156,22 @@ export default function ProjectsDashboardPage() {
                       {project.brief}
                     </p>
 
-                    <div className="pt-1 flex items-center gap-3 text-xs text-vice-dim flex-wrap">
+                    <div className="pt-1 flex items-center gap-3 text-xs text-vice-muted flex-wrap">
                       <span>Client: <strong className="text-vice-text">{project.creator_name}</strong></span>
                       <span>•</span>
                       <span>Editor: <strong className="text-vice-text">{project.editor_name || 'Unassigned'}</strong></span>
                       <span>•</span>
-                      <span>Budget: <strong className="text-vice-gold font-mono font-bold">${project.budget} USD</strong></span>
+                      <span>Budget: <strong className="text-vice-coral font-mono font-bold">${project.budget} USD</strong></span>
                       <span>•</span>
                       <span>Due: <strong className="text-vice-text">{project.deadline}</strong></span>
                     </div>
                   </div>
 
                   {/* Right Column: Escrow & CTA */}
-                  <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end justify-between gap-3 flex-shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-pink-500/20">
+                  <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end justify-between gap-3 flex-shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-vice-border">
                     <div className="text-xs text-right">
-                      <span className="text-vice-dim block text-[11px] font-medium">MILESTONE ESCROW:</span>
-                      <span className="text-vice-gold font-mono font-bold">
+                      <span className="text-vice-muted block text-[11px] font-medium">MILESTONE ESCROW:</span>
+                      <span className="text-amber-500 font-mono font-bold">
                         30% [${ms1Amount}] + 70% [${ms2Amount}]
                       </span>
                     </div>
@@ -182,7 +182,7 @@ export default function ProjectsDashboardPage() {
                         retroSound.playDing();
                         setActiveProjectId(project.id);
                       }}
-                      className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-md shadow-pink-500/25 transition-all cursor-pointer"
+                      className="bg-vice-pink hover:bg-vice-pinkHover text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer"
                     >
                       <span>Open Workspace</span>
                       <ArrowRight className="w-3.5 h-3.5" />

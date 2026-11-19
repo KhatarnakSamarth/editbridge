@@ -53,12 +53,12 @@ function isVideoFile(fileName?: string, url?: string, fileType?: string): boolea
 }
 
 const CATEGORIES: { label: string; value: CommentCategory; color: string; ringColor: string }[] = [
-  { label: 'B-Roll & Visuals', value: 'B_ROLL', color: '#FFD166', ringColor: 'ring-[#FFD166]/50' },
-  { label: 'Audio / Music', value: 'AUDIO', color: '#FF2E93', ringColor: 'ring-[#FF2E93]/50' },
-  { label: 'Pacing & Cuts', value: 'PACING', color: '#00F5A0', ringColor: 'ring-[#00F5A0]/50' },
-  { label: 'Text & Graphics', value: 'TEXT_GRAPHICS', color: '#FF7B54', ringColor: 'ring-[#FF7B54]/50' },
-  { label: 'Color / Lighting', value: 'COLOR', color: '#E056FD', ringColor: 'ring-fuchsia-400/50' },
-  { label: 'General Feedback', value: 'GENERAL', color: '#C8A8C9', ringColor: 'ring-[#C8A8C9]/50' },
+  { label: 'B-Roll & Visuals', value: 'B_ROLL', color: '#F59E0B', ringColor: 'ring-amber-500/50' },
+  { label: 'Audio / Music', value: 'AUDIO', color: '#E11D74', ringColor: 'ring-rose-500/50' },
+  { label: 'Pacing & Cuts', value: 'PACING', color: '#10B981', ringColor: 'ring-emerald-500/50' },
+  { label: 'Text & Graphics', value: 'TEXT_GRAPHICS', color: '#F97316', ringColor: 'ring-orange-500/50' },
+  { label: 'Color / Lighting', value: 'COLOR', color: '#8B5CF6', ringColor: 'ring-purple-500/50' },
+  { label: 'General Feedback', value: 'GENERAL', color: '#8E7D91', ringColor: 'ring-slate-400/50' },
 ];
 
 export function TimestampPlayer({
@@ -431,7 +431,7 @@ export function TimestampPlayer({
     <div className="flex flex-col gap-4 w-full max-w-full">
       {/* Project-Specific Video Cuts Bar */}
       {showSampleSelector && (
-        <div className="p-3 bg-[#170B29]/90 border border-pink-500/20 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-2.5 shadow-sm">
+        <div className="p-3 bg-vice-surface border border-vice-border rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-2.5 shadow-xs">
           <div className="flex items-center gap-2 shrink-0">
             <Film className="w-4 h-4 text-vice-pink shrink-0" />
             <span className="text-xs font-bold text-vice-text">
@@ -449,8 +449,8 @@ export function TimestampPlayer({
                   onClick={() => switchSampleCut(cut)}
                   className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
                     isSelected
-                      ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/20 font-bold'
-                      : 'bg-[#211038] text-vice-muted hover:text-vice-text hover:bg-[#2c174a] border border-pink-500/20'
+                      ? 'bg-vice-gradient text-white shadow-xs font-bold'
+                      : 'bg-vice-cardElevated text-vice-muted hover:text-vice-text hover:bg-vice-hover border border-vice-border'
                   }`}
                   title={`Switch to ${cut.label}`}
                 >
@@ -463,8 +463,8 @@ export function TimestampPlayer({
                   <span
                     className={`text-[9px] px-1.5 py-0.2 rounded font-mono ${
                       isSelected
-                        ? 'bg-black/40 text-vice-gold'
-                        : 'bg-[#170B29] text-vice-dim'
+                        ? 'bg-black/30 text-vice-gold'
+                        : 'bg-vice-surface text-vice-dim'
                     }`}
                   >
                     {cut.tag}
@@ -487,7 +487,7 @@ export function TimestampPlayer({
               type="button"
               disabled={isUploadingVideo}
               onClick={() => fileInputRef.current?.click()}
-              className="px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 bg-gradient-to-r from-vice-pink via-vice-coral to-vice-gold hover:opacity-95 text-white shadow-md shadow-pink-500/20 transition-all shrink-0 cursor-pointer active:scale-95 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 bg-vice-gradient hover:opacity-95 text-white shadow-xs transition-all shrink-0 cursor-pointer active:scale-95 disabled:opacity-50"
               title="Upload video to Supabase Storage and sync with PostgreSQL"
             >
               {isUploadingVideo ? (
@@ -507,11 +507,11 @@ export function TimestampPlayer({
       )}
 
       {/* Main Video Monitor Display */}
-      <div className="relative overflow-hidden bg-black rounded-2xl border border-pink-500/25 shadow-xl shadow-pink-950/30 flex flex-col items-center justify-center">
+      <div className="relative overflow-hidden bg-black rounded-2xl border border-vice-border shadow-md flex flex-col items-center justify-center">
         {/* Top Watermark / Status Header */}
         <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none gap-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="bg-[#0D0618]/85 backdrop-blur-md text-vice-pink font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-pink-500/40 font-semibold shadow-xs">
+            <span className="bg-vice-surface/90 backdrop-blur-md text-vice-pink font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-vice-border font-semibold shadow-xs">
               {hasNoVideo
                 ? 'TIMELINE IDLE'
                 : activeFileName
@@ -520,12 +520,12 @@ export function TimestampPlayer({
                 ? 'VERTICAL 9:16 • SYNCED'
                 : '1080P PRORES • SYNCED'}
             </span>
-            <span className="bg-[#0D0618]/85 backdrop-blur-md text-vice-mint font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-emerald-500/40 font-semibold shadow-xs">
+            <span className="bg-vice-surface/90 backdrop-blur-md text-vice-mint font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-emerald-500/30 font-semibold shadow-xs">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
 
-          <span className="bg-[#0D0618]/85 backdrop-blur-md text-vice-gold font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-amber-500/40 font-semibold shadow-xs hidden sm:inline">
+          <span className="bg-vice-surface/90 backdrop-blur-md text-vice-gold font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-full border border-amber-500/30 font-semibold shadow-xs hidden sm:inline">
             30/70 ESCROW PROTECTED
           </span>
         </div>
@@ -534,7 +534,7 @@ export function TimestampPlayer({
         <div className="relative w-full flex items-center justify-center bg-black min-h-[260px] sm:min-h-[360px] max-h-[460px]">
           {hasNoVideo ? (
             <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-center space-y-4 max-w-md mx-auto">
-              <div className="w-16 h-16 rounded-3xl bg-[#170B29] border border-pink-500/30 flex items-center justify-center text-vice-pink shadow-inner">
+              <div className="w-16 h-16 rounded-3xl bg-vice-surface border border-vice-border flex items-center justify-center text-vice-pink shadow-xs">
                 <FileVideo className="w-8 h-8 opacity-80" />
               </div>
               <div className="space-y-1.5">
@@ -550,7 +550,7 @@ export function TimestampPlayer({
                 type="button"
                 disabled={isUploadingVideo}
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-vice-gradient hover:opacity-95 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-pink-500/25 flex items-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                className="bg-vice-gradient hover:opacity-95 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
               >
                 {isUploadingVideo ? (
                   <>
@@ -588,7 +588,7 @@ export function TimestampPlayer({
               {!isPlaying && !hasError && (
                 <div
                   onClick={togglePlay}
-                  className="absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-vice-pink to-vice-coral hover:from-vice-pink-hover hover:to-vice-coral text-white flex items-center justify-center shadow-xl shadow-pink-500/40 cursor-pointer backdrop-blur-xs transition-transform hover:scale-110 active:scale-95 z-10"
+                  className="absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-vice-pink to-vice-coral hover:from-vice-pink-hover hover:to-vice-coral text-white flex items-center justify-center shadow-md cursor-pointer backdrop-blur-xs transition-transform hover:scale-110 active:scale-95 z-10"
                   title="Click or press Space to Play"
                 >
                   <Play className="w-6 h-6 fill-current ml-0.5" />
@@ -599,10 +599,10 @@ export function TimestampPlayer({
         </div>
 
         {/* Video Scrubber with Revision Pins */}
-        <div className="w-full px-4 sm:px-5 py-3.5 bg-[#170B29]/95 border-t border-pink-500/20 flex flex-col gap-2.5">
+        <div className="w-full px-4 sm:px-5 py-3.5 bg-vice-surface border-t border-vice-border flex flex-col gap-2.5">
           {/* Active Frame Note Banner (if playhead is near a pin) */}
           {activeProjectComments.some((c) => Math.abs(c.timestamp_seconds - currentTime) < 2.5) && (
-            <div className="px-3 py-1.5 bg-amber-500/15 border border-amber-500/30 rounded-xl text-xs text-vice-gold flex items-center justify-between gap-2 animate-in fade-in duration-200">
+            <div className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-600 dark:text-amber-400 flex items-center justify-between gap-2 animate-in fade-in duration-200">
               <span className="truncate">
                 <strong className="font-mono text-vice-pink">
                   [{activeProjectComments.find((c) => Math.abs(c.timestamp_seconds - currentTime) < 2.5)?.formatted_time}]
@@ -611,7 +611,7 @@ export function TimestampPlayer({
                   {activeProjectComments.find((c) => Math.abs(c.timestamp_seconds - currentTime) < 2.5)?.comment}
                 </span>
               </span>
-              <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-vice-gold text-[#0D0618] shrink-0">
+              <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 shrink-0">
                 Frame Note
               </span>
             </div>
@@ -632,10 +632,10 @@ export function TimestampPlayer({
                     }}
                     title={`[${comment.formatted_time}] ${comment.comment}`}
                     style={{ left: `${Math.min(99, Math.max(1, percent))}%` }}
-                    className="absolute -top-1.5 w-3.5 h-5 -translate-x-1/2 cursor-pointer pointer-events-auto bg-vice-gold hover:bg-vice-pink border border-[#0D0618] rounded-sm shadow-md hover:scale-130 transition-all z-20 group"
+                    className="absolute -top-1.5 w-3.5 h-5 -translate-x-1/2 cursor-pointer pointer-events-auto bg-vice-gold hover:bg-vice-pink border border-vice-surface rounded-sm shadow-xs hover:scale-130 transition-all z-20 group"
                   >
                     {/* Hover tooltip */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden group-hover:block bg-[#170B29] text-white text-[10px] font-sans px-2.5 py-1 rounded-md border border-pink-500/40 whitespace-nowrap shadow-xl z-30 pointer-events-none max-w-[200px] truncate">
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden group-hover:block bg-vice-surface text-vice-text text-[10px] font-sans px-2.5 py-1 rounded-md border border-vice-border whitespace-nowrap shadow-xl z-30 pointer-events-none max-w-[200px] truncate">
                       <span className="font-mono text-vice-pink font-bold">[{comment.formatted_time}]</span> {comment.comment}
                     </div>
                   </div>
@@ -657,7 +657,7 @@ export function TimestampPlayer({
                 seekTo(parseFloat((e.target as HTMLInputElement).value));
               }}
               onChange={handleScrubberChange}
-              className="w-full h-2 bg-[#211038] rounded-lg appearance-none cursor-pointer accent-[#FF2E93] focus:outline-hidden disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full h-2 bg-vice-cardElevated rounded-lg appearance-none cursor-pointer accent-vice-pink focus:outline-hidden disabled:opacity-30 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -668,7 +668,7 @@ export function TimestampPlayer({
               <button
                 disabled={hasNoVideo}
                 onClick={togglePlay}
-                className="bg-vice-gradient hover:opacity-95 text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-bold transition-all shadow-md shadow-pink-500/25 active:scale-95 text-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-vice-gradient hover:opacity-95 text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-bold transition-all shadow-xs active:scale-95 text-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
                 <span>{isPlaying ? 'PAUSE' : 'PLAY'}</span>
@@ -677,7 +677,7 @@ export function TimestampPlayer({
               <button
                 disabled={hasNoVideo}
                 onClick={() => seekRelative(-5)}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-muted hover:text-vice-text border border-pink-500/20 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-muted hover:text-vice-text border border-vice-border px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40"
                 title="Rewind 5s"
               >
                 -5s
@@ -686,7 +686,7 @@ export function TimestampPlayer({
               <button
                 disabled={hasNoVideo}
                 onClick={() => seekRelative(5)}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-muted hover:text-vice-text border border-pink-500/20 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-muted hover:text-vice-text border border-vice-border px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40"
                 title="Forward 5s"
               >
                 +5s
@@ -696,7 +696,7 @@ export function TimestampPlayer({
               <button
                 disabled={hasNoVideo}
                 onClick={() => stepFrame(-0.04)}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-muted hover:text-vice-text border border-pink-500/20 px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline disabled:opacity-40"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-muted hover:text-vice-text border border-vice-border px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline disabled:opacity-40"
                 title="Previous frame (0.04s)"
               >
                 -1f
@@ -705,7 +705,7 @@ export function TimestampPlayer({
               <button
                 disabled={hasNoVideo}
                 onClick={() => stepFrame(0.04)}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-muted hover:text-vice-text border border-pink-500/20 px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline disabled:opacity-40"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-muted hover:text-vice-text border border-vice-border px-1.5 py-1.5 rounded-lg text-[10px] transition-colors cursor-pointer hidden xs:inline disabled:opacity-40"
                 title="Next frame (0.04s)"
               >
                 +1f
@@ -714,7 +714,7 @@ export function TimestampPlayer({
               <button
                 disabled={hasNoVideo}
                 onClick={toggleMute}
-                className="bg-[#211038] hover:bg-[#2c174a] text-vice-muted hover:text-vice-text border border-pink-500/20 p-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-40"
+                className="bg-vice-cardElevated hover:bg-vice-hover text-vice-muted hover:text-vice-text border border-vice-border p-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-40"
                 title={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? <VolumeX className="w-3.5 h-3.5 text-vice-dim" /> : <Volume2 className="w-3.5 h-3.5 text-vice-pink" />}
@@ -736,7 +736,7 @@ export function TimestampPlayer({
                   className={`px-2 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer disabled:opacity-40 ${
                     playbackRate === rate
                       ? 'bg-vice-pink text-white font-bold shadow-xs'
-                      : 'bg-[#211038] text-vice-dim hover:text-vice-text hover:bg-[#2c174a]'
+                      : 'bg-vice-cardElevated text-vice-dim hover:text-vice-text hover:bg-vice-hover'
                   }`}
                 >
                   {rate}x
@@ -748,14 +748,14 @@ export function TimestampPlayer({
       </div>
 
       {/* Timestamp Feedback Input Box (The Core Coordination Engine) */}
-      <div className="glass-panel p-4 sm:p-5 bg-[#170B29]/90 border border-pink-500/25 rounded-2xl shadow-lg transition-colors">
-        <div className="flex flex-wrap items-center justify-between pb-3 mb-4 border-b border-pink-500/20 gap-2">
+      <div className="glass-panel p-4 sm:p-5 bg-vice-surface border border-vice-border rounded-2xl shadow-xs transition-colors">
+        <div className="flex flex-wrap items-center justify-between pb-3 mb-4 border-b border-vice-border gap-2">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-vice-pink shrink-0" />
             <span className="font-semibold text-xs text-vice-text">
               Pin Revision Note at Timecode:
             </span>
-            <span className="px-2.5 py-0.5 bg-pink-500/15 text-vice-pink font-mono font-bold text-xs rounded-full border border-pink-500/30 shadow-xs">
+            <span className="px-2.5 py-0.5 bg-vice-pink/10 text-vice-pink font-mono font-bold text-xs rounded-full border border-vice-pink/20 shadow-xs">
               {formatTime(currentTime)}
             </span>
           </div>
@@ -780,8 +780,8 @@ export function TimestampPlayer({
               }}
               className={`px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs rounded-xl flex items-center gap-1.5 font-medium transition-all cursor-pointer ${
                 activeCategory === cat.value
-                  ? 'bg-vice-gradient text-white font-semibold shadow-md shadow-pink-500/25 scale-102'
-                  : 'bg-[#211038] text-vice-muted hover:bg-[#2c174a] hover:text-vice-text border border-pink-500/20'
+                  ? 'bg-vice-gradient text-white font-semibold shadow-xs scale-102'
+                  : 'bg-vice-cardElevated text-vice-muted hover:bg-vice-hover hover:text-vice-text border border-vice-border'
               }`}
             >
               <span
@@ -800,12 +800,12 @@ export function TimestampPlayer({
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder={`e.g., "${formatTime(currentTime)} - Replace B-roll with chart animation"`}
-            className="flex-1 px-4 py-2.5 text-xs text-vice-text bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-vice-pink placeholder:text-vice-dim transition-colors"
+            className="flex-1 px-4 py-2.5 text-xs text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink placeholder:text-vice-dim transition-colors"
           />
           <button
             type="submit"
             disabled={!commentText.trim()}
-            className="bg-vice-gradient hover:opacity-95 text-white px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-pink-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 cursor-pointer shrink-0"
+            className="bg-vice-gradient hover:opacity-95 text-white px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 cursor-pointer shrink-0"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Drop Note</span>

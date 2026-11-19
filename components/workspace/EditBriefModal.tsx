@@ -86,10 +86,10 @@ export function EditBriefModal({
   return (
     <Portal>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
-        <div className="bg-[#170B29] border border-pink-500/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col p-6 space-y-5">
-          <div className="flex items-center justify-between pb-4 border-b border-pink-500/20">
+        <div className="bg-vice-surface border border-vice-border rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col p-6 space-y-5">
+          <div className="flex items-center justify-between pb-4 border-b border-vice-border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-pink-500/10 border border-pink-500/20 text-vice-pink flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-vice-pink/10 border border-vice-pink/20 text-vice-pink flex items-center justify-center">
                 <FileText className="w-5 h-5" />
               </div>
               <div>
@@ -104,7 +104,7 @@ export function EditBriefModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-vice-muted hover:text-vice-text hover:bg-[#211038] cursor-pointer transition-colors"
+              className="p-2 rounded-xl text-vice-muted hover:text-vice-text hover:bg-vice-hover cursor-pointer transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -121,7 +121,7 @@ export function EditBriefModal({
                 value={briefFormText}
                 onChange={(e) => setBriefFormText(e.target.value)}
                 placeholder="Describe the storyline, hook, pacing, tone of voice, visual energy, motion graphics style, and core call to action..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text placeholder:text-vice-dim focus:outline-hidden focus:border-vice-pink font-sans leading-relaxed"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-vice-border bg-vice-input text-vice-text placeholder:text-vice-muted focus:outline-hidden focus:border-vice-pink font-sans leading-relaxed"
                 required
               />
             </div>
@@ -133,7 +133,7 @@ export function EditBriefModal({
                 <select
                   value={briefAspectRatio}
                   onChange={(e) => setBriefAspectRatio(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text focus:border-vice-pink"
+                  className="w-full px-3 py-2 rounded-xl border border-vice-border bg-vice-input text-vice-text focus:border-vice-pink"
                 >
                   <option value="16:9">16:9 (Landscape YouTube)</option>
                   <option value="9:16">9:16 (Vertical Shorts/Reels)</option>
@@ -148,7 +148,7 @@ export function EditBriefModal({
                   max={120}
                   value={briefTargetDuration}
                   onChange={(e) => setBriefTargetDuration(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text focus:border-vice-pink font-mono"
+                  className="w-full px-3 py-2 rounded-xl border border-vice-border bg-vice-input text-vice-text focus:border-vice-pink font-mono"
                 />
               </div>
 
@@ -157,7 +157,7 @@ export function EditBriefModal({
                 <select
                   value={briefResolution}
                   onChange={(e) => setBriefResolution(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text focus:border-vice-pink"
+                  className="w-full px-3 py-2 rounded-xl border border-vice-border bg-vice-input text-vice-text focus:border-vice-pink"
                 >
                   <option value="4K (3840x2160)">4K (3840x2160)</option>
                   <option value="1080p (1920x1080)">1080p (1920x1080)</option>
@@ -180,7 +180,7 @@ export function EditBriefModal({
                 value={briefFootageLinksText}
                 onChange={(e) => setBriefFootageLinksText(e.target.value)}
                 placeholder="https://drive.google.com/drive/folders/raw-footage&#10;https://storage.editbridge.network/raw/a-cam.mp4"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-vice-border bg-vice-input text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
               />
             </div>
 
@@ -197,23 +197,23 @@ export function EditBriefModal({
                 value={briefReferencesText}
                 onChange={(e) => setBriefReferencesText(e.target.value)}
                 placeholder="https://youtube.com/watch?v=vox-explainer-masterclass&#10;https://youtube.com/watch?v=visual-pacing-guide"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-pink-500/30 bg-[#0D0618] text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-vice-border bg-vice-input text-vice-text font-mono text-[11px] focus:outline-hidden focus:border-vice-pink"
               />
             </div>
 
             {/* Action Footer */}
-            <div className="pt-3 border-t border-pink-500/20 flex items-center justify-end gap-3">
+            <div className="pt-3 border-t border-vice-border flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl border border-pink-500/20 hover:bg-[#211038] text-vice-muted hover:text-vice-text font-semibold cursor-pointer transition-colors"
+                className="px-4 py-2 rounded-xl border border-vice-border hover:bg-vice-hover text-vice-muted hover:text-vice-text font-semibold cursor-pointer transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-5 py-2 rounded-xl bg-vice-gradient hover:opacity-95 text-white font-bold flex items-center gap-2 shadow-md shadow-pink-500/25 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                className="px-5 py-2 rounded-xl bg-vice-pink hover:bg-vice-pinkHover text-white font-bold flex items-center gap-2 shadow-sm cursor-pointer transition-all active:scale-95 disabled:opacity-50"
               >
                 <CheckCircle2 className="w-4 h-4 text-white" />
                 <span>{isSaving ? 'Saving to Database...' : 'Save & Sync Brief'}</span>

@@ -53,11 +53,11 @@ export default function LandingPage() {
       <RetroWindow
         title="EDITBRIDGE WORKSPACE — CREATOR &amp; EDITOR COLLABORATION HUB"
         icon={<Film className="w-4 h-4 text-vice-pink" />}
-        className="w-full shadow-2xl relative overflow-hidden"
+        className="w-full shadow-xl relative overflow-hidden"
       >
         <div className="space-y-6">
           {/* Main Hero Banner with Ambient 3D Prop in Background */}
-          <div className="bg-gradient-to-b from-[#211038] via-[#170B29] to-[#0D0618] text-white p-6 sm:p-12 md:p-16 rounded-2xl border border-pink-500/25 flex flex-col items-center text-center relative overflow-hidden transition-colors min-h-[480px] sm:min-h-[520px] justify-center">
+          <div className="bg-gradient-to-b from-vice-card via-vice-surface to-vice-bg text-vice-text p-6 sm:p-12 md:p-16 rounded-2xl border border-vice-border flex flex-col items-center text-center relative overflow-hidden transition-colors min-h-[480px] sm:min-h-[520px] justify-center">
             
             {/* Ambient 3D Perspective Studio Prop in the Background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
@@ -65,16 +65,16 @@ export default function LandingPage() {
             </div>
 
             {/* Ambient Background Glow Effect */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 sm:w-[600px] h-64 bg-gradient-to-b from-pink-500/20 via-orange-500/15 to-transparent blur-3xl pointer-events-none z-0" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 sm:w-[600px] h-64 bg-gradient-to-b from-vice-pink/10 via-vice-coral/5 to-transparent blur-3xl pointer-events-none z-0" />
 
             {/* Foreground Content */}
             <div className="relative z-10 flex flex-col items-center max-w-4xl">
-              <div className="inline-flex items-center gap-2 bg-[#170B29]/80 text-vice-pink border border-pink-500/40 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-xs backdrop-blur-md">
+              <div className="inline-flex items-center gap-2 bg-vice-surface/80 text-vice-pink border border-vice-border px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-xs backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5 text-vice-gold" />
                 <span>THE DIGITAL WORKSPACE FOR MODERN VIDEO CREATORS &amp; EDITORS</span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white max-w-4xl leading-tight">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-vice-text max-w-4xl leading-tight">
                 One Workspace to Brief, Review &amp; Deliver High-Retention Videos.
               </h1>
 
@@ -87,7 +87,7 @@ export default function LandingPage() {
                 <Link
                   href="/workspace"
                   onClick={() => retroSound.playDing()}
-                  className="bg-vice-gradient hover:opacity-95 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-pink-500/30 transition-all hover:scale-102 active:scale-98"
+                  className="bg-vice-gradient hover:opacity-95 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all hover:scale-102 active:scale-98"
                 >
                   <span>Launch Creator Workspace</span>
                   <ArrowRight className="w-4 h-4" />
@@ -96,7 +96,7 @@ export default function LandingPage() {
                 <Link
                   href="/editors"
                   onClick={() => retroSound.playDing()}
-                  className="bg-gradient-to-r from-purple-700 via-pink-700 to-rose-600 hover:opacity-95 text-white w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-purple-500/30 transition-all hover:scale-102 active:scale-98"
+                  className="bg-vice-cardElevated hover:bg-vice-hover text-vice-text border border-vice-border w-full py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all hover:scale-102 active:scale-98"
                 >
                   <span>Discover Vetted Editors</span>
                   <ChevronRight className="w-4 h-4" />
@@ -104,7 +104,7 @@ export default function LandingPage() {
               </div>
 
               {/* Production trust pill */}
-              <div className="mt-8 flex items-center gap-2 text-xs text-vice-mint font-semibold bg-[#0D0618]/80 px-4 py-1.5 rounded-full border border-pink-500/25 backdrop-blur-md">
+              <div className="mt-8 flex items-center gap-2 text-xs text-vice-mint font-semibold bg-vice-surface/80 px-4 py-1.5 rounded-full border border-vice-border backdrop-blur-md">
                 <span className="w-2 h-2 rounded-full bg-vice-mint animate-pulse" />
                 <span>Production Infrastructure • 30/70 Escrow Protocol • Supabase Cloud Active</span>
               </div>
@@ -121,16 +121,16 @@ export default function LandingPage() {
               }}
               className={`p-6 rounded-2xl border cursor-pointer transition-all ${
                 selectedPath === 'CREATOR'
-                  ? 'border-vice-pink bg-[#170B29] shadow-lg shadow-pink-500/20 ring-2 ring-pink-500/30'
-                  : 'bg-[#211038] border-pink-500/20 hover:border-vice-pink'
+                  ? 'border-vice-pink bg-vice-surface shadow-xs ring-1 ring-vice-pink/30'
+                  : 'bg-vice-cardElevated border-vice-border hover:border-vice-pink'
               }`}
             >
-              <div className="flex items-center justify-between pb-3.5 border-b border-pink-500/20">
+              <div className="flex items-center justify-between pb-3.5 border-b border-vice-border">
                 <span className="font-bold text-xs text-vice-pink flex items-center gap-2 uppercase tracking-wide">
                   <Film className="w-4 h-4" />
                   FOR CONTENT CREATORS
                 </span>
-                <span className="text-[10px] bg-pink-500/15 text-vice-pink border border-pink-500/30 px-2.5 py-0.5 rounded-full font-bold">
+                <span className="text-[10px] bg-vice-pink/10 text-vice-pink border border-vice-pink/20 px-2.5 py-0.5 rounded-full font-bold">
                   YOUTUBE &amp; PODCASTS
                 </span>
               </div>
@@ -148,7 +148,7 @@ export default function LandingPage() {
                   <span><strong>Bring Your Editor:</strong> One-click invite link to onboard your trusted editor into the platform without switching talent.</span>
                 </li>
               </ul>
-              <div className="mt-6 pt-3.5 border-t border-pink-500/20">
+              <div className="mt-6 pt-3.5 border-t border-vice-border">
                 <Link
                   href="/projects/new"
                   onClick={() => switchRole('CREATOR')}
@@ -167,16 +167,16 @@ export default function LandingPage() {
               }}
               className={`p-6 rounded-2xl border cursor-pointer transition-all ${
                 selectedPath === 'EDITOR'
-                  ? 'border-vice-coral bg-[#170B29] shadow-lg shadow-orange-500/20 ring-2 ring-orange-500/30'
-                  : 'bg-[#211038] border-pink-500/20 hover:border-vice-coral'
+                  ? 'border-vice-coral bg-vice-surface shadow-xs ring-1 ring-vice-coral/30'
+                  : 'bg-vice-cardElevated border-vice-border hover:border-vice-coral'
               }`}
             >
-              <div className="flex items-center justify-between pb-3.5 border-b border-pink-500/20">
+              <div className="flex items-center justify-between pb-3.5 border-b border-vice-border">
                 <span className="font-bold text-xs text-vice-coral flex items-center gap-2 uppercase tracking-wide">
                   <Film className="w-4 h-4" />
                   FOR VIDEO EDITORS
                 </span>
-                <span className="text-[10px] bg-orange-500/15 text-vice-coral border border-orange-500/30 px-2.5 py-0.5 rounded-full font-bold">
+                <span className="text-[10px] bg-vice-coral/10 text-vice-coral border border-vice-coral/20 px-2.5 py-0.5 rounded-full font-bold">
                   FREELANCE &amp; STUDIOS
                 </span>
               </div>
@@ -194,11 +194,11 @@ export default function LandingPage() {
                   <span><strong>Structured Feedback Checklist:</strong> No vague &ldquo;make it punchier&rdquo; WhatsApp voice notes. Every note is pinned to a timecode.</span>
                 </li>
               </ul>
-              <div className="mt-6 pt-3.5 border-t border-pink-500/20">
+              <div className="mt-6 pt-3.5 border-t border-vice-border">
                 <Link
                   href="/editors"
                   onClick={() => switchRole('EDITOR')}
-                  className="bg-gradient-to-r from-vice-coral to-vice-gold hover:opacity-95 text-slate-950 font-bold w-full py-2.5 text-xs text-center block rounded-xl transition-all shadow-xs"
+                  className="bg-gradient-to-r from-vice-coral to-vice-gold hover:opacity-95 text-white font-bold w-full py-2.5 text-xs text-center block rounded-xl transition-all shadow-xs"
                 >
                   Explore Editor Roster →
                 </Link>
@@ -215,9 +215,9 @@ export default function LandingPage() {
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Step 1 */}
-          <div className="p-5 bg-[#170B29] border border-pink-500/20 rounded-2xl flex flex-col justify-between shadow-xs hover:border-pink-500/40 transition-all">
+          <div className="p-5 bg-vice-surface border border-vice-border rounded-2xl flex flex-col justify-between shadow-xs hover:border-vice-borderHover transition-all">
             <div>
-              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-sm shadow-pink-500/25">
+              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-xs">
                 01
               </div>
               <h3 className="font-bold text-xs text-vice-text mb-1.5">
@@ -227,15 +227,15 @@ export default function LandingPage() {
                 Filter editors by niche, software, and retention score, or send a direct link to bring your current editor.
               </p>
             </div>
-            <div className="mt-4 pt-2.5 border-t border-pink-500/20 text-[10px] text-vice-pink font-bold uppercase tracking-wider">
+            <div className="mt-4 pt-2.5 border-t border-vice-border text-[10px] text-vice-pink font-bold uppercase tracking-wider">
               Directory / Direct URL
             </div>
           </div>
 
           {/* Step 2 */}
-          <div className="p-5 bg-[#170B29] border border-pink-500/20 rounded-2xl flex flex-col justify-between shadow-xs hover:border-pink-500/40 transition-all">
+          <div className="p-5 bg-vice-surface border border-vice-border rounded-2xl flex flex-col justify-between shadow-xs hover:border-vice-borderHover transition-all">
             <div>
-              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-sm shadow-pink-500/25">
+              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-xs">
                 02
               </div>
               <h3 className="font-bold text-xs text-vice-text mb-1.5">
@@ -245,15 +245,15 @@ export default function LandingPage() {
                 Define duration, 16:9/9:16 aspect ratio, captions, style references, and set strict revision limits.
               </p>
             </div>
-            <div className="mt-4 pt-2.5 border-t border-pink-500/20 text-[10px] text-vice-pink font-bold uppercase tracking-wider">
+            <div className="mt-4 pt-2.5 border-t border-vice-border text-[10px] text-vice-pink font-bold uppercase tracking-wider">
               Scope &amp; Deliverables
             </div>
           </div>
 
           {/* Step 3 */}
-          <div className="p-5 bg-[#170B29] border border-pink-500/20 rounded-2xl flex flex-col justify-between shadow-xs hover:border-pink-500/40 transition-all">
+          <div className="p-5 bg-vice-surface border border-vice-border rounded-2xl flex flex-col justify-between shadow-xs hover:border-vice-borderHover transition-all">
             <div>
-              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-sm shadow-pink-500/25">
+              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-xs">
                 03
               </div>
               <h3 className="font-bold text-xs text-vice-text mb-1.5">
@@ -263,15 +263,15 @@ export default function LandingPage() {
                 Client funds Milestone 1 deposit in protected escrow. Editor downloads raw footage and begins cut.
               </p>
             </div>
-            <div className="mt-4 pt-2.5 border-t border-pink-500/20 text-[10px] text-vice-mint font-bold uppercase tracking-wider">
+            <div className="mt-4 pt-2.5 border-t border-vice-border text-[10px] text-vice-mint font-bold uppercase tracking-wider">
               Escrow Protection
             </div>
           </div>
 
           {/* Step 4 */}
-          <div className="p-5 bg-[#170B29] border border-pink-500/20 rounded-2xl flex flex-col justify-between shadow-xs hover:border-pink-500/40 transition-all">
+          <div className="p-5 bg-vice-surface border border-vice-border rounded-2xl flex flex-col justify-between shadow-xs hover:border-vice-borderHover transition-all">
             <div>
-              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-sm shadow-pink-500/25">
+              <div className="w-8 h-8 bg-vice-gradient text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-xs">
                 04
               </div>
               <h3 className="font-bold text-xs text-vice-text mb-1.5">
@@ -281,15 +281,15 @@ export default function LandingPage() {
                 Client plays draft proxy and drops pinned timecode notes. Editor checks off items: Pending → In Progress → Resolved.
               </p>
             </div>
-            <div className="mt-4 pt-2.5 border-t border-pink-500/20 text-[10px] text-vice-gold font-bold uppercase tracking-wider">
+            <div className="mt-4 pt-2.5 border-t border-vice-border text-[10px] text-vice-gold font-bold uppercase tracking-wider">
               Synced Video Player
             </div>
           </div>
 
           {/* Step 5 */}
-          <div className="p-5 bg-[#170B29] border border-pink-500/20 rounded-2xl flex flex-col justify-between shadow-xs hover:border-pink-500/40 transition-all">
+          <div className="p-5 bg-vice-surface border border-vice-border rounded-2xl flex flex-col justify-between shadow-xs hover:border-vice-borderHover transition-all">
             <div>
-              <div className="w-8 h-8 bg-gradient-to-r from-vice-coral to-vice-gold text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-sm shadow-orange-500/25">
+              <div className="w-8 h-8 bg-gradient-to-r from-vice-coral to-vice-gold text-white font-bold text-xs rounded-xl flex items-center justify-center mb-3 shadow-xs">
                 05
               </div>
               <h3 className="font-bold text-xs text-vice-text mb-1.5">
@@ -299,7 +299,7 @@ export default function LandingPage() {
                 Final master uploaded. Client releases remaining 70% milestone, unlocking verified uncompressed 4K download!
               </p>
             </div>
-            <div className="mt-4 pt-2.5 border-t border-pink-500/20 text-[10px] text-vice-coral font-bold uppercase tracking-wider">
+            <div className="mt-4 pt-2.5 border-t border-vice-border text-[10px] text-vice-coral font-bold uppercase tracking-wider">
               Master Unlock &amp; Review
             </div>
           </div>
@@ -312,7 +312,7 @@ export default function LandingPage() {
         icon={<Film className="w-4 h-4 text-vice-pink" />}
       >
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-pink-500/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-vice-border">
             <div>
               <h2 className="text-xs sm:text-sm font-bold text-vice-text flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-vice-pink" />
@@ -325,7 +325,7 @@ export default function LandingPage() {
             <Link
               href="/workspace"
               onClick={() => retroSound.playDing()}
-              className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-md shadow-pink-500/25 transition-all shrink-0 self-start sm:self-auto cursor-pointer"
+              className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-xs transition-all shrink-0 self-start sm:self-auto cursor-pointer"
             >
               <span>Open in Full Studio Workspace</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -356,14 +356,14 @@ export default function LandingPage() {
         icon={<Users className="w-4 h-4 text-vice-coral" />}
       >
         <div className="space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2 pb-3.5 border-b border-pink-500/20">
+          <div className="flex items-center justify-between flex-wrap gap-2 pb-3.5 border-b border-vice-border">
             <span className="text-xs text-vice-muted font-medium">
               Showing top vetted editors specializing in high-retention creator workflows:
             </span>
             <Link
               href="/editors"
               onClick={() => retroSound.playClick()}
-              className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-md shadow-pink-500/25 transition-all cursor-pointer"
+              className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
             >
               <span>View Full Directory ({editors.length})</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -374,7 +374,7 @@ export default function LandingPage() {
             {editors.map((editor) => (
               <div
                 key={editor.user_id}
-                className="p-4 bg-[#170B29] border border-pink-500/20 rounded-2xl flex flex-col justify-between hover:border-pink-500/40 transition-all shadow-xs"
+                className="p-4 bg-vice-surface border border-vice-border rounded-2xl flex flex-col justify-between hover:border-vice-borderHover transition-all shadow-xs"
               >
                 <div>
                   <div className="flex items-start gap-3">
@@ -382,7 +382,7 @@ export default function LandingPage() {
                     <img
                       src={editor.portfolio_items[0]?.thumbnail_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=150'}
                       alt={editor.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-pink-500/30 flex-shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border border-vice-border flex-shrink-0"
                     />
                     <div className="min-w-0">
                       <h4 className="font-bold text-xs text-vice-text truncate">
@@ -405,7 +405,7 @@ export default function LandingPage() {
                     {editor.niches.slice(0, 2).map((n) => (
                       <span
                         key={n}
-                        className="bg-[#211038] border border-pink-500/20 text-[10px] px-2 py-0.5 rounded-md text-vice-text font-medium"
+                        className="bg-vice-cardElevated border border-vice-border text-[10px] px-2 py-0.5 rounded-md text-vice-text font-medium"
                       >
                         {n}
                       </span>
@@ -413,14 +413,14 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3.5 border-t border-pink-500/20 flex items-center justify-between text-xs">
+                <div className="mt-4 pt-3.5 border-t border-vice-border flex items-center justify-between text-xs">
                   <span className="font-bold text-vice-gold font-mono">
                     {editor.price_range}
                   </span>
                   <Link
                     href={`/editors/${editor.user_id}`}
                     onClick={() => retroSound.playClick()}
-                    className="bg-[#211038] hover:bg-[#2c174a] text-vice-text border border-pink-500/20 px-3 py-1 text-xs font-semibold rounded-lg transition-colors"
+                    className="bg-vice-cardElevated hover:bg-vice-hover text-vice-text border border-vice-border px-3 py-1 text-xs font-semibold rounded-lg transition-colors"
                   >
                     Profile
                   </Link>
@@ -443,13 +443,13 @@ export default function LandingPage() {
               {faqs.map((faq, index) => {
                 const isOpen = activeFaq === index;
                 return (
-                  <div key={index} className="bg-[#170B29] border border-pink-500/20 rounded-xl overflow-hidden transition-all">
+                  <div key={index} className="bg-vice-surface border border-vice-border rounded-xl overflow-hidden transition-all">
                     <button
                       onClick={() => {
                         retroSound.playClick();
                         setActiveFaq(isOpen ? null : index);
                       }}
-                      className="w-full p-4 text-left font-bold text-xs text-vice-text flex items-center justify-between hover:bg-[#211038] transition-colors cursor-pointer"
+                      className="w-full p-4 text-left font-bold text-xs text-vice-text flex items-center justify-between hover:bg-vice-hover transition-colors cursor-pointer"
                     >
                       <span>{faq.q}</span>
                       <span className="text-sm font-bold text-vice-pink ml-2">
@@ -457,7 +457,7 @@ export default function LandingPage() {
                       </span>
                     </button>
                     {isOpen && (
-                      <div className="px-4 pb-4 text-xs text-vice-muted leading-relaxed border-t border-pink-500/20 pt-3">
+                      <div className="px-4 pb-4 text-xs text-vice-muted leading-relaxed border-t border-vice-border pt-3">
                         {faq.a}
                       </div>
                     )}
@@ -474,8 +474,8 @@ export default function LandingPage() {
             title="PLATFORM METRICS"
             icon={<Monitor className="w-4 h-4 text-vice-mint" />}
           >
-            <div className="p-5 bg-[#170B29] rounded-2xl border border-pink-500/25 text-xs space-y-3 text-vice-muted">
-              <div className="border-b border-pink-500/20 pb-2 text-vice-mint font-bold uppercase tracking-wider text-[11px]">
+            <div className="p-5 bg-vice-surface rounded-2xl border border-vice-border text-xs space-y-3 text-vice-muted">
+              <div className="border-b border-vice-border pb-2 text-vice-mint font-bold uppercase tracking-wider text-[11px]">
                 [PLATFORM INTEGRITY STATUS]
               </div>
               <div className="flex justify-between">
@@ -498,7 +498,7 @@ export default function LandingPage() {
                 <span>DISPUTE RATE:</span>
                 <span className="text-vice-mint font-mono font-bold">&lt;0.4%</span>
               </div>
-              <div className="pt-2 border-t border-pink-500/20 text-[11px] text-vice-dim leading-relaxed">
+              <div className="pt-2 border-t border-vice-border text-[11px] text-vice-dim leading-relaxed">
                 Operating under milestone state machine v1.0. All transitions validated server-side.
               </div>
             </div>
@@ -510,7 +510,7 @@ export default function LandingPage() {
                   retroSound.playDing();
                   switchRole('CREATOR');
                 }}
-                className="bg-vice-gradient hover:opacity-95 text-white w-full py-3 text-xs font-semibold text-center block rounded-xl shadow-md shadow-pink-500/25 transition-all"
+                className="bg-vice-gradient hover:opacity-95 text-white w-full py-3 text-xs font-semibold text-center block rounded-xl shadow-xs transition-all"
               >
                 Open Project Workspace →
               </Link>

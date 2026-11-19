@@ -69,7 +69,7 @@ export default function SignInPage() {
             <KeyRound className="w-6 h-6" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-vice-text">
-            Welcome to <span className="bg-vice-gradient bg-clip-text text-transparent">EditBridge</span>
+            Welcome to <span className="inline-block bg-gradient-to-r from-pink-600 via-rose-500 to-orange-500 bg-clip-text text-transparent">EditBridge</span>
           </h1>
           <p className="text-xs sm:text-sm text-vice-muted max-w-sm mx-auto">
             Log in to manage video revisions, 30/70 escrow milestones, and master deliverables.
@@ -77,13 +77,13 @@ export default function SignInPage() {
         </div>
 
         {/* Login Form Container */}
-        <div className="bg-[#170B29] border border-pink-500/30 rounded-3xl p-6 sm:p-8 shadow-xl shadow-pink-950/20 space-y-5 transition-colors">
+        <div className="bg-vice-surface border border-vice-border rounded-3xl p-6 sm:p-8 shadow-xl space-y-5 transition-colors">
           {errorMessage && (
             <div
               role="alert"
-              className="p-3.5 bg-rose-950/50 border border-rose-800/70 rounded-2xl text-xs text-rose-300 flex items-start gap-2.5"
+              className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-xs text-rose-500 dark:text-rose-400 flex items-start gap-2.5"
             >
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -91,7 +91,7 @@ export default function SignInPage() {
           {successMessage && (
             <div
               role="status"
-              className="p-3.5 bg-emerald-950/50 border border-emerald-800/70 rounded-2xl text-xs text-emerald-300 flex items-start gap-2.5"
+              className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs text-emerald-600 dark:text-emerald-400 flex items-start gap-2.5"
             >
               <CheckCircle2 className="w-4 h-4 text-vice-mint shrink-0 mt-0.5" />
               <span>{successMessage}</span>
@@ -111,7 +111,7 @@ export default function SignInPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. marcus@sterlingcapital.yt"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl focus:outline-hidden focus:border-vice-pink focus:ring-2 focus:ring-pink-500/20 text-vice-text transition-all placeholder:text-vice-dim"
+                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-vice-input border border-vice-border rounded-xl focus:outline-hidden focus:border-vice-pink focus:ring-2 focus:ring-vice-pink/20 text-vice-text transition-all placeholder:text-vice-dim"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function SignInPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-10 py-2.5 text-xs bg-[#0D0618] border border-pink-500/30 rounded-xl focus:outline-hidden focus:border-vice-pink focus:ring-2 focus:ring-pink-500/20 text-vice-text transition-all placeholder:text-vice-dim"
+                  className="w-full pl-10 pr-10 py-2.5 text-xs bg-vice-input border border-vice-border rounded-xl focus:outline-hidden focus:border-vice-pink focus:ring-2 focus:ring-vice-pink/20 text-vice-text transition-all placeholder:text-vice-dim"
                 />
                 <button
                   type="button"
@@ -149,7 +149,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-vice-gradient hover:opacity-95 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-pink-500/25 hover:shadow-pink-500/40 active:scale-[0.99] transition-all disabled:opacity-60 cursor-pointer"
+              className="w-full bg-vice-gradient hover:opacity-95 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-all disabled:opacity-60 cursor-pointer"
             >
               {isLoading ? (
                 <span>Verifying...</span>
@@ -162,7 +162,7 @@ export default function SignInPage() {
             </button>
           </form>
 
-          <div className="pt-2 text-center text-xs text-vice-muted border-t border-pink-500/20">
+          <div className="pt-2 text-center text-xs text-vice-muted border-t border-vice-border">
             Don&apos;t have an account?{' '}
             <Link
               href="/signup"

@@ -273,16 +273,16 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
   return (
     <div className="flex flex-col gap-3.5">
       {/* Vault header with upload button */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-pink-500/20">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-vice-border">
         <div className="flex items-center gap-2">
           <HardDrive className="w-4 h-4 text-vice-pink" />
           <span className="font-bold text-xs text-vice-text uppercase tracking-wide">
             Project File Storage &amp; Asset Vault
           </span>
-          <span className="text-[10px] bg-[#211038] border border-pink-500/20 px-2 py-0.5 rounded-full text-vice-gold font-mono font-semibold">
+          <span className="text-[10px] bg-vice-cardElevated border border-vice-border px-2 py-0.5 rounded-full text-vice-gold font-mono font-semibold">
             {activeProjectFiles.length} Records
           </span>
-          <span className="text-[10px] bg-emerald-950/40 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-semibold hidden sm:inline flex items-center gap-1">
+          <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold hidden sm:inline flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-vice-mint animate-pulse"></span>
             <span>Supabase Cloud Sync</span>
           </span>
@@ -294,7 +294,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               retroSound.playClick();
               setShowUploadModal(true);
             }}
-            className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-md shadow-pink-500/25 transition-all active:scale-95 cursor-pointer"
+            className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <Upload className="w-3.5 h-3.5" />
             <span>Upload Video / Asset</span>
@@ -305,7 +305,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
       {/* Files Table / List */}
       <div className="space-y-3">
         {activeProjectFiles.length === 0 ? (
-          <div className="p-8 text-center rounded-2xl border border-dashed border-pink-500/30 bg-[#170B29]/40 space-y-3">
+          <div className="p-8 text-center rounded-2xl border border-dashed border-vice-border bg-vice-surface/40 space-y-3">
             <Film className="w-8 h-8 text-vice-pink/60 mx-auto" />
             <p className="text-xs font-semibold text-vice-text">
               No files uploaded to this project yet.
@@ -317,7 +317,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               <button
                 type="button"
                 onClick={() => setShowUploadModal(true)}
-                className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl inline-flex items-center gap-2 shadow-md shadow-pink-500/25 transition-all cursor-pointer"
+                className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-semibold rounded-xl inline-flex items-center gap-2 shadow-xs transition-all cursor-pointer"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Upload First Video</span>
@@ -333,13 +333,13 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                 key={file.id}
                 className={`p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3.5 transition-all ${
                   isFinalLocked
-                    ? 'border-rose-500/40 bg-rose-950/20 shadow-xs'
-                    : 'bg-[#170B29] border-pink-500/20 shadow-xs hover:border-pink-500/40'
+                    ? 'border-rose-500/40 bg-rose-500/5 shadow-xs'
+                    : 'bg-vice-surface border-vice-border shadow-xs hover:border-vice-borderHover'
                 }`}
               >
                 {/* File Info */}
                 <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                  <div className="p-3 bg-[#211038] rounded-xl border border-pink-500/20 shrink-0 mt-0.5 shadow-xs">
+                  <div className="p-3 bg-vice-cardElevated rounded-xl border border-vice-border shrink-0 mt-0.5 shadow-xs">
                     {getFileIcon(file.file_type)}
                   </div>
 
@@ -348,7 +348,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                       <span className="font-bold text-xs text-vice-text truncate">
                         {file.file_name}
                       </span>
-                      <span className="bg-[#211038] border border-pink-500/20 text-[10px] px-2 py-0.5 rounded-md font-mono text-vice-gold">
+                      <span className="bg-vice-cardElevated border border-vice-border text-[10px] px-2 py-0.5 rounded-md font-mono text-vice-gold">
                         {file.version}
                       </span>
                       <span className="text-[11px] font-mono text-vice-dim">
@@ -389,7 +389,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                         <span>Release Milestone 2 to Unlock</span>
                       </button>
                     ) : (
-                      <span className="px-3 py-1.5 bg-[#211038] border border-pink-500/20 rounded-xl text-xs text-vice-muted flex items-center gap-1.5 font-medium">
+                      <span className="px-3 py-1.5 bg-vice-cardElevated border border-vice-border rounded-xl text-xs text-vice-muted flex items-center gap-1.5 font-medium">
                         <Lock className="w-3.5 h-3.5 text-rose-400" />
                         Awaiting Client Payment
                       </span>
@@ -401,7 +401,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                       target="_blank"
                       rel="noreferrer"
                       onClick={() => retroSound.playClick()}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-xs transition-all"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>Download</span>
@@ -416,7 +416,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                         retroSound.playClick();
                         setFileToDelete(file);
                       }}
-                      className="p-1.5 text-vice-dim hover:text-rose-400 hover:bg-rose-950/40 rounded-xl transition-all border border-transparent hover:border-rose-800/60 cursor-pointer"
+                      className="p-1.5 text-vice-dim hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all border border-transparent hover:border-rose-500/20 cursor-pointer"
                       title="Delete Video"
                       aria-label="Delete Video"
                     >
@@ -439,9 +439,9 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               if (e.target === e.currentTarget && !isDeleting) setFileToDelete(null);
             }}
           >
-            <div className="glass-panel max-w-md w-full bg-[#170B29] border border-rose-500/40 rounded-2xl shadow-2xl p-6 space-y-4">
-              <div className="flex items-center gap-3 text-rose-400">
-                <div className="p-2.5 rounded-xl bg-rose-950/60 border border-rose-800/60">
+            <div className="glass-panel max-w-md w-full bg-vice-surface border border-rose-500/40 rounded-2xl shadow-xl p-6 space-y-4">
+              <div className="flex items-center gap-3 text-rose-500 dark:text-rose-400">
+                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20">
                   <Trash2 className="w-6 h-6" />
                 </div>
                 <div>
@@ -452,7 +452,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                 </div>
               </div>
 
-              <div className="p-3 bg-[#0D0618] rounded-xl border border-pink-500/20 text-xs space-y-1">
+              <div className="p-3 bg-vice-cardElevated rounded-xl border border-vice-border text-xs space-y-1">
                 <p className="font-semibold text-vice-text truncate">
                   {fileToDelete.file_name}
                 </p>
@@ -479,7 +479,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                   type="button"
                   disabled={isDeleting}
                   onClick={handleConfirmDelete}
-                  className="bg-rose-600 hover:bg-rose-500 text-white px-5 py-2 text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="bg-rose-600 hover:bg-rose-500 text-white px-5 py-2 text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isDeleting ? (
                     <>
@@ -508,9 +508,9 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               if (e.target === e.currentTarget && !isUploading) setShowUploadModal(false);
             }}
           >
-            <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-[#170B29] border border-pink-500/30 rounded-2xl shadow-2xl overflow-hidden my-auto">
+            <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-vice-surface border border-vice-border rounded-2xl shadow-xl overflow-hidden my-auto">
               {/* Titlebar */}
-              <div className="px-5 py-3.5 bg-[#211038] border-b border-pink-500/20 flex items-center justify-between shrink-0">
+              <div className="px-5 py-3.5 bg-vice-cardElevated border-b border-vice-border flex items-center justify-between shrink-0">
                 <span className="flex items-center gap-2 font-bold text-vice-text text-xs truncate pr-2">
                   <Upload className="w-4 h-4 text-vice-pink shrink-0" />
                   <span>UPLOAD VIDEO TO CLOUD STORAGE</span>
@@ -519,7 +519,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                   type="button"
                   disabled={isUploading}
                   onClick={() => setShowUploadModal(false)}
-                  className="w-7 h-7 rounded-lg bg-[#2c174a] hover:bg-[#381e5e] text-vice-muted hover:text-vice-text text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-50"
+                  className="w-7 h-7 rounded-lg bg-vice-surface hover:bg-vice-hover border border-vice-border text-vice-muted hover:text-vice-text text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-50"
                   title="Close"
                   aria-label="Close"
                 >
@@ -530,7 +530,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
               {/* Form Body */}
               <form onSubmit={handlePerformUpload} className="p-6 space-y-4 text-xs text-vice-text overflow-y-auto flex-1 min-h-0">
                 {uploadError && (
-                  <div className="p-3 bg-rose-950/40 border border-rose-800/60 text-rose-300 rounded-xl flex items-center gap-2">
+                  <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 rounded-xl flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{uploadError}</span>
                   </div>
@@ -553,10 +553,10 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                     }}
                     className={`border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all ${
                       isDragOver
-                        ? 'border-vice-pink bg-pink-950/30'
+                        ? 'border-vice-pink bg-vice-pink/5'
                         : selectedFile
-                        ? 'border-emerald-400 bg-emerald-950/20'
-                        : 'border-pink-500/30 hover:border-vice-pink bg-[#0D0618]'
+                        ? 'border-emerald-500 bg-emerald-500/5'
+                        : 'border-vice-border hover:border-vice-pink bg-vice-input'
                     }`}
                   >
                     <input
@@ -604,7 +604,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                     value={newFileName}
                     onChange={(e) => setNewFileName(e.target.value)}
                     placeholder="e.g. AI_Bubble_Final_Export_v1.mp4"
-                    className="w-full px-3.5 py-2 text-xs text-vice-text bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-vice-pink focus:outline-hidden disabled:opacity-50"
+                    className="w-full px-3.5 py-2 text-xs text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden disabled:opacity-50"
                   />
                 </div>
 
@@ -619,7 +619,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                       onChange={(e) =>
                         setNewFileType(e.target.value as ProjectFile['file_type'])
                       }
-                      className="w-full px-3 py-2 text-xs text-vice-text bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-vice-pink focus:outline-hidden disabled:opacity-50"
+                      className="w-full px-3 py-2 text-xs text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden disabled:opacity-50"
                     >
                       <option value="DRAFT_VIDEO">Draft Video Cut (Timeline Review)</option>
                       <option value="FINAL_MASTER">Final Master Export (Locked until payment)</option>
@@ -639,14 +639,14 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                       value={newVersion}
                       onChange={(e) => setNewVersion(e.target.value)}
                       placeholder="e.g. Draft Cut 1"
-                      className="w-full px-3.5 py-2 text-xs text-vice-text bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-vice-pink focus:outline-hidden disabled:opacity-50"
+                      className="w-full px-3.5 py-2 text-xs text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden disabled:opacity-50"
                     />
                   </div>
                 </div>
 
                 {/* Upload Progress Bar */}
                 {isUploading && (
-                  <div className="p-3.5 bg-pink-950/40 border border-pink-500/40 rounded-xl space-y-2">
+                  <div className="p-3.5 bg-vice-pink/10 border border-vice-pink/20 rounded-xl space-y-2">
                     <div className="flex items-center justify-between font-mono text-[11px]">
                       <span className="flex items-center gap-1.5 font-bold text-vice-pink">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -656,7 +656,7 @@ export function FileVault({ onRequestReleaseMilestone }: FileVaultProps) {
                         {uploadProgress}%
                       </span>
                     </div>
-                    <div className="w-full bg-[#0D0618] h-2 rounded-full overflow-hidden border border-pink-500/20">
+                    <div className="w-full bg-vice-cardElevated h-2 rounded-full overflow-hidden border border-vice-border">
                       <div
                         className="bg-vice-gradient h-full rounded-full transition-all duration-200"
                         style={{ width: `${uploadProgress}%` }}

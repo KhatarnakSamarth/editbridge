@@ -78,7 +78,7 @@ export function RetroHeader() {
   }, [isAuthenticated, activeRole]);
 
   return (
-    <header className="sticky top-0 z-50 h-16 bg-[#0D0618]/95 border-b border-[rgba(255,46,147,0.22)] backdrop-blur-md select-none transition-colors shadow-lg shadow-black/40">
+    <header className="sticky top-0 z-50 h-16 bg-vice-bg/95 border-b border-vice-border backdrop-blur-md select-none transition-colors shadow-xs">
       <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4">
         {/* Left: Brand / Logo */}
         <div className="flex items-center gap-6 shrink-0">
@@ -87,19 +87,19 @@ export function RetroHeader() {
             onClick={() => retroSound.playClick()}
             className="flex items-center gap-2.5 group focus-visible:outline-hidden"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF2E93] via-[#FF7B54] to-[#FFD166] flex items-center justify-center text-[#0D0618] font-extrabold text-sm shadow-md shadow-[#FF2E93]/25 group-hover:scale-105 transition-all">
-              <Film className="w-4 h-4 text-[#0D0618]" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-vice-pink via-vice-coral to-vice-gold flex items-center justify-center text-white font-extrabold text-sm shadow-xs group-hover:scale-105 transition-all">
+              <Film className="w-4 h-4 text-white" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5 leading-none">
-                <span className="font-extrabold text-base tracking-tight text-[#FFF5F9]">
-                  Edit<span className="text-[#FF2E93]">Bridge</span>
+                <span className="font-extrabold text-base tracking-tight text-vice-text">
+                  Edit<span className="text-vice-pink">Bridge</span>
                 </span>
-                <span className="bg-[#FF2E93]/15 text-[#FF2E93] text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold border border-[#FF2E93]/30">
-                  VICE
+                <span className="bg-vice-pink/10 text-vice-pink text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold border border-vice-pink/20">
+                  STUDIO
                 </span>
               </div>
-              <span className="text-[10px] text-[#C8A8C9] font-medium hidden sm:block mt-0.5">
+              <span className="text-[10px] text-vice-muted font-medium hidden sm:block mt-0.5">
                 Creator–Editor Collaboration
               </span>
             </div>
@@ -118,18 +118,18 @@ export function RetroHeader() {
                 onClick={() => retroSound.playClick()}
                 className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all whitespace-nowrap ${
                   isActive
-                    ? 'bg-[#FF2E93]/15 text-[#FFF5F9] border border-[#FF2E93]/40 shadow-xs font-bold'
-                    : 'text-[#C8A8C9] hover:text-[#FFF5F9] hover:bg-[#211038]/70 border border-transparent'
+                    ? 'bg-vice-pink/10 text-vice-pink border border-vice-pink/30 shadow-xs font-bold'
+                    : 'text-vice-muted hover:text-vice-text hover:bg-vice-hover border border-transparent'
                 }`}
               >
                 <Icon
                   className={`w-4 h-4 shrink-0 ${
-                    isActive ? 'text-[#FF2E93]' : 'text-[#8E6B93]'
+                    isActive ? 'text-vice-pink' : 'text-vice-muted'
                   }`}
                 />
                 <span>{item.label}</span>
                 {!isAuthenticated && item.requiresAuth && (
-                  <Lock className="w-3 h-3 text-[#8E6B93] shrink-0 ml-0.5" />
+                  <Lock className="w-3 h-3 text-vice-dim shrink-0 ml-0.5" />
                 )}
               </Link>
             );
@@ -143,12 +143,12 @@ export function RetroHeader() {
             onClick={toggleThemeMode}
             title={themeMode === 'DARK' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             aria-label="Toggle Light and Dark Mode"
-            className="w-9 h-9 rounded-xl bg-[#170B29] hover:bg-[#211038] text-[#FFD166] border border-[rgba(255,46,147,0.25)] flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+            className="w-9 h-9 rounded-xl bg-vice-surface hover:bg-vice-hover text-vice-gold border border-vice-border flex items-center justify-center transition-colors shadow-xs cursor-pointer"
           >
             {themeMode === 'DARK' ? (
-              <Sun className="w-4 h-4 text-[#FFD166]" />
+              <Sun className="w-4 h-4 text-vice-gold" />
             ) : (
-              <Moon className="w-4 h-4 text-[#FF2E93]" />
+              <Moon className="w-4 h-4 text-vice-pink" />
             )}
           </button>
 
@@ -157,12 +157,12 @@ export function RetroHeader() {
             onClick={toggleSound}
             aria-label={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
             title={soundEnabled ? 'Sound: ON' : 'Sound: OFF'}
-            className="w-9 h-9 rounded-xl bg-[#170B29] hover:bg-[#211038] text-[#C8A8C9] border border-[rgba(255,46,147,0.25)] hidden sm:flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+            className="w-9 h-9 rounded-xl bg-vice-surface hover:bg-vice-hover text-vice-muted border border-vice-border hidden sm:flex items-center justify-center transition-colors shadow-xs cursor-pointer"
           >
             {soundEnabled ? (
-              <Volume2 className="w-4 h-4 text-[#00F5A0]" />
+              <Volume2 className="w-4 h-4 text-vice-mint" />
             ) : (
-              <VolumeX className="w-4 h-4 text-[#8E6B93]" />
+              <VolumeX className="w-4 h-4 text-vice-dim" />
             )}
           </button>
 
@@ -171,10 +171,10 @@ export function RetroHeader() {
             <div className="relative">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="h-9 px-2.5 rounded-xl border border-[rgba(255,46,147,0.3)] bg-[#170B29] hover:bg-[#211038] flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+                className="h-9 px-2.5 rounded-xl border border-vice-border bg-vice-surface hover:bg-vice-hover flex items-center gap-2 transition-all cursor-pointer shadow-xs"
               >
                 {/* User Avatar */}
-                <div className="w-6 h-6 rounded-full bg-[#211038] overflow-hidden shrink-0 border border-[#FF2E93]/40">
+                <div className="w-6 h-6 rounded-full bg-vice-cardElevated overflow-hidden shrink-0 border border-vice-border">
                   {currentUser.avatar ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -183,7 +183,7 @@ export function RetroHeader() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-[#FFF5F9]">
+                    <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-vice-text">
                       {currentUser.name.charAt(0)}
                     </div>
                   )}
@@ -191,23 +191,23 @@ export function RetroHeader() {
 
                 {/* User Name & Locked Role Pill */}
                 <div className="hidden sm:flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-[#FFF5F9] max-w-[120px] truncate">
+                  <span className="text-xs font-bold text-vice-text max-w-[120px] truncate">
                     {currentUser.name}
                   </span>
                   <span
                     className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
                       activeRole === 'ADMIN'
-                        ? 'bg-[#FFD166]/15 text-[#FFD166] border border-[#FFD166]/30'
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                         : activeRole === 'EDITOR'
-                        ? 'bg-[#FF7B54]/15 text-[#FF7B54] border border-[#FF7B54]/30'
-                        : 'bg-[#FF2E93]/15 text-[#FF2E93] border border-[#FF2E93]/30'
+                        ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20'
+                        : 'bg-vice-pink/10 text-vice-pink border border-vice-pink/20'
                     }`}
                   >
                     {activeRole}
                   </span>
                 </div>
 
-                <ChevronDown className="w-3.5 h-3.5 text-[#C8A8C9]" />
+                <ChevronDown className="w-3.5 h-3.5 text-vice-muted" />
               </button>
 
               {/* Profile Dropdown Menu */}
@@ -217,22 +217,22 @@ export function RetroHeader() {
                     className="fixed inset-0 z-40"
                     onClick={() => setProfileDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#170B29] border border-[rgba(255,46,147,0.3)] shadow-2xl z-50 p-2 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-3 py-2 border-b border-[rgba(255,46,147,0.2)]">
-                      <div className="font-bold text-[#FFF5F9] truncate">
+                  <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-vice-surface border border-vice-border shadow-xl z-50 p-2 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-3 py-2 border-b border-vice-border">
+                      <div className="font-bold text-vice-text truncate">
                         {currentUser.name}
                       </div>
-                      <div className="text-[11px] text-[#C8A8C9] truncate font-mono">
+                      <div className="text-[11px] text-vice-muted truncate font-mono">
                         {currentUser.email}
                       </div>
                       <div className="mt-1">
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${
                             activeRole === 'ADMIN'
-                              ? 'bg-[#FFD166]/15 text-[#FFD166]'
+                              ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                               : activeRole === 'EDITOR'
-                              ? 'bg-[#FF7B54]/15 text-[#FF7B54]'
-                              : 'bg-[#FF2E93]/15 text-[#FF2E93]'
+                              ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                              : 'bg-vice-pink/10 text-vice-pink'
                           }`}
                         >
                           Role: {activeRole}
@@ -243,9 +243,9 @@ export function RetroHeader() {
                     <Link
                       href={activeRole === 'ADMIN' ? '/admin' : '/workspace'}
                       onClick={() => setProfileDropdownOpen(false)}
-                      className="w-full px-3 py-2 rounded-xl text-[#FFF5F9] hover:bg-[#211038] flex items-center gap-2 font-medium transition-colors"
+                      className="w-full px-3 py-2 rounded-xl text-vice-text hover:bg-vice-hover flex items-center gap-2 font-medium transition-colors"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-[#FF2E93]" />
+                      <Sparkles className="w-3.5 h-3.5 text-vice-pink" />
                       <span>{activeRole === 'ADMIN' ? 'Operational Control' : 'Active Workspace'}</span>
                     </Link>
 
@@ -255,9 +255,9 @@ export function RetroHeader() {
                         logout();
                         setProfileDropdownOpen(false);
                       }}
-                      className="w-full px-3 py-2 rounded-xl text-[#C8A8C9] hover:bg-[#211038] flex items-center gap-2 font-medium transition-colors"
+                      className="w-full px-3 py-2 rounded-xl text-vice-muted hover:text-vice-text hover:bg-vice-hover flex items-center gap-2 font-medium transition-colors"
                     >
-                      <LogIn className="w-3.5 h-3.5 text-[#8E6B93]" />
+                      <LogIn className="w-3.5 h-3.5 text-vice-dim" />
                       <span>Switch Account</span>
                     </Link>
 
@@ -266,7 +266,7 @@ export function RetroHeader() {
                         logout();
                         setProfileDropdownOpen(false);
                       }}
-                      className="w-full px-3 py-2 rounded-xl text-rose-400 hover:bg-rose-950/40 flex items-center gap-2 font-semibold transition-colors cursor-pointer text-left"
+                      className="w-full px-3 py-2 rounded-xl text-rose-500 hover:bg-rose-500/10 flex items-center gap-2 font-semibold transition-colors cursor-pointer text-left"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>Sign Out</span>
@@ -280,15 +280,15 @@ export function RetroHeader() {
               <Link
                 href="/signin"
                 onClick={() => retroSound.playClick()}
-                className="h-9 px-3.5 rounded-xl border border-[rgba(255,46,147,0.3)] bg-[#170B29] text-xs font-semibold text-[#FFF5F9] hover:bg-[#211038] flex items-center gap-1.5 transition-colors shadow-xs"
+                className="h-9 px-3.5 rounded-xl border border-vice-border bg-vice-surface text-xs font-semibold text-vice-text hover:bg-vice-hover flex items-center gap-1.5 transition-colors shadow-xs"
               >
-                <LogIn className="w-3.5 h-3.5 text-[#FF2E93]" />
+                <LogIn className="w-3.5 h-3.5 text-vice-pink" />
                 <span>Sign In</span>
               </Link>
               <Link
                 href="/signup"
                 onClick={() => retroSound.playClick()}
-                className="h-9 px-4 rounded-xl bg-gradient-to-r from-[#FF2E93] via-[#FF7B54] to-[#FFD166] text-xs font-extrabold text-[#0D0618] flex items-center gap-1.5 transition-all shadow-md shadow-[#FF2E93]/25 hover:opacity-95"
+                className="h-9 px-4 rounded-xl bg-vice-gradient text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-xs hover:opacity-95"
               >
                 <span>Get Started</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -299,7 +299,7 @@ export function RetroHeader() {
           {/* Mobile hamburger button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="w-9 h-9 md:hidden bg-[#170B29] border border-[rgba(255,46,147,0.3)] rounded-xl text-[#FFF5F9] flex items-center justify-center cursor-pointer"
+            className="w-9 h-9 md:hidden bg-vice-surface border border-vice-border rounded-xl text-vice-text flex items-center justify-center cursor-pointer"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -309,7 +309,7 @@ export function RetroHeader() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-[rgba(255,46,147,0.25)] bg-[#0D0618] p-3 space-y-2 shadow-2xl">
+        <div className="md:hidden border-t border-vice-border bg-vice-surface p-3 space-y-2 shadow-xl">
           {navLinks.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -323,8 +323,8 @@ export function RetroHeader() {
                 }}
                 className={`p-2.5 rounded-xl text-xs flex items-center justify-between font-medium ${
                   isActive
-                    ? 'bg-[#FF2E93]/15 text-[#FFF5F9] border border-[#FF2E93]/40'
-                    : 'text-[#C8A8C9] hover:bg-[#170B29]'
+                    ? 'bg-vice-pink/10 text-vice-pink border border-vice-pink/30 font-bold'
+                    : 'text-vice-muted hover:text-vice-text hover:bg-vice-hover'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -332,16 +332,16 @@ export function RetroHeader() {
                   <span>{item.label}</span>
                 </div>
                 {!isAuthenticated && item.requiresAuth && (
-                  <Lock className="w-3.5 h-3.5 text-[#8E6B93]" />
+                  <Lock className="w-3.5 h-3.5 text-vice-dim" />
                 )}
               </Link>
             );
           })}
 
-          <div className="pt-2 border-t border-[rgba(255,46,147,0.2)] flex items-center justify-between text-xs">
+          <div className="pt-2 border-t border-vice-border flex items-center justify-between text-xs">
             {isAuthenticated ? (
               <>
-                <span className="text-[#C8A8C9] font-medium">
+                <span className="text-vice-muted font-medium">
                   {currentUser.name} ({activeRole})
                 </span>
                 <button
@@ -349,7 +349,7 @@ export function RetroHeader() {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="px-3 py-1 bg-rose-950/50 text-rose-400 rounded-lg font-bold"
+                  className="px-3 py-1 bg-rose-500/10 text-rose-500 rounded-lg font-bold"
                 >
                   Sign Out
                 </button>
@@ -359,14 +359,14 @@ export function RetroHeader() {
                 <Link
                   href="/signin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 text-center py-2 bg-[#170B29] text-[#FFF5F9] rounded-xl font-bold border border-[rgba(255,46,147,0.25)]"
+                  className="flex-1 text-center py-2 bg-vice-surface text-vice-text rounded-xl font-bold border border-vice-border"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 text-center py-2 bg-gradient-to-r from-[#FF2E93] via-[#FF7B54] to-[#FFD166] text-[#0D0618] rounded-xl font-extrabold"
+                  className="flex-1 text-center py-2 bg-vice-gradient text-white rounded-xl font-bold"
                 >
                   Get Started
                 </Link>

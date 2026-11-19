@@ -37,7 +37,7 @@ export function ProjectChat() {
   return (
     <div className="flex flex-col h-[520px] max-h-[75vh] min-h-[380px] w-full min-w-0">
       {/* Messages Scroll Area */}
-      <div className="p-3.5 sm:p-4 flex-1 min-h-0 overflow-y-auto space-y-3.5 bg-[#170B29] rounded-2xl border border-pink-500/20 transition-colors scrollbar-thin">
+      <div className="p-3.5 sm:p-4 flex-1 min-h-0 overflow-y-auto space-y-3.5 bg-vice-surface rounded-2xl border border-vice-border transition-colors scrollbar-thin">
         {activeProjectMessages.map((msg) => {
           const isMe = msg.sender_id === currentUser.id;
           const isSystem = msg.message.startsWith('[SYSTEM');
@@ -59,8 +59,8 @@ export function ProjectChat() {
               className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-full`}
             >
               <div className="flex items-center gap-1.5 mb-1 text-[11px] text-vice-dim">
-                <span className="font-semibold text-white">{msg.sender_name}</span>
-                <span className="bg-[#211038] border border-pink-500/20 px-1.5 py-0.2 rounded-md text-[10px] font-mono text-vice-muted">
+                <span className="font-semibold text-vice-text">{msg.sender_name}</span>
+                <span className="bg-vice-cardElevated border border-vice-border px-1.5 py-0.2 rounded-md text-[10px] font-mono text-vice-muted">
                   {msg.sender_role}
                 </span>
                 <span>
@@ -74,8 +74,8 @@ export function ProjectChat() {
               <div
                 className={`max-w-[85%] sm:max-w-[75%] p-3.5 text-xs leading-relaxed rounded-2xl break-words whitespace-pre-wrap shadow-xs ${
                   isMe
-                    ? 'bg-vice-gradient text-white shadow-md shadow-pink-500/25'
-                    : 'bg-[#211038] text-[#FFF5F9] border border-pink-500/20'
+                    ? 'bg-vice-gradient text-white shadow-xs'
+                    : 'bg-vice-cardElevated text-vice-text border border-vice-border'
                 }`}
               >
                 {msg.message}
@@ -100,7 +100,7 @@ export function ProjectChat() {
               retroSound.playClick();
               setInputText(reply);
             }}
-            className="px-3 py-1 rounded-full bg-[#170B29] hover:bg-[#211038] text-vice-muted hover:text-white border border-pink-500/20 flex-shrink-0 transition-all shadow-xs cursor-pointer active:scale-95"
+            className="px-3 py-1 rounded-full bg-vice-cardElevated hover:bg-vice-hover text-vice-muted hover:text-vice-text border border-vice-border flex-shrink-0 transition-all shadow-xs cursor-pointer active:scale-95"
           >
             {reply}
           </button>
@@ -118,7 +118,7 @@ export function ProjectChat() {
               ? activeProject.editor_name || 'Editor'
               : activeProject.creator_name
           }...`}
-          className="flex-1 px-4 py-2.5 text-xs text-white bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-pink-500 focus:outline-hidden placeholder:text-vice-dim transition-colors"
+          className="flex-1 px-4 py-2.5 text-xs text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden placeholder:text-vice-dim transition-colors"
         />
         <button
           type="submit"

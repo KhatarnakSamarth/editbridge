@@ -22,9 +22,9 @@ export function WorkspaceBriefTab({
       icon={<FileText className="w-4 h-4 text-vice-pink" />}
       bodyClassName="p-4 sm:p-5 overflow-visible font-sans"
     >
-      <div className="p-6 bg-[#170B29] rounded-2xl text-xs space-y-6 text-vice-text border border-pink-500/25">
+      <div className="p-6 bg-vice-surface rounded-2xl text-xs space-y-6 text-vice-text border border-vice-border">
         {/* Brief Controls & Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-pink-500/20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-vice-border">
           <div>
             <h3 className="font-extrabold text-sm text-vice-text flex items-center gap-2">
               <FileText className="w-4 h-4 text-vice-pink" />
@@ -37,7 +37,7 @@ export function WorkspaceBriefTab({
           <button
             type="button"
             onClick={onOpenBriefEditor}
-            className="px-4 py-2 bg-vice-gradient hover:opacity-95 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-pink-500/25 transition-all cursor-pointer shrink-0 active:scale-95 self-start sm:self-auto"
+            className="px-4 py-2 bg-vice-pink hover:bg-vice-pinkHover text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer shrink-0 active:scale-95 self-start sm:self-auto"
           >
             <Edit3 className="w-3.5 h-3.5" />
             <span>{project.brief ? 'Edit / Update Creative Brief' : 'Add Creative Brief'}</span>
@@ -45,7 +45,7 @@ export function WorkspaceBriefTab({
         </div>
 
         {/* Creator Profile & Channel Details */}
-        <div className="p-4 bg-[#211038] rounded-xl border border-pink-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-4 bg-vice-cardElevated rounded-xl border border-vice-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <img
               src={
@@ -53,7 +53,7 @@ export function WorkspaceBriefTab({
                 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
               }
               alt={project.creator_name || 'Creator'}
-              className="w-12 h-12 rounded-full object-cover border-2 border-pink-500/50 shrink-0"
+              className="w-12 h-12 rounded-full object-cover border-2 border-vice-pink/60 shrink-0"
             />
             <div>
               <h3 className="font-extrabold text-sm text-vice-text">
@@ -87,9 +87,9 @@ export function WorkspaceBriefTab({
         </div>
 
         {/* Creator's Editing Guidelines & Rules */}
-        <div className="p-4 bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-orange-500/15 border border-pink-500/30 rounded-xl space-y-2">
+        <div className="p-4 bg-vice-cardElevated border border-vice-border rounded-xl space-y-2">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-vice-gold shrink-0" />
+            <Sparkles className="w-4 h-4 text-vice-coral shrink-0" />
             <h4 className="font-bold text-xs uppercase tracking-wide text-vice-text">
               Client Pacing &amp; Aesthetic Directives (Editor Rules):
             </h4>
@@ -97,13 +97,13 @@ export function WorkspaceBriefTab({
           <p className="text-xs text-vice-text leading-relaxed font-sans pl-6">
             &ldquo;{creatorProfile?.requirements || 'Fast-paced documentary style, sophisticated kinetic typography, sound effects for every chart pop.'}&rdquo;
           </p>
-          <div className="pl-6 pt-1 text-[11px] text-vice-dim font-mono">
+          <div className="pl-6 pt-1 text-[11px] text-vice-muted font-mono">
             Cadence: {creatorProfile?.publishing_frequency || '1 Long-form weekly + 3 Shorts'}
           </div>
         </div>
 
         {/* Narrative Goal */}
-        <div className="border-b border-pink-500/20 pb-4">
+        <div className="border-b border-vice-border pb-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-bold text-xs uppercase text-vice-text">
               Project Narrative Brief &amp; Story Arc:
@@ -129,38 +129,38 @@ export function WorkspaceBriefTab({
             Agreed Technical Deliverables:
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
-              <span className="text-vice-dim block text-[11px]">Aspect Ratio:</span>
+            <div className="p-3.5 bg-vice-cardElevated rounded-xl border border-vice-border">
+              <span className="text-vice-muted block text-[11px]">Aspect Ratio:</span>
               <strong className="text-vice-text text-xs">
                 {project.deliverables?.aspect_ratio || '16:9'}
               </strong>
             </div>
-            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
-              <span className="text-vice-dim block text-[11px]">Target Duration:</span>
+            <div className="p-3.5 bg-vice-cardElevated rounded-xl border border-vice-border">
+              <span className="text-vice-muted block text-[11px]">Target Duration:</span>
               <strong className="text-vice-text text-xs">
                 {project.deliverables?.target_duration_minutes || 10} minutes
               </strong>
             </div>
-            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
-              <span className="text-vice-dim block text-[11px]">Master Resolution:</span>
+            <div className="p-3.5 bg-vice-cardElevated rounded-xl border border-vice-border">
+              <span className="text-vice-muted block text-[11px]">Master Resolution:</span>
               <strong className="text-vice-text text-xs">
                 {project.deliverables?.resolution || '4K (3840x2160)'}
               </strong>
             </div>
-            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
-              <span className="text-vice-dim block text-[11px]">Captions:</span>
+            <div className="p-3.5 bg-vice-cardElevated rounded-xl border border-vice-border">
+              <span className="text-vice-muted block text-[11px]">Captions:</span>
               <strong className="text-vice-text text-xs">
                 {project.deliverables?.captions_included ? 'Included (SRT + Burned)' : 'No'}
               </strong>
             </div>
-            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
-              <span className="text-vice-dim block text-[11px]">Sound Design:</span>
+            <div className="p-3.5 bg-vice-cardElevated rounded-xl border border-vice-border">
+              <span className="text-vice-muted block text-[11px]">Sound Design:</span>
               <strong className="text-vice-text text-xs">
                 {project.deliverables?.sound_design ? 'Full Foley & Riser Mix' : 'Basic'}
               </strong>
             </div>
-            <div className="p-3.5 bg-[#211038] rounded-xl border border-pink-500/20">
-              <span className="text-vice-dim block text-[11px]">Color Grading:</span>
+            <div className="p-3.5 bg-vice-cardElevated rounded-xl border border-vice-border">
+              <span className="text-vice-muted block text-[11px]">Color Grading:</span>
               <strong className="text-vice-text text-xs">
                 {project.deliverables?.color_grading ? 'Custom Film Emulation' : 'Standard'}
               </strong>
@@ -201,7 +201,7 @@ export function WorkspaceBriefTab({
                 </li>
               ))
             ) : (
-              <li className="text-vice-dim list-none italic">None specified</li>
+              <li className="text-vice-muted list-none italic">None specified</li>
             )}
           </ul>
         </div>
@@ -211,7 +211,7 @@ export function WorkspaceBriefTab({
           <h4 className="font-bold text-xs uppercase text-vice-text mb-2">
             Revision Policy Scope &amp; Escrow Boundary:
           </h4>
-          <div className="p-4 bg-[#211038] border border-vice-gold/30 rounded-xl text-vice-gold text-xs leading-relaxed">
+          <div className="p-4 bg-vice-cardElevated border border-amber-500/30 rounded-xl text-amber-500 dark:text-amber-300 text-xs leading-relaxed">
             Included Revisions: <strong>{project.revision_limit ?? 2} rounds</strong> (Currently{' '}
             <strong>{project.revisions_used ?? 0}</strong> used). Changes must be documented through
             timestamp pins on the review player. Additional revisions beyond scope require written mutual

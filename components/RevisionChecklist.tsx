@@ -33,7 +33,7 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
 
   if (!activeProject) {
     return (
-      <div className="p-8 text-center text-xs text-vice-muted font-mono bg-[#170B29]/90 rounded-2xl border border-pink-500/20">
+      <div className="p-8 text-center text-xs text-vice-muted font-mono bg-vice-surface rounded-2xl border border-vice-border">
         No active project selected.
       </div>
     );
@@ -70,37 +70,37 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
     switch (cat) {
       case 'B_ROLL':
         return (
-          <span className="bg-[#FFD166]/15 text-[#FFD166] border border-[#FFD166]/30 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
+          <span className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
             B-Roll
           </span>
         );
       case 'AUDIO':
         return (
-          <span className="bg-[#FF2E93]/15 text-[#FF2E93] border border-[#FF2E93]/30 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
+          <span className="bg-vice-pink/10 text-vice-pink border border-vice-pink/20 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
             Audio
           </span>
         );
       case 'PACING':
         return (
-          <span className="bg-[#00F5A0]/15 text-[#00F5A0] border border-[#00F5A0]/30 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
+          <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
             Pacing
           </span>
         );
       case 'TEXT_GRAPHICS':
         return (
-          <span className="bg-[#FF7B54]/15 text-[#FF7B54] border border-[#FF7B54]/30 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
+          <span className="bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
             Text/GFX
           </span>
         );
       case 'COLOR':
         return (
-          <span className="bg-fuchsia-500/15 text-fuchsia-400 border border-fuchsia-500/30 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
+          <span className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
             Color
           </span>
         );
       default:
         return (
-          <span className="bg-pink-300/10 text-vice-muted border border-pink-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
+          <span className="bg-vice-cardElevated text-vice-muted border border-vice-border px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0">
             General
           </span>
         );
@@ -110,7 +110,7 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
   return (
     <div className="flex flex-col gap-3.5 w-full max-w-full overflow-hidden">
       {/* Revision Scope Card */}
-      <div className="p-4 bg-[#170B29]/95 border border-pink-500/20 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 w-full">
+      <div className="p-4 bg-vice-surface border border-vice-border rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 w-full">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <CheckSquare className="w-4 h-4 text-vice-pink shrink-0" />
@@ -125,9 +125,9 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
 
         {/* Progress meter */}
         <div className="flex items-center gap-3 w-full sm:w-auto sm:min-w-[180px] shrink-0">
-          <div className="flex-1 bg-[#211038] rounded-full h-2.5 overflow-hidden border border-pink-500/20">
+          <div className="flex-1 bg-vice-cardElevated rounded-full h-2.5 overflow-hidden border border-vice-border">
             <div
-              className="bg-vice-gradient h-full transition-all duration-500 rounded-full shadow-[0_0_8px_rgba(255,46,147,0.4)]"
+              className="bg-vice-gradient h-full transition-all duration-500 rounded-full"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -146,7 +146,7 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-2.5 py-1 text-[11px] bg-[#211038] text-vice-text border border-pink-500/30 rounded-xl focus:border-vice-pink focus:outline-hidden shrink-0"
+            className="px-2.5 py-1 text-[11px] bg-vice-cardElevated text-vice-text border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden shrink-0"
             title="Filter by comment status"
           >
             <option value="ALL">All Status ({totalCount})</option>
@@ -159,7 +159,7 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-2.5 py-1 text-[11px] bg-[#211038] text-vice-text border border-pink-500/30 rounded-xl focus:border-vice-pink focus:outline-hidden shrink-0"
+            className="px-2.5 py-1 text-[11px] bg-vice-cardElevated text-vice-text border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden shrink-0"
             title="Filter by revision category"
           >
             <option value="ALL">All Categories</option>
@@ -180,7 +180,7 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
       {/* Checklist items list */}
       <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1 w-full scrollbar-thin">
         {filteredComments.length === 0 ? (
-          <div className="p-8 text-center text-xs text-vice-muted font-mono bg-[#170B29]/60 rounded-2xl border border-pink-500/20">
+          <div className="p-8 text-center text-xs text-vice-muted font-mono bg-vice-surface rounded-2xl border border-vice-border">
             No revision comments match selected filters.
           </div>
         ) : (
@@ -193,10 +193,10 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
                 key={comment.id}
                 className={`p-3.5 rounded-2xl border transition-all duration-200 w-full overflow-hidden hover:shadow-xs ${
                   isResolved
-                    ? 'bg-[#170B29]/60 border-emerald-500/30 opacity-75'
+                    ? 'bg-vice-surface/60 border-emerald-500/30 opacity-75'
                     : isInProgress
-                    ? 'bg-[#211038] border-pink-500/40 shadow-xs shadow-pink-500/10'
-                    : 'bg-[#170B29] border-pink-500/20 shadow-xs hover:border-pink-500/40'
+                    ? 'bg-vice-cardElevated border-vice-pink/50 shadow-xs'
+                    : 'bg-vice-surface border-vice-border shadow-xs hover:border-vice-borderHover'
                 }`}
               >
                 {/* Header: Timecode + Category + Author + Status Button */}
@@ -228,26 +228,26 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
                     onClick={() => handleStatusChange(comment.id, comment.status)}
                     className={`px-3 py-1 rounded-xl text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shrink-0 ${
                       isResolved
-                        ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 shadow-2xs hover:bg-emerald-900/50'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
                         : isInProgress
-                        ? 'bg-pink-950/60 text-pink-300 border border-pink-500/40 shadow-2xs hover:bg-pink-900/50'
-                        : 'bg-amber-950/60 text-amber-300 border border-amber-500/40 shadow-2xs hover:bg-amber-900/50'
+                        ? 'bg-vice-pink/10 text-vice-pink border border-vice-pink/20 hover:bg-vice-pink/20'
+                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20'
                     }`}
                     title="Click to toggle status: Pending → In Progress → Resolved"
                   >
                     {isResolved ? (
                       <>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                         <span>RESOLVED</span>
                       </>
                     ) : isInProgress ? (
                       <>
-                        <Clock className="w-3.5 h-3.5 text-pink-400 shrink-0" />
+                        <Clock className="w-3.5 h-3.5 text-vice-pink shrink-0" />
                         <span>IN PROGRESS</span>
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                         <span>PENDING</span>
                       </>
                     )}
@@ -255,7 +255,7 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
                 </div>
 
                 {/* Comment body */}
-                <div className="p-3 bg-[#0D0618] rounded-xl border border-pink-500/20 text-xs text-vice-text font-sans leading-relaxed break-words overflow-hidden">
+                <div className="p-3 bg-vice-cardElevated rounded-xl border border-vice-border text-xs text-vice-text font-sans leading-relaxed break-words overflow-hidden">
                   <p className={isResolved ? 'line-through text-vice-dim' : ''}>
                     {comment.comment}
                   </p>
@@ -268,8 +268,8 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
 
       {/* Editor action helper */}
       {activeRole === 'EDITOR' && (
-        <div className="p-3.5 bg-[#211038] border border-vice-gold/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
-          <div className="text-xs text-vice-gold">
+        <div className="p-3.5 bg-vice-cardElevated border border-amber-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
+          <div className="text-xs text-amber-500">
             <strong>Editor Step:</strong> Once all notes are marked Resolved, prepare Final Render cut.
           </div>
           <button
@@ -278,7 +278,7 @@ export function RevisionChecklist({ onSeekToTimestamp }: RevisionChecklistProps)
               retroSound.playDing();
               updateProjectStatus(activeProject.id, 'FINAL_RENDER');
             }}
-            className="bg-vice-gradient hover:opacity-95 text-white px-4 py-1.5 text-xs font-semibold rounded-xl shadow-xs transition-all self-start sm:self-auto shrink-0 cursor-pointer"
+            className="bg-vice-pink hover:bg-vice-pinkHover text-white px-4 py-1.5 text-xs font-semibold rounded-xl shadow-xs transition-all self-start sm:self-auto shrink-0 cursor-pointer"
           >
             Mark Ready for Master
           </button>

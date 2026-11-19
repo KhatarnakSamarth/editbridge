@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#0D0618] text-[#FFF5F9] antialiased flex flex-col selection:bg-[#FF2E93] selection:text-white transition-colors duration-200">
+      <body className="min-h-screen bg-vice-bg text-vice-text antialiased flex flex-col selection:bg-vice-pink selection:text-white transition-colors duration-200">
         <EditBridgeProvider>
           {/* Global Ambient Cursor Follower */}
           <CursorFollower />

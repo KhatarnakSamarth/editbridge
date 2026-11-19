@@ -141,10 +141,10 @@ export function InviteEditorModal({
           if (e.target === e.currentTarget) onClose();
         }}
       >
-        <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-[#170B29] border border-pink-500/30 rounded-2xl overflow-hidden shadow-2xl shadow-pink-500/10 transition-colors my-auto">
+        <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-vice-surface border border-vice-border rounded-2xl overflow-hidden shadow-xl transition-colors my-auto">
           {/* Titlebar */}
-          <div className="px-5 py-3.5 bg-[#0D0618] border-b border-pink-500/20 flex items-center justify-between shrink-0">
-            <span className="flex items-center gap-2 font-bold text-xs text-white truncate pr-2">
+          <div className="px-5 py-3.5 bg-vice-cardElevated border-b border-vice-border flex items-center justify-between shrink-0">
+            <span className="flex items-center gap-2 font-bold text-xs text-vice-text truncate pr-2">
               {role === 'EDITOR' ? (
                 <Share2 className="w-4 h-4 text-vice-pink shrink-0" />
               ) : (
@@ -158,7 +158,7 @@ export function InviteEditorModal({
                 retroSound.playClick();
                 onClose();
               }}
-              className="w-7 h-7 rounded-lg bg-[#211038] hover:bg-[#2c174a] text-vice-muted hover:text-white border border-pink-500/25 text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+              className="w-7 h-7 rounded-lg bg-vice-surface hover:bg-vice-hover text-vice-muted hover:text-vice-text border border-vice-border text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer"
               title="Close"
               aria-label="Close"
             >
@@ -169,18 +169,18 @@ export function InviteEditorModal({
           {/* Body */}
           <div className="p-5 sm:p-6 text-sm space-y-4 overflow-y-auto flex-1 min-h-0">
             {/* Informational banner */}
-            <div className="p-3.5 bg-pink-500/10 border border-pink-500/25 rounded-xl text-xs text-vice-text leading-relaxed">
-              💡 <strong className="text-white">Custom Invite Engine:</strong> Generate custom direct onboarding links with customized permissions, roles, and project tokens to invite external editors, clients, or agency reviewers.
+            <div className="p-3.5 bg-vice-pink/10 border border-vice-pink/20 rounded-xl text-xs text-vice-text leading-relaxed">
+              💡 <strong className="text-vice-text">Custom Invite Engine:</strong> Generate custom direct onboarding links with customized permissions, roles, and project tokens to invite external editors, clients, or agency reviewers.
             </div>
 
             {invited ? (
-              <div className="p-5 bg-vice-mint/10 border border-vice-mint/30 rounded-xl text-white text-center space-y-3">
+              <div className="p-5 bg-vice-mint/10 border border-vice-mint/30 rounded-xl text-vice-text text-center space-y-3">
                 <div className="w-10 h-10 rounded-full bg-vice-mint/20 text-vice-mint flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <p className="font-bold text-sm text-vice-mint">🎉 Direct Invitation Dispatched!</p>
                 <p className="text-xs text-vice-muted">
-                  We sent a customized invitation link to <strong className="text-white">{editorEmail}</strong> for project <strong className="text-white">{project?.title || 'Active Project'}</strong> as <strong>{targetRole}</strong>.
+                  We sent a customized invitation link to <strong className="text-vice-text">{editorEmail}</strong> for project <strong className="text-vice-text">{project?.title || 'Active Project'}</strong> as <strong>{targetRole}</strong>.
                 </p>
                 <button
                   type="button"
@@ -189,7 +189,7 @@ export function InviteEditorModal({
                     setEditorEmail('');
                     onClose();
                   }}
-                  className="bg-vice-gradient hover:opacity-95 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all shadow-md shadow-pink-500/25 cursor-pointer active:scale-95"
+                  className="bg-vice-gradient hover:opacity-95 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
                 >
                   Done
                 </button>
@@ -198,7 +198,7 @@ export function InviteEditorModal({
               <div className="space-y-4">
                 {/* 1. Target Role Selection */}
                 <div>
-                  <label className="block font-semibold text-white text-xs mb-1.5 flex items-center gap-1.5">
+                  <label className="block font-semibold text-vice-text text-xs mb-1.5 flex items-center gap-1.5">
                     <span>1. Select Target Role to Invite:</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -216,8 +216,8 @@ export function InviteEditorModal({
                         }}
                         className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                           targetRole === item.role
-                            ? 'border-pink-500 bg-pink-500/20 text-white shadow-xs'
-                            : 'border-pink-500/20 bg-[#211038] text-vice-muted hover:border-pink-500/40'
+                            ? 'border-vice-pink bg-vice-pink/10 text-vice-text shadow-xs'
+                            : 'border-vice-border bg-vice-cardElevated text-vice-muted hover:border-vice-borderHover'
                         }`}
                       >
                         <span className="block font-bold text-xs">{item.label}</span>
@@ -232,7 +232,7 @@ export function InviteEditorModal({
                 {/* 2. Custom Link Slug & Configuration */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold text-white text-xs mb-1.5">
+                    <label className="block font-semibold text-vice-text text-xs mb-1.5">
                       2. Custom Link Slug / Referral Code:
                     </label>
                     <input
@@ -240,29 +240,29 @@ export function InviteEditorModal({
                       value={customSlug}
                       onChange={(e) => setCustomSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ''))}
                       placeholder="e.g. alex-cut1"
-                      className="w-full px-3.5 py-2 text-xs font-mono text-white bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-pink-500 focus:outline-hidden placeholder:text-vice-dim"
+                      className="w-full px-3.5 py-2 text-xs font-mono text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden placeholder:text-vice-dim"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-semibold text-white text-xs mb-1.5">
+                    <label className="block font-semibold text-vice-text text-xs mb-1.5">
                       3. Permission Scope:
                     </label>
                     <select
                       value={permission}
                       onChange={(e) => setPermission(e.target.value as PermissionLevel)}
-                      className="w-full px-3 py-2 text-xs text-white bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-pink-500 focus:outline-hidden"
+                      className="w-full px-3 py-2 text-xs text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden"
                     >
-                      <option value="FULL_WORKSPACE" className="bg-[#170B29] text-white">Full Access (Review, Upload, Chat)</option>
-                      <option value="REVIEW_ONLY" className="bg-[#170B29] text-white">Review &amp; Pin Timestamps Only</option>
-                      <option value="VIEW_ONLY" className="bg-[#170B29] text-white">View Only (Watermarked Demo)</option>
+                      <option value="FULL_WORKSPACE" className="bg-vice-surface text-vice-text">Full Access (Review, Upload, Chat)</option>
+                      <option value="REVIEW_ONLY" className="bg-vice-surface text-vice-text">Review &amp; Pin Timestamps Only</option>
+                      <option value="VIEW_ONLY" className="bg-vice-surface text-vice-text">View Only (Watermarked Demo)</option>
                     </select>
                   </div>
                 </div>
 
                 {/* 3. Live Custom Generated Link Display */}
                 <div>
-                  <label className="block font-semibold text-white text-xs mb-1.5 flex items-center justify-between">
+                  <label className="block font-semibold text-vice-text text-xs mb-1.5 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
                       <Link2 className="w-3.5 h-3.5 text-vice-pink" />
                       <span>Custom Invite Link (Ready to Share):</span>
@@ -277,12 +277,12 @@ export function InviteEditorModal({
                       type="text"
                       readOnly
                       value={dynamicInviteUrl}
-                      className="flex-1 px-3.5 py-2 text-xs font-mono text-vice-muted bg-[#0D0618] border border-pink-500/30 rounded-xl select-all truncate"
+                      className="flex-1 px-3.5 py-2 text-xs font-mono text-vice-muted bg-vice-input border border-vice-border rounded-xl select-all truncate"
                     />
                     <button
                       type="button"
                       onClick={handleCopy}
-                      className="px-4 py-2 rounded-xl font-mono font-bold flex items-center gap-1.5 text-xs bg-vice-gradient hover:opacity-95 text-white shadow-md shadow-pink-500/25 transition-all shrink-0 cursor-pointer active:scale-95"
+                      className="px-4 py-2 rounded-xl font-mono font-bold flex items-center gap-1.5 text-xs bg-vice-gradient hover:opacity-95 text-white shadow-xs transition-all shrink-0 cursor-pointer active:scale-95"
                     >
                       {copied ? <Check className="w-3.5 h-3.5 text-vice-mint" /> : <Copy className="w-3.5 h-3.5" />}
                       <span>{copied ? 'Copied!' : 'Copy Link'}</span>
@@ -291,8 +291,8 @@ export function InviteEditorModal({
                 </div>
 
                 {/* 4. Or Send Direct Email */}
-                <form onSubmit={handleSubmit} className="pt-2 border-t border-pink-500/15 space-y-3">
-                  <label className="block font-semibold text-white text-xs">
+                <form onSubmit={handleSubmit} className="pt-2 border-t border-vice-border space-y-3">
+                  <label className="block font-semibold text-vice-text text-xs">
                     Or Dispatch Direct Email Invitation:
                   </label>
                   <div className="flex gap-2">
@@ -301,12 +301,12 @@ export function InviteEditorModal({
                       value={editorEmail}
                       onChange={(e) => setEditorEmail(e.target.value)}
                       placeholder="collaborator@studio.com"
-                      className="flex-1 px-3.5 py-2 text-xs text-white bg-[#0D0618] border border-pink-500/30 rounded-xl focus:border-pink-500 focus:outline-hidden placeholder:text-vice-dim transition-colors"
+                      className="flex-1 px-3.5 py-2 text-xs text-vice-text bg-vice-input border border-vice-border rounded-xl focus:border-vice-pink focus:outline-hidden placeholder:text-vice-dim transition-colors"
                     />
                     <button
                       type="submit"
                       disabled={!editorEmail.trim()}
-                      className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-pink-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0 active:scale-95"
+                      className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0 active:scale-95"
                     >
                       <Send className="w-3.5 h-3.5 text-white" />
                       <span>Send Invite</span>
@@ -319,7 +319,7 @@ export function InviteEditorModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 text-xs font-medium text-vice-muted hover:text-white rounded-xl transition-colors cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium text-vice-muted hover:text-vice-text rounded-xl transition-colors cursor-pointer"
                   >
                     Close
                   </button>

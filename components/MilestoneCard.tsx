@@ -52,7 +52,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Escrow summary banner */}
-      <div className="p-5 bg-gradient-to-r from-[#211038] via-[#170B29] to-[#211038] text-white rounded-2xl border border-pink-500/25 shadow-lg shadow-pink-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
+      <div className="p-5 bg-vice-surface text-vice-text rounded-2xl border border-vice-border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
         <div>
           <div className="flex items-center gap-2 text-vice-pink font-bold text-xs tracking-wider uppercase">
             <ShieldCheck className="w-4 h-4 text-vice-mint" />
@@ -72,13 +72,13 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
               retroSound.playDing();
               setShowReceiptModal(true);
             }}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 self-start sm:self-center shadow-md shadow-emerald-500/20 transition-all active:scale-95 cursor-pointer"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-2 self-start sm:self-center shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <Receipt className="w-4 h-4" />
             <span>View Receipt &amp; Invoice</span>
           </button>
         ) : (
-          <div className="bg-[#0D0618]/80 border border-pink-500/25 rounded-xl px-4 py-2.5 text-xs text-right shadow-xs">
+          <div className="bg-vice-cardElevated border border-vice-border rounded-xl px-4 py-2.5 text-xs text-right shadow-xs">
             <span className="text-vice-dim block text-[10px] font-mono uppercase font-semibold">Pending Final Payout:</span>
             <span className="text-vice-gold font-bold font-mono text-base">
               ${ms2 ? ms2.amount : 0}.00 USD
@@ -91,14 +91,10 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Milestone 1 */}
         <div
-          className={`p-5 rounded-2xl border flex flex-col justify-between transition-all ${
-            isMs1Released
-              ? 'bg-[#170B29] border-pink-500/20 shadow-xs'
-              : 'bg-[#170B29] border-pink-500/40 shadow-md shadow-pink-500/10'
-          }`}
+          className="p-5 rounded-2xl border border-vice-border bg-vice-surface shadow-xs flex flex-col justify-between transition-all"
         >
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-pink-500/20">
+            <div className="flex items-center justify-between pb-3 border-b border-vice-border">
               <span className="font-bold text-xs text-vice-text uppercase tracking-wide">
                 MILESTONE 1 (30%)
               </span>
@@ -115,7 +111,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
             </p>
           </div>
 
-          <div className="mt-6 pt-3.5 border-t border-pink-500/20 flex items-center justify-between">
+          <div className="mt-6 pt-3.5 border-t border-vice-border flex items-center justify-between">
             <span
               className={`text-xs font-semibold flex items-center gap-1.5 ${
                 isMs1Released ? 'text-vice-mint' : 'text-vice-gold'
@@ -151,12 +147,12 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
         <div
           className={`p-5 rounded-2xl border flex flex-col justify-between transition-all ${
             isMs2Released
-              ? 'bg-[#170B29] border-emerald-500/40 shadow-md shadow-emerald-500/10'
-              : 'bg-[#170B29] border-pink-500/30 shadow-xs'
+              ? 'bg-vice-surface border-emerald-500/30 shadow-xs'
+              : 'bg-vice-surface border-vice-border shadow-xs'
           }`}
         >
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-pink-500/20">
+            <div className="flex items-center justify-between pb-3 border-b border-vice-border">
               <span className="font-bold text-xs text-vice-text uppercase tracking-wide">
                 MILESTONE 2 (70%)
               </span>
@@ -173,7 +169,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
             </p>
           </div>
 
-          <div className="mt-6 pt-3.5 border-t border-pink-500/20 flex items-center justify-between">
+          <div className="mt-6 pt-3.5 border-t border-vice-border flex items-center justify-between">
             <span
               className={`text-xs font-semibold flex items-center gap-1.5 ${
                 isMs2Released ? 'text-vice-mint' : 'text-vice-gold'
@@ -197,7 +193,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
                 onClick={() => {
                   releaseFinalMilestone(activeProject.id);
                 }}
-                className="bg-gradient-to-r from-vice-pink via-vice-coral to-vice-gold hover:opacity-95 text-white px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-pink-500/25 active:scale-95 transition-all cursor-pointer"
+                className="bg-vice-gradient hover:opacity-95 text-white px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-xs active:scale-95 transition-all cursor-pointer"
               >
                 <Unlock className="w-3.5 h-3.5" />
                 <span>Release 70% (${ms2?.amount})</span>
@@ -216,8 +212,8 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
               if (e.target === e.currentTarget) setShowReceiptModal(false);
             }}
           >
-            <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-[#170B29] border border-pink-500/30 rounded-2xl shadow-2xl overflow-hidden my-auto">
-              <div className="px-5 py-3.5 bg-[#211038] border-b border-pink-500/20 flex items-center justify-between shrink-0">
+            <div className="glass-panel max-w-lg w-full max-h-[92vh] flex flex-col bg-vice-surface border border-vice-border rounded-2xl shadow-xl overflow-hidden my-auto">
+              <div className="px-5 py-3.5 bg-vice-cardElevated border-b border-vice-border flex items-center justify-between shrink-0">
                 <span className="flex items-center gap-2 font-bold text-vice-text text-xs truncate pr-2">
                   <Receipt className="w-4 h-4 text-vice-mint shrink-0" />
                   <span>OFFICIAL EDITBRIDGE TRANSACTION RECEIPT</span>
@@ -225,7 +221,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
                 <button
                   type="button"
                   onClick={() => setShowReceiptModal(false)}
-                  className="w-7 h-7 rounded-lg bg-[#2c174a] hover:bg-[#381e5e] text-vice-muted hover:text-vice-text text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+                  className="w-7 h-7 rounded-lg bg-vice-surface hover:bg-vice-hover border border-vice-border text-vice-muted hover:text-vice-text text-xs font-bold transition-colors flex items-center justify-center shrink-0 cursor-pointer"
                   title="Close"
                   aria-label="Close"
                 >
@@ -233,7 +229,7 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
                 </button>
               </div>
               <div className="p-6 font-sans text-xs space-y-4 text-vice-muted overflow-y-auto flex-1 min-h-0">
-                <div className="border-b border-pink-500/20 pb-3.5 flex justify-between items-start">
+                <div className="border-b border-vice-border pb-3.5 flex justify-between items-start">
                   <div>
                     <h3 className="font-bold text-sm text-vice-text">EDITBRIDGE SETTLEMENT INVOICE</h3>
                     <p className="text-[11px] text-vice-dim font-mono mt-0.5">
@@ -244,40 +240,40 @@ export function MilestoneCard({ onShowPaymentModal }: MilestoneCardProps) {
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full font-bold text-[11px]">
+                    <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-bold text-[11px]">
                       PAID IN FULL
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-2.5 text-xs">
-                  <div className="flex justify-between py-1 border-b border-pink-500/10">
+                  <div className="flex justify-between py-1 border-b border-vice-border/50">
                     <span className="text-vice-dim">Project:</span>
                     <span className="font-semibold text-vice-text">{activeProject.title}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-pink-500/10">
+                  <div className="flex justify-between py-1 border-b border-vice-border/50">
                     <span className="text-vice-dim">Client / Creator:</span>
                     <span className="text-vice-text">{activeProject.creator_name}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-pink-500/10">
+                  <div className="flex justify-between py-1 border-b border-vice-border/50">
                     <span className="text-vice-dim">Assigned Editor:</span>
                     <span className="text-vice-text">{activeProject.editor_name || 'Assigned Editor'}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-pink-500/10">
+                  <div className="flex justify-between py-1 border-b border-vice-border/50">
                     <span className="text-vice-dim">Milestone 1 (30% Upfront):</span>
                     <span className="font-mono font-semibold text-vice-mint">${ms1?.amount}.00 USD (Settled)</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-pink-500/10">
+                  <div className="flex justify-between py-1 border-b border-vice-border/50">
                     <span className="text-vice-dim">Milestone 2 (70% Final Master):</span>
                     <span className="font-mono font-semibold text-vice-mint">${ms2?.amount}.00 USD (Settled)</span>
                   </div>
-                  <div className="flex justify-between py-2 border-t border-pink-500/20 font-bold text-sm">
+                  <div className="flex justify-between py-2 border-t border-vice-border font-bold text-sm">
                     <span className="text-vice-text">TOTAL SETTLED:</span>
                     <span className="font-mono text-vice-gold text-base">${activeProject.budget}.00 USD</span>
                   </div>
                 </div>
 
-                <div className="p-3 bg-[#0D0618] border border-pink-500/20 rounded-xl text-[11px] text-vice-muted leading-relaxed">
+                <div className="p-3 bg-vice-cardElevated border border-vice-border rounded-xl text-[11px] text-vice-muted leading-relaxed">
                   ✓ Master 4K ProRes files, project archives, and full commercial distribution rights transferred to client.
                 </div>
 
