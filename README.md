@@ -125,4 +125,20 @@ Follow the exact **Section 19 Hackathon Demo Scenario** built right into the pla
 
 ---
 
-Good luck with your Hackathon! 🚀
+ ## Unique Selling Points (USPs)
+
+- **End-to-End Collaboration:** A single platform covering the complete video editing journey, from finding an editor to final delivery.
+
+- **Smart Creator-Editor Matching:** Helps creators discover suitable editors based on skills, budget, editing style and experience.
+
+- **Unified Project Workspace:** Brings communication, file sharing, references, project updates and feedback together in one organised space.
+
+- **Structured Revision Management:** Makes draft reviews and revision requests more organised, reducing scattered conversations and unnecessary back-and-forth.
+
+- **Two-Sided Growth Ecosystem:** Supports both creators looking for editing talent and editors seeking genuine clients and professional growth.
+
+- **Transparent Project Tracking:** Provides visibility into project progress, delivery status and payment status.
+
+- **Editor Recognition System:** Supports editor growth through portfolios, achievements, levels and leaderboards.
+
+- **AI-Powered Future Scope:** Plans to introduce AI-based matching, intelligent project briefs and smart recommendations.
